@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>UsefulJS.Event</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body data-spy="scroll" data-target="#sidebar">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="core.html">UsefulJS.Core</a></li>
+                            <li><a href="array.html">UsefulJS.Array</a></li>
+                            <li><a href="classlist.html">UsefulJS.ClassList</a></li>
+                            <li><a href="date.html">UsefulJS.Date</a></li>
+                            <li><a href="math.html">UsefulJS.Math</a></li>
+                            <li><a href="numeric.html">UsefulJS.Number</a></li>
+                            <li><a href="query.html">UsefulJS.Query</a></li>
+                            <li><a href="storage.html">UsefulJS.Storage</a></li>
+                            <li><a href="string.html">UsefulJS.String</a></li>
+                            <li><a href="locale.html">UsefulJS.Locale</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="browser.html">UsefulJS.Browser</a></li>
+                            <li><a href="currency.html">UsefulJS.Currency</a></li>
+                            <li><a href="dnd.html">UsefulJS.DnD</a></li>
+                            <li><a href="skin.html">UsefulJS.Skin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container">
+            <h1>UsefulJS.Event</h1>
+            <p>The Event module provides a simple, cross-browser event registration mechanism. It also provides a
+            facility for dispatching custom events to interested parties.</p>
+            <h2>Static methods</h2>
+            <h4 class="api-doc">register</h4>
+            <p>Registers interest in an event</p>
+            <h5>Syntax</h5>
+            <pre>register(elem, eventType, callback[, ctx])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>elem</code> <b>Object</b><br>
+                The element whose events you want to capture. See the description below for more details.</li>
+                <li><code>eventType</code> <b>String|Array</b><br>
+                The name or names of the event(s) that you want to listen for. Takes the form "click" rather than "onclick"</li>
+                <li><code>callback</code> <b>Function</b><br>
+                The callback function; see the description below for details of the function parameters</li>
+                <li><code>ctx</code> <b>Object</b> (optional)<br>
+                The calling context (i.e. "this") for the callback. Allows you to pass in unbound object method pointers
+                as the callback.</li>
+            </ul>
+            <p>Returns <b>Boolean</b>: <b>true</b> if any callback function was successfully registered, <b>false</b> if
+            the same callback and context had already been used to register interest in the same events (will also return
+            <b>false</b> if the parameters are garbage).</p>
+            <h5>Description</h5>
+            <p>The callback function takes has the following form:</p>
+            <pre>callback(event, eventType, eventSource, registeredElement)</pre>
+            <p>Note that event will already have been resolved so there is no need to do that annoying <code>event = event
+                || window.event</code> dance. In addition, the document tree will already have been walked to trace back
+            from the source of an event to the document element that you registered an interest in in the first
+            place.  The event type is also resolved so you don't have to go peeking inside the event object to get at it.</p>
+            <p>The callback function can return an explicit Boolean <b>false</b> to stop event propagation (assuming the
+            event is cancelable in the first place). Either way, no further callbacks registered using
+            <code>register</code> will be called for this event.</p>
+            <p>For convenience, you may pass a String value as the <code>elem</code> parameter. Otherwise you may pass
+            in an Element object, the document object or the window object. You may also pass in nothing, in which case
+            window is assumed. If an Element object is passed in and it doesn't have an id attribute, a random ID will
+            be assigned to it. This is required to match events in elements to the registered callbacks.</p>
+            <div class="alert alert-warning"><span class="glyphicon glyphicon-warning-sign"></span>
+            Uncaught exceptions during event handling go <em>somewhere</em> and are handled in
+            some way by the browser. UsefulJS.Event traps exceptions thrown by your callback, 
+            removes your callback from its callback list and rethrows the exception to be handled
+            by the browser. This is not something you want happening, so trap exceptions in
+            your callback and handle them explicitly!
+            </div>
+            <h5>Usage</h5>
+            <pre>// Force characters entered into a text input to uppercase
+var ucOnly = function(evt, evtType, evtSrc, eReg) {
+    // Can't modify keypress events directly in most browsers
+    var fn = function() {
+        eReg.value = eReg.value.toLocaleUpperCase();
+    };
+    setTimeout(fn, 20);
+};
+UsefulJS.Event.register("myInput", "keypress", ucOnly, null);
+</pre>
+            <h4 class="api-doc">deregister</h4>
+            <p>Deregisters a previously registered event handler.</p>
+            <h5>Syntax</h5>
+            <pre>deregister(elem, eventType, callback[, ctx])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>elem</code> <b>Object</b><br>
+                The element whose events you no longer want to capture.</li>
+                <li><code>eventType</code> <b>String|Array</b><br>
+                The name or names of the event(s) that no you longer want to listen for. 
+                Takes the form "click" rather than "onclick"</li>
+                <li><code>callback</code> <b>Function</b><br>
+                The callback function that was previously registered</li>
+                <li><code>ctx</code> <b>Object</b> (optional)<br>
+                The calling context (i.e. "this") for the callback</li>
+            </ul>
+            <p>Returns <b>Boolean</b>: <b>true</b> if any listener was successfully deregistered, <b>false</b> if all
+            listeners were no longer registered or were never registered in the first place.</p>
+            <h5>Description</h5>
+            <p>The parameters are identical to the <code>register</code> method. The context is required together with
+            the callback since the combination of callback and context identifies the event handler. See the description
+            of <code>register</code> for information about the <code>elem</code> parameter.</p>
+            <h5>Usage</h5>
+            <pre>// Allow normal text entry
+UsefulJS.Event.deregister("myInput", "keypress", ucOnly, null);
+</pre>
+            <h4 class="api-doc">clear</h4>
+            <p>Clears all event handlers for an element that were set using <code>register</code>.</p>
+            <h5>Syntax</h5>
+            <pre>clear(elem)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>elem</code> <b>Object</b><br>
+                The element whose event handlers you want to remove.</li>
+            </ul>
+            <h5>Description</h5>
+            <p>If you remove an element from the document tree and later reuse the same
+            ID for a different element, event handling won't work properly because the
+            registered event handlers will be for the old element. Calling clear will
+            clear the internal tables for the element ID.</p>
+            <h4 class="api-doc">fire</h4>
+            <p>Sends a custom event through the UsefulJS.Event dispatcher</p>
+            <h5>Syntax</h5>
+            <pre>fire(eventType, eventTarget, eventProperties)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>eventType</code> <b>String</b><br>
+                The name of the "event" that you want dispatched</li>
+                <li><code>eventTarget</code> <b>Object</b><br>
+                The element or Object that you want the event purportedly to come from</li>
+                <li><code>eventProperties</code> <b>Object</b><br>
+                Data to be associated with the event.</li>
+            </ul>
+            <h5>Description</h5>
+            <p>Events don't have to be limited to DOM events. The <code>fire</code> method allows pretty much anything
+            to be sent as an event and picked up by registered listeners. If the system supports CustomEvent objects the 
+            event object received by the listener functions will be a bona-fide custom event dispatched from the
+            eventTarget. Otherwise it will be an object that looks and behaves for all intents and purposes like a
+            CustomEvent object. The eventProperties parameter will be available as the <code>detail</code>
+            property of the event object. As with the other UsefulJS.Event methods, eventTarget can be an Element object, the
+            ID of an element, the document object or the window object and defaults to the window object.</p>
+            <h5>Usage</h5>
+            <pre>// Dispatch Christmas greetings
+UsefulJS.Event.register(null, "specialday", function(evt) {
+    if (evt.detail.day === "Christmas") {
+        alert(evt.detail.greeting);
+    }
+});
+var christmasGreetings = UsefulJS.Event.fire.bind(null, "specialday", window, 
+    { day : "Christmas", greeting : "Merry Christmas, everybody!" });
+var f = function() {
+    var now = new Date();
+    if (now.getMonth() === 11 &amp;&amp; now.getDate() === 25) {
+        christmasGreetings();
+    }
+    setTimeout(f, 86400000);
+};
+f();
+</pre>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

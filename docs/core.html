@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>UsefulJS.Core</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body data-spy="scroll" data-target="#sidebar">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="array.html">UsefulJS.Array</a></li>
+                            <li><a href="classlist.html">UsefulJS.ClassList</a></li>
+                            <li><a href="date.html">UsefulJS.Date</a></li>
+                            <li><a href="event.html">UsefulJS.Event</a></li>
+                            <li><a href="math.html">UsefulJS.Math</a></li>
+                            <li><a href="numeric.html">UsefulJS.Number</a></li>
+                            <li><a href="query.html">UsefulJS.Query</a></li>
+                            <li><a href="storage.html">UsefulJS.Storage</a></li>
+                            <li><a href="string.html">UsefulJS.String</a></li>
+                            <li><a href="locale.html">UsefulJS.Locale</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="browser.html">UsefulJS.Browser</a></li>
+                            <li><a href="currency.html">UsefulJS.Currency</a></li>
+                            <li><a href="dnd.html">UsefulJS.DnD</a></li>
+                            <li><a href="skin.html">UsefulJS.Skin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container">
+            <h1>UsefulJS Core</h1>
+            <p>The core provides basic utility functions and properties that are used by the rest of the library.</p>
+            <h2>Properties</h2>
+            <p>These are the public properties available under the UsefulJS namespace:</p>
+            <h4 class="api-doc">globalObject</h4>
+            <p>The global context; may be one of <code>window</code> or <code>global</code>.</p>
+            <h4 class="api-doc">globalObjectName</h4>
+            <p>The name of the global context; may be one of <code>"window"</code> or <code>"global"</code>.</p>
+            <h4 class="api-doc">RE_WS</h4>
+            <p>Regular expression object to test for whitespace. In most modern browsers this will be equivalent to <code>/\s/</code></p>
+            <p>However, not all browsers correctly make \s Unicode-aware. RE_WS <em>is</em>
+            Unicode-aware and may be used to correctly test for whitespace in all browsers:</p>
+            <pre>UsefulJS.RE_WS.test("\u00a0"); // true</pre>
+            <h4 class="api-doc">RE_WS_START</h4>
+            <p>Portable regular expression object that matches whitespace at the start of a string.</p>
+            <h4 class="api-doc">RE_WS_END</h4>
+            <p>Portable regular expression object that matches whitespace at the end of a string.</p>
+            <h4 class="api-doc">featureSupport</h4>
+            <p>A map of detected features. This is intended primarily for internal use and currently
+            exposes the following properties that your application code can test for:</p>
+            <ul>
+                <!--li><b>stringIndex</b><br>
+                Whether characters in a String may be indexed using [] notation.</li-->
+                <li><b>defineProperty</b><br>
+                Whether full support for <code>Object.defineProperty</code> is available.
+                <li><b>createObject</b><br>
+                Whether full support for <code>Object.create</code> is available.
+                <li><b>strictMode</b><br>
+                Whether <code>"use strict";</code> has any effect.</li>
+            </ul>
+            <p>Additional modules (such as ClassList) may add additional properties.</p>
+            <div class="alert alert-info">UsefulJS does a minimum amount of feature detection. Use something like
+                <a href="http://modernizr.com/" target="_blank" class="alert-link">Modernizr</a> if you want a
+                full-featured library for detecting HTML5 and CSS3 support.
+            </div>
+            <h4 class="api-doc">listSeparator</h4>
+            <p>The detected list separator (such as ',' or ';') in use on the system.</p>
+            <h2>Methods</h2>
+            <p>These are the public methods available under the UsefulJS namespace:</p>
+            <h4 class="api-doc">defined</h4>
+            <p>Tests to see whether its argument is <em>defined</em>, that is not null or
+            undefined</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.defined(obj)</pre>
+            <h5>Usage</h5>
+            <pre>// Optional boolean parameter defaults to true
+var f = function(strParam, boolParam) {
+    if (!UsefulJS.defined(boolParam)) {
+        boolParam = true;
+    }
+    ...
+};</pre>
+            <h4 class="api-doc">_typeof</h4>
+            <p>Returns somewhat more reliable run-time type information for its argument than the built-in
+            <code>typeof</code> operator.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS._typeof(obj)</pre>
+            <h5>Description</h5>
+            <p>Poor RTTI is one of JavaScript's core weaknesses and makes generic programming painful and
+            error prone. Almost <em>everything</em> is identified as an "object":</p>
+            <pre>typeof("a")             // "string"; OK
+typeof([])              // "array";  Good
+// Pre-allocate
+typeof(new Array(1000)) // "object"; Huh?
+typeof(null)            // "object"; You're kidding, right?
+typeof(document)        // "object"; A pattern emerges</pre>
+            <p>_typeof uses introspection (not duck-typing, other than as a last resort) to
+            identify the type of its argument:</p>
+            <pre>_typeof(new Array(1000)) // "array"
+_typeof(null)            // "null"
+_typeof(document)        // "document"</pre>
+            <p>A list of inputs and return values is shown below:</p>
+            <table class="table">
+                <thead>
+                    <tr><th>Input</th><th>Return value</th>
+                        <th>Input</th><th>Return value</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>undefined</td><td>"undefined"</td>
+                        <td>User-defined class</td><td>"object"</td></tr>
+                    <tr><td>null</td><td>"null"</td>
+                        <td>Date</td><td>"date"</td></tr>
+                    <tr><td>Boolean</td><td>"boolean"</td>
+                        <td>RegExp</td><td>"regexp"</td></tr>
+                    <tr><td>new Boolean()</td><td>"boolean"</td>
+                        <td>ArrayBuffer</td><td>"arraybuffer"</td></tr>
+                    <tr><td>Number</td><td>"number"</td>
+                        <td>Element (any)</td><td>"element"</td></tr>
+                    <tr><td>new Number()</td><td>"number"</td>
+                        <td>Element attribute</td><td>"attr"</td></tr>
+                    <tr><td>String</td><td>"string"</td>
+                        <td>Text node</td><td>"text"</td></tr>
+                    <tr><td>new String()</td><td>"string"</td>
+                        <td>document</td><td>"document"</td></tr>
+                    <tr><td>Array</td><td>"array"</td>
+                        <td>Event (any)</td><td>"event"</td></tr>
+                    <tr><td>new Array()</td><td>"array"</td>
+                        <td>Error (any)</td><td>"error"</td></tr>
+                    <tr><td>Function</td><td>"function"</td>
+                        <td>window</td><td>"window"</td></tr>
+                    <tr><td>new Function()</td><td>"function"</td>
+                        <td>Math</td><td>"math"</td></tr>
+                    <tr><td>Object</td><td>"object"</td>
+                        <td>JSON</td><td>"json"</td></tr>
+                </tbody>
+            </table>
+            <div class="alert alert-info">
+                Element, event and error objects are identified generically as "element",
+                "event" and "error" respectively, regardless of their particular type. It is
+                more useful to identify an HTML element object generically than specifically as,
+                for example, an "htmldivelement".
+            </div>
+            <h5>Usage</h5>
+            <pre>var addClass = function(elem, clName) {
+    // Inputs must be an element and a string
+    var _u = UsefulJS;
+    if (!(_u._typeof(elem) === "element" &amp;&amp;
+        _u._typeof(clName) === "string")) {
+        throw new TypeError("Bad arguments");
+    }
+    ...
+};</pre>
+            <h4 class="api-doc">clone</h4>
+            <p>Returns an object that is equal but not identical to its argument</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.clone(obj)</pre>
+            <h5>Description</h5>
+            <p>JavaScript Array and Object variables are pointers. Not keeping this in mind can lead
+            to hard-to-track-down bugs:</p>
+            <pre>var a = [1, 2, 3, 4], b = a;
+... Many lines later ...
+b[0] = 5;       // Changed a; is this intended?</pre>
+            <p>clone creates, in effect, a bitwise copy of its argument, resulting in an
+            independent copy that <em>can</em> safely be modified without unexpected side-effects:
+            <pre>var a = [1, 2, 3, 4], b = UsefulJS.clone(a);
+... Many lines later ...
+b[0] = 5;       // a[0] is still 1</pre>
+            <p>Only objects for which cloning makes sense are cloned; other types are returned as-is.
+            Cloneable object types are:</p>
+            <ul>
+                <li>Array</li>
+                <li>Object</li>
+                <li>Date</li>
+                <li>RegExp</li>
+                <li>ArrayBuffer</li>
+            </ul>
+            <p>Arrays and Objects are cloned recursively, that is any cloneable items that they contain
+            are also cloned.</p>
+            <div class="alert alert-warning">
+                <span class="glyphicon glyphicon-warning-sign"></span>
+                <code>clone</code> keeps track of how many times it has been called recursively in a single clone
+                operation. If the recursion depth exceeds 100, it will raise an Error. This is
+                better than a browser crash. Basically, if your Objects contain circular references by design,
+                (this may be legitimate in a tree structure, for example) do not attempt to clone
+                them. If your Objects contain circular references by accident, give yourself a smack
+                on the head!
+            </div>
+            <div class="alert alert-warning">
+                <span class="glyphicon glyphicon-warning-sign"></span>
+                If the browser does not support <code>Object.create</code>, cloning an instance
+                of a user-defined class will cause the returned value to lose its identity: the properties
+                will be copied, but it will no longer be an instance of the class. You can test
+                <code>UsefulJS.featureSupport.createObject</code> to see whether instances of a
+                user-defined class can be successfully cloned.
+            </div>
+            <p>To clarify the results of a clone operation, examine the following snippet:</p>
+            <pre>var a = { a : 1, b : [1] }, b = UsefulJS.clone(a);
+a.a === b.a;                    // scalar, true
+a.b === b.b;                    // array, false
+a.b[0] === b.b[0];              // true
+a === b;                        // false</pre>
+            <h5>Usage</h5>
+            <pre>var StaticList = function(arr) {
+    // Hide the initial data in a closure
+    this.data = (function() {
+        var _data = UsefulJS.clone(arr);
+
+        return {
+            get : function() {
+                // Don't give out private data
+                return UsefulJS.clone(_data);
+            }
+        };
+    })();
+};
+
+var sl = new StaticList([1, 2, 3, 4]), arr = sl.data.get();
+arr[0] = 2;
+var k = sl.data.get()[0];  // k = 1;</pre>
+            <div class="alert alert-info">
+            <code>defined</code>, <code>_typeof</code> and <code>clone</code> are exported to the global namespace by
+            default. <code>_typeof</code> is intended as a drop-in replacement for the built-in
+            <code>typeof</code> operator. Apart from UsefulJS itself, these are the only additions to the global
+            namespace.
+            </div>
+            <h4 class="api-doc">pad</h4>
+            <p>Pads a string to a specified length using a specified character; padding is either left
+            or right</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.pad(s, padTo, padWith, right)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>s</code> <b>String</b><br>
+                The string to pad</li>
+                <li><code>padTo</code> <b>Number</b><br>
+                The minimum width of the output string</li>
+                <li><code>padWith</code> <b>String</b><br>
+                The character to pad with; defaults to ' '</li>
+                <li><code>right</code> <b>Boolean</b><br>
+                Whether to pad at the end of the string</li>
+            </ul>
+            <p>Returns: <b>String</b></p>
+            <h5>Usage</h5>
+            <pre>// Turn a string into a series of \uxxxx sequences
+var uLit = Array.from("한국어").reduce(function(s, c) {
+    return s + "\\u" + UsefulJS.pad(c.charCodeAt(0).toString(16), 4, '0');
+}, "");</pre>
+            <div class="alert alert-info">
+                The UsefulJS.String module optionally makes <code>padLeft</code> and <code>padRight</code>
+                methods of <code>String.prototype</code>
+            </div>
+            <!--h4 class="api-doc">dump</h4>
+            <p>Dumps its argument to the debug console.</p>
+            <h5>Syntax</h5>
+            <pre>dump(obj)</pre>
+            <h5>Description</h5>
+            <p>Dumps a value to the browser console using JSON.stringify with an indentation level of four;
+            if the browser does not support both console and JSON, this
+            function does nothing.</p-->
+            <h4 class="api-doc">mix</h4>
+            <p>Merges properties from one object into another.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.mix(o1, o2, prefer1)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>o1</code> <b>Object</b><br>
+                The object that properties are copied <em>to</em></li>
+                <li><code>o2</code> <b>Object</b><br>
+                The object that properties are copied <em>from</em></li>
+                <li><code>prefer1</code> <b>Boolean</b><br>
+                Whether or not to overwrite properties in o1</li>
+            </ul>
+            <p>Returns: <b>Object</b></p>
+            <h5>Description</h5>
+            <p>Copies the properties that are in o2 into o1 and
+            returns o1. o2 is unaffected.</p>
+            <p>To avoid inadvertent bugs with shared references, properties are <em>cloned</em>
+            rather than copied.</p>
+            <p>If both o2 and o1 have identically named properties that are also Objects, the two
+            values will be mixed recursively.</p>
+            <p>The prefer1 parameter controls how conflicts are handled. If o1
+            already contains a property and prefer1 is true, it will be left alone 
+            (unless it is an Object - see above). Otherwise it will be overwritten.</p>
+            <h5>Usage</h5>
+            <pre>var a = {
+    a : 1,
+    b : {
+        p1 : "a"
+    },
+    d : null
+}, b = {
+    a : 2,
+    b : {
+        p1 : "b",
+        p2 : "c"
+    },
+    c : 3,
+    d : 4
+};
+UsefulJS.mix(a, b, true);
+// a is now
+// {
+//     a : 1,
+//     b : {
+//         p1 : "a",
+//         p2 : "c"
+//     },
+//     c : 3,
+//     d : null
+// }</pre>
+            <div class="alert alert-info">
+                The <code>mix</code> function is used when defining locale properties. Each locale definition contains
+                only the attributes that are different from another locale and these are mixed with the properties of the
+                parent locale.
+            </div>
+            <h4 class="api-doc">keys</h4>
+            <p>Returns the property names (or <em>keys</em>) of an Object</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.keys(obj)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>obj</code> <b>Object</b><br>
+                Any object</li>
+            </ul>
+            <p>Returns: <b>Array</b> of property names. If the object has no enumerable properties, the array will be
+            empty.</p>
+            <h5>Description</h5>
+            <p>This will be the same function as <code>Object.keys</code> if that function
+            is implemented. The return value only contains property names for which 
+            <code>hasOwnProperty</code> returns <b>true</b>.</p>
+            <h4 class="api-doc">every</h4>
+            <p>Iterates over an object, calling a callback function for each enumerable property until either the keys
+            are exhausted or the callback function returns <b>false</b>.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.every(obj, callback, ctx)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>obj</code> <b>Object</b><br>
+                The object to iterate over</li>
+                <li><code>callback</code> <b>Function</b><br>
+                A callback for each property in the object; the callback signature is:<br>
+                <pre>f(value, key, obj)</pre></li>
+                <li><code>ctx</code> <b>Object</b><br>
+                The <code>this</code> context for the callback</li>
+            </ul>
+            <p>Returns: <b>Boolean</b> <b>true</b> unless the callback returns <b>false</b>.
+            <p>Throws: <b>TypeError</b> if the callback is not a function.</p>
+            <h4 class="api-doc">filter</h4>
+            <p>Iterates over an object, calling a callback function for each enumerable property which should return 
+            <b>true</b> for the properties that are to be copied into the return value.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.filter(obj, callback, ctx)</pre>
+            <h5>Parameters</h5>
+            <p>All iteration functions take the same parameters</p>
+            <p>Returns: <b>Object</b> A shallow copy of the input with a subset of the properties of the original.</p>
+            <h4 class="api-doc">find</h4>
+            <p>Iterates over an object, calling a callback function for each enumerable property which should return 
+            <b>true</b> if the required value has been found.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.find(obj, callback, ctx)</pre>
+            <h5>Parameters</h5>
+            <p>All iteration functions take the same parameters</p>
+            <p>Returns: <b>Object</b> The item that satisfies the callback or undefined.</p>
+            <h4 class="api-doc">findKey</h4>
+            <p>Iterates over an object, calling a callback function for each enumerable property which should return 
+            <b>true</b> if the required key has been found.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.find(obj, callback, ctx)</pre>
+            <h5>Parameters</h5>
+            <p>All iteration functions take the same parameters</p>
+            <p>Returns: <b>Object</b> The key that satisfies the callback or undefined.</p>
+            <h4 class="api-doc">forEach</h4>
+            <p>Iterates over an object, calling a callback function for each enumerable property.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.forEach(obj, callback, ctx)</pre>
+            <h5>Parameters</h5>
+            <p>All iteration functions take the same parameters</p>
+            <p>Returns: <b>undefined</b>.</p>
+            <h4 class="api-doc">map</h4>
+            <p>Iterates over an object, calling a callback function for each enumerable property which should return 
+            a value be set in the return value. The property name set will be the same one passed to the callback</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.map(obj, callback, ctx)</pre>
+            <h5>Parameters</h5>
+            <p>All iteration functions take the same parameters</p>
+            <p>Returns: <b>Object</b> A shallow copy of the input with the same property names as the original but with
+            values transformed by the mapping function.</p>
+            <h4 class="api-doc">some</h4>
+            <p>Iterates over an object, calling a callback function for each enumerable property until either the keys
+            are exhausted or the callback function returns <b>true</b>.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.some(obj, callback, ctx)</pre>
+            <h5>Parameters</h5>
+            <p>All iteration functions take the same parameters</p>
+            <p>Returns: <b>Boolean</b> <b>false</b> unless the callback returns <b>true</b>.
+            <h5>Usage</h5>
+            <pre>var _u = UsefulJS, obj = { ... };
+// Does the object have any undefined values
+var isGood = _u.every(obj, function(item, key) {
+    return _u.defined(item);
+});
+
+// Filter out undefined values
+obj = isGood ? obj : _u.filter(obj, function(item, key) {
+    return _u.defined(item);
+});
+
+// Transform the values remaining
+obj = _u.map(obj, function(item, key) {
+    return String(item).toLocaleUpperCase();
+});</pre>
+            <h5>Notes</h5>
+            <p>Many objects, such as strings and instances of Date or RegExp, have no
+            enumerable properties.</p>
+            <p>The properties that will be enumerated over are frozen when you call an iterator. This means that you can
+            modify the input (it's passed as the <code>obj</code> parameter to the callback) as it's iterated over. The
+            callback will not be called for properties that are no longer in the input.</p>
+            <p>You can pass Array objects to the iteration functions and the return value from filter and
+            map will be arrays. However, since Array objects have their own iteration methods which, likely
+            as not, will run at native speed, there is little point.</p>
+            <p>Array-like objects are better served with generic Array methods. For example, <code>Array.prototype.forEach</code>
+            will iterate over the characters in a string while UsefulJS.forEach will not.</p>
+            <p>filter creates a <em>shallow</em> copy of the input. Be careful with shared references.
+            Depending on how values are transformed, the return value from map may have shared references
+            as well.</p>
+            <p>If the system supports <code>Object.create</code>, the returns from filter and
+            map will be the instances of the same class as the input. Otherwise they will be plain
+            objects.</p>
+            <h4 class="api-doc">uuid</h4>
+            <p>Generates a UUID (universally unique identifier).</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.uuid()</pre>
+            <h5>Description</h5>
+            <p>Generates an <a href="http://tools.ietf.org/html/rfc4122" target="_blank">RFC
+            4122-compliant</a> UUID. The version field is 4 (randomly generated).</p>
+            <h4 class="api-doc">fix</h4>
+            <p>Applies fixes provided by the various UsefulJS modules</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.fix(opts)</pre>
+            <h5>Description</h5>
+            <p>Each UsefulJS module registers fix callbacks with the core on load. When you call <code>UsefulJS.fix</code>,
+            these callbacks are called and the fixes are applied. You can control which fixes are applied via the
+            (optional) <code>opts</code> parameter. If you are happy with the defaults, you don't need to specify
+            anything. If, for some reason, you don't want the <code>defined</code> function exported into the global
+            namespace, you'd call <code>fix</code> like this:</p>
+            <pre>UsefulJS.fix({
+    _core : {
+        defined : false
+    }
+});</pre>
+            <p>Rather than supplying Objects as the input options, you can specify <code>"all"</code> or
+            <code>"none"</code>. So if you didn't want anything exported into the global namespace you could call:
+<pre>UsefulJS.fix({
+    _core : "none"
+});</pre>
+            <p>The return value is an object indicating which fixes have been applied. The naming convention in the
+            output properties is the same as that in the input properties so that if the defaults are used, the output
+            properties might look like this:
+            <pre>{
+    _core : {
+        defined : true,
+        _typeof : true,
+        clone : true
+    },
+    _array : {
+        ...
+    }
+    ...
+}</pre>
+            <div class="alert alert-info">
+                Remember, fixes are not applied when they are not needed. If they are not applied, there won't be
+                anything in the return value relating to them. So on Internet Explorer 8, for example, the
+                <code>_array</code> property in the return value will be populated while on Internet Explorer 9, it
+                won't be.
+            </div>
+            <p>Generally, fixes that fill in standard methods and properties that are absent in the runtime
+            environment are applied by default and have to be explicitly disabled. Non-standard extensions to
+            the standard classes have to be explicitly enabled.</p>
+            <h4 class="api-doc">fromCodePoint</h4>
+            <p>Implementation of <code>String.fromCodePoint</code>.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.fromCodePoint(codePoint1[, codePoint2, ...])</pre>
+            <h5>Description</h5>
+            <p>If <code>String.fromCodePoint</code> is implemented in the browser, this will
+            be the same function. It constructs a String from one or more code points (numeric
+            values between 0 and 0x10ffff). Code points between 0x10000 and 0x10ffff are
+            resolved into surrogate pairs.</p> 
+            <h4 class="api-doc">codePointAt</h4>
+            <p>Implementation of <code>String.prototype.codePointAt</code>.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.codePointAt.call(str, pos)</pre>
+            <h5>Description</h5>
+            <p>If <code>String.prototype.codePointAt</code> is implemented in the browser, this will
+            be the same function. It behaves like <code>charCodeAt</code> unless the character
+            at pos is one half of a surrogate pair, in which case it combines the character
+            code at this position and the next into a single value >= 0x10000.</p> 
+            <h4 class="api-doc">is</h4>
+            <p>Implementation of <code>Object.is</code>.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.is(a, b)</pre>
+            <h5>Description</h5>
+            <p>Evaluates to the same boolean value as <code>a === b</code> with two exceptions:
+            returns false if a is 0 and b is -0 (or vice versa); returns true if a and b are
+            both NaN.</p> 
+            <h2>Fixes</h2>
+            <p>The fixes for the core module are defined in the _core namespace in the input and output properties. 
+            All are applied by default.</p>
+            <h4 class="api-doc">defined</h4>
+            <p>Make <code>UsefulJS.defined</code> available in the global namespace.</p>
+            <h4 class="api-doc">_typeof</h4>
+            <p>Make <code>UsefulJS._typeof</code> available in the global namespace.</p>
+            <h4 class="api-doc">clone</h4>
+            <p>Make <code>UsefulJS.clone</code> available in the global namespace.</p>
+            <h4 class="api-doc">language</h4>
+            <p>Add <code>navigator.language</code> property if not already present.</p>
+            <div class="alert alert-warning">
+                <span class="glyphicon glyphicon-warning-sign"></span>
+                On Firefox and Internet Explorer (after the fix is applied anyway) <code>navigator.language</code> contains
+                a value that you can use. On Webkit-based browsers, the value is baked in at compile-time and is consequently
+                useless.
+            </div>
+            <h4 class="api-doc">bindFunction</h4>
+            <p>Adds a bind method to <code>Function.prototype</code> if not already present.</p>
+            <h4 class="api-doc">is</h4>
+            <p>Adds an "is" static method to <code>Object</code> if not already present.</p>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

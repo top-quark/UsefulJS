@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Character Reference</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+        <style type="text/css">
+            .container {
+                margin: 0 auto;
+            }
+            .chr, .chhdr {
+                display : inline-block;
+                width: 3.5em;
+                text-align: center;
+            }
+            .hdr {
+                background-color: #444;
+                color: white;
+                margin-bottom: 5px;
+            }
+            #cpop {
+                position: absolute;
+                padding: 0;
+                margin: 0;
+            }
+            #cpop-inner {
+                height: 52px;
+                text-align: center;
+                vertical-align: middle;
+                font-size: 2.8em;
+                width: 104px;
+                margin: 6px;
+            }
+        </style>
+    </head>
+    <body>
+        <pre id="cpop" style="display:none;"><div id="cpop-inner">A</div></pre>
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Programmer's Character Reference<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="1010.html">1010</a></li>
+                            <li><a href="calendar.html">Five Year Calendar</a></li>
+                            <li><a href="cconv.html">Currency Converter</a></li>
+                            <li><a href="awords.html">Angry Words</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="selected-group"></span><b class="caret"></b></a>
+                        <ul class="dropdown-menu" id="group-choice"></ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container" id="ctr">
+            <h1>Programmer's Character Reference</h1>
+            <pre id="ctable"></pre>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+        <script src="../built/UsefulJS-min-latest.js"></script>
+        <script type="text/javascript">
+        
+window.onload = function() {
+    var _u = UsefulJS, _s = UsefulJS.String; _sprintf = _s.sprintf,
+        _toUtf8 = _s.encode.toUtf8, _hEscape = _s.escape.html, 
+        _ele = function(item) {
+            if ("string" === _typeof(item)) {
+                return document.getElementById(item);
+            }
+            return item;
+        }, 
+        _fixed = _u.fix({ _string : "all" }), pre = _ele("ctable"),
+        max = 256, nbsp = "\xA0", sep = nbsp.repeat(3), i = 0, 
+        qparams = _u.Query.parameters, perRow = qparams.get("pr", 4),
+        defKey = "unicode", key = qparams.get("grp", defKey);
+    // Normalize perRow
+    if ("number" !== _typeof(perRow) || perRow <= 0) {
+        perRow = 4;
+    }
+    perRow = Math.min(perRow, 4), w = 22 * perRow, minW = 24;
+    
+    // Field widths are to accommodate codepoints to 0x10xxxx
+    // Header blocks look like "DECIMAL HEX    CHAR UTF-8      "
+    var decW = 7, hexW = 6, utf8W = 11, charW = 4, hdrW = decW + hexW + utf8W + charW + 3;     
+    var lineLength = perRow * hdrW + 3 * (perRow - 1), 
+        hdrFmt = '%s\xA0%*s\xA0<span class="chhdr">%s</span>\xA0%-*s',
+        hdr = '<div class="hdr">' + 
+            (_sprintf(hdrFmt, "DECIMAL", hexW, "HEX", "CHAR", utf8W, "UTF-8") + sep).repeat(perRow).trimRight() + '</div>',
+        container = _ele("ctr");
+    
+    if (w < minW) {
+        w = minW;
+    }
+    container.style.width = w + "em";
+                
+    // Control codes
+    var c0c1 = {
+          0 : "NUL",   1 : "SOH",   2 : "STX",   3 : "ETX",   4 : "EOT",    5 : "ENQ",   6 : "ACK",
+          7 : "BEL",   8 : "BS",    9 : "\\t",  10 : "\\n",  11 : "VT",    12 : "FF",   13 : "\\r",
+         14 : "SO",   15 : "SI",   16 : "DLE",  17 : "DC1",  18 : "DC2",   19 : "DC3",  20 : "DC4",
+         21 : "NAK",  22 : "SYN",  23 : "ETB",  24 : "CAN",  25 : "EM",    26 : "SUB",  27 : "ESC",
+         28 : "FS",   29 : "GS",   30 : "RS",   31 : "US",   32 : "SP",   38 : "&amp;",60 : "&lt;", 127 : "DEL",
+        128 : "PAD", 129 : "HOP", 130 : "BPH", 131 : "NBH", 132 : "IND",  133 : "NEL", 134 : "SSA",
+        135 : "ESA", 136 : "HTS", 137 : "HTJ", 138 : "VTS", 139 : "PLD",  140 : "PLU", 141 : "RI",
+        142 : "SS2", 143 : "SS3", 144 : "DCS", 145 : "PU1", 146 : "PU2",  147 : "STS", 148 : "CCS",
+        149 : "MW",  150 : "SPA", 151 : "EPA", 152 : "SOS", 153 : "SGCI", 154 : "SCI", 155 : "CSI",
+        156 : "ST",  157 : "OSC", 158 : "PM",  159 : "APC", 160 : "NBSP", 173 : "SHY",
+        0x34F : "CGJ",
+        0x2000 : "NQUAD", 0x2001 : "MQUAD", 0x2002 : "ENSP", 0x2003 : "EMSP",
+        0x2004 : "3PMSP", 0x2005 : "4PMSP", 0x2006 : "6PMSP", 0x2007 : "FGSP",
+        0x2008 : "PNSP", 0x2009 : "THSP", 0x200A : "HRSP", 0x200B : "ZWSP",
+        0x200C : "ZWNJ", 0x200D : "ZWJ", 0x200E : "LTRM", 0x200F : "RTLM",
+        0x2060 : "WRDJ"   
+    };
+    
+    // Ranges of characters
+    var rdefs = {
+        "US ASCII" : [0, 0x80],
+        "Latin-1 Supplement" : [0x80, 0x100],
+        "Latin Extended-A" : [0x100, 0x180],
+        "Latin Extended-B" : [0x180, 0x250],
+        "IPA Extensions" : [0x250, 0x2B0],
+        "Spacing Modifier Letters" : [0x2B0, 0x300],
+        "Combining Diacritical Marks" : [0x300, 0x370],
+        "Greek and Coptic" : [0x370, 0x400],
+        "Cyrillic" : [0x400, 0x500],
+        "Cyrillic Supplement" : [0x500, 0x530],
+        "Armenian" : [0x530, 0x590],
+        "Hebrew" : [0x590, 0x600],
+        "Arabic" : [0x600, 0x700],
+        "Syriac" : [0x700, 0x750],
+        "Arabic Supplement" : [0x750, 0x780],
+        "Thaana" : [0x780, 0x7C0],
+        "N'Ko" : [0x7C0, 0x800],
+        "Samaritan" : [0x800, 0x840],
+        "Mandaic" : [0x840, 0x850],
+        "Arabic Extended-A" : [0x8A0, 0x900],
+        "Devangari" : [0x900, 0x980],
+        "Bengali" : [0x980, 0xA00],
+        "Gurmukhi" : [0xA00, 0xA80],
+        "Gujarati" : [0xA80, 0xB00],
+        "Oriya" : [0xB00, 0xB80],
+        "Tamil" : [0xB80, 0xC00],
+        "Telugu" : [0xC00, 0xC80],
+        "Kannada" : [0xC80, 0xD00],
+        "Malayalam" : [0xD00, 0xD80],
+        "Sinhala" : [0xD80, 0xE00],
+        "Thai" : [0xE00, 0xE80],
+        "Lao" : [0xE80, 0xF00],
+        "Tibetan" : [0xF00, 0x1000],
+        "Myanmar" : [0x1000, 0x10A0],
+        "Georgian" : [0x10A0, 0x1100],
+        "Hangul Jamo" : [0x1100, 0x1200],
+        "Ethiopic" : [0x1200, 0x1380],
+        "Ethiopic Supplement" : [0x1380, 0x13A0],
+        "Cherokee" : [0x13A0, 0x1400],
+        "Unified Canadian Aboriginal Syllabics" : [0x1400, 0x1680],
+        "Ogham" : [0x1680, 0x16A0],
+        "Runic" : [0x16A0, 0x1700],
+        "Tagalog" : [0x1700, 0x1720],
+        "Hanunoo" : [0x1720, 0x1740],
+        "Buhid" : [0x1740, 0x1760],
+        "Tagbanwa" : [0x1760, 0x1780],
+        "Khmer" : [0x1780, 0x1800],
+        "Mongolian" : [0x1800, 0x18B0],
+        "Unified Canadian Aboriginal Syllabics Extended" : [0x18B0, 0x1900],
+        "Limbu" : [0x1900, 0x1950],
+        "Tai Le" : [0x1950, 0x1980],
+        "New Tai Lue" : [0x1980, 0x19E0],
+        "Khmer Symbols" : [0x19E0, 0x1A00],
+        "Buginese" : [0x1A00, 0x1A20],
+        "Tai Tham" : [0x1A20, 0x1B00],
+        "Combining Diacritical Marks Extended" : [0x1AB0, 0x1B00],
+        "Balinese" : [0x1B00, 0x1B80],
+        "Sundanese" : [0x1B80, 0x1BC0],
+        "Batak" : [0x1BC0, 0x1C00],
+        "Lepcha" : [0x1C00, 0x1C50],
+        "Ol Chiki" : [0x1C50, 0x1C80],
+        "Sundanese Supplement" : [0x1CC0, 0x1CD0],
+        "Vedic Extensions" : [0x1CD0, 0x1CF0],
+        "Phonetic Extensions" : [0x1D00, 0x1D80],
+        "Phonetic Extensions Supplement" : [0x1D80, 0x1DC0],
+        "Combining Diacritical Marks Supplement" : [0x1DC0, 0x1E00],
+        "Latin Extended Additional" : [0x1E00, 0x1F00],
+        "Greek Extended" : [0x1F00, 0x2000],
+        "General Punctuation" : [0x2000, 0x2070],
+        "Superscripts and Subscripts" : [0x2070, 0x20A0],
+        "Currency Symbols" : [0x20A0, 0x20D0],
+        "Combining Diacritical Marks for Symbols" : [0x20D0, 0x2100],
+        "Letterlike Symbols" : [0x2100, 0x2150],
+        "Number Forms" : [0x2150, 0x2190],
+        "Arrows" : [0x2190, 0x2200],
+        "Mathematical Operators" : [0x2200, 0x2300],
+        "Miscellaneous Technical" : [0x2300, 0x2400],
+        "Control Pictures" : [0x2400, 0x2440],
+        "Optical Character Recognition" : [0x2440, 0x2460],
+        "Enclosed Alphanumerics" : [0x2460, 0x2500],
+        "Box Drawing" : [0x2500, 0x2580],
+        "Block Elements" : [0x2580, 0x25A0],
+        "Geometric Shapes" : [0x25A0, 0x2600],
+        "Miscellaneous Symbols" : [0x2600, 0x2700],
+        "Dingbats" : [0x2700, 0x27C0],
+        "Miscellaneous Mathematical Symbols-A" : [0x27C0, 0x27F0],
+        "Supplemental Arrows-A" : [0x27F0, 0x2800],
+        "Braille Patterns" : [0x2800, 0x2900],
+        "Supplemental Arrows-B" : [0x2900, 0x2980],
+        "Miscellaneous Mathematical Symbols-B" : [0x2980, 0x2A00],
+        "Supplemental Mathematical Operators" : [0x2A00, 0x2B00],
+        "Miscellaneous Symbols and Arrows" : [0x2B00, 0x2C00],
+        "Glagolitic" : [0x2C00, 0x2C60],
+        "Latin Extended-C" : [0x2C60, 0x2C80],
+        "Coptic" : [0x2C80, 0x2D00],
+        "Georgian Supplement" : [0x2D00, 0x2D30],
+        "Tifinagh" : [0x2D30, 0x2D80],
+        "Ethiopic Extended" : [0x2D80, 0x2DE0],
+        "Cyrillic Extended-A" : [0x2D80, 0x2DE0],
+        "Supplemental Punctuation" : [0x2E00, 0x2E80],
+        "CJK Radicals Supplement" : [0x2E80, 0x2F00],
+        "Kangxi Radicals" : [0x2F00, 0x2FE0],
+        "Ideographic Description Characters" : [0x2FF0, 0x3000],
+        "CJK Symbols and Punctuation" : [0x3000, 0x3040],
+        "Hiragana" : [0x3040, 0x30A0],
+        "Katakana" : [0x30A0, 0x3100],
+        "Bopomofo" : [0x3100, 0x3130],
+        "Hangul Compatibility Jamo" : [0x3130, 0x3190],
+        "Kanbun" : [0x3190, 0x31A0],
+        "Bopomofo Extended" : [0x31A0, 0x31C0],
+        "CJK Strokes" : [0x31C0, 0x31F0],
+        "Katakana Phonetic Extensions" : [0x31F0, 0x3200],
+        "Enclosed CJK Letters and Months" : [0x3200, 0x3300],
+        "CJK Compatibility" : [0x3300, 0x3400],
+        "CJK Unified Ideographs Ext. A" : [0x3400, 0x4DC0],
+        "Yijing Hexagram Symbols" : [0x4DC0, 0x4E00],
+        "CJK Unified Ideographs" : [0x4E00, 0xA000],
+        "Yi Syllables" : [0xA000, 0xA490],
+        "Yi Radicals" : [0xA490, 0xA4C0],
+        "Lisu" : [0xA4D0, 0xA500],
+        "Vai" : [0xA500, 0xA640],
+        "Cyrillic Extended-B" : [0xA640, 0xA6A0],
+        "Bamum" : [0xA6A0, 0xA700],
+        "Modifier Tone Letters" : [0xA700, 0xA720],
+        "Latin Extended-D" : [0xA720, 0xA800],
+        "Syloti Nagri" : [0xA800, 0xA830],
+        "Common Indic Number Forms" : [0xA830, 0xA840],
+        "Phags-pa" : [0xA840, 0xA880],
+        "Saurashtra" : [0xA880, 0xA8E0],
+        "Devangari Extended" : [0xA8E0, 0xA900],
+        "Kayah Li" : [0xA900, 0xA930],
+        "Rejang" : [0xA930, 0xA960],
+        "Hangul Jamo Extended-A" : [0xA960, 0xA980],
+        "Javanese" : [0xA980, 0xA9E0],
+        "Myanmar Extended-B" : [0xA9E0, 0xAA00],
+        "Cham" : [0xAA00, 0xAA60],
+        "Myanmar Extended-A" : [0xAA60, 0xAA80],
+        "Tai Viet" : [0xAA80, 0xAAE0],
+        "Ethiopic Extended-A" : [0xAB00, 0xAB30],
+        "Latin Extended-E" : [0xAB30, 0xAB70],
+        "Cherokee Supplement" : [0xAB70, 0xABC0],
+        "Meetei Mayek" : [0xABC0, 0xAC00],
+        "Hangul Syllables" : [0xAC00, 0xD7B0],
+        "Hangul Jamo Extended-B" : [0xD7B0, 0xD800],
+        "High Surrogates" : [0xD800, 0xDB80],
+        "High Private Use Surrogates" : [0xDB80, 0xDC00],
+        "Low Surrogates" : [0xDC00, 0xE000],
+        "Private Use Area" : [0xE000, 0xF900],
+        "CJK Compatibility Ideographs" : [0xF900, 0xFB00],
+        "Alphabetic Presentation Forms" : [0xFB00, 0xFB50],
+        "Arabic Presentation Forms-A" : [0xFB50, 0xFE00],
+        "Variation Selectors" : [0xFE00, 0xFE10],
+        "Vertical Forms" : [0xFE10, 0xFE20],
+        "Combining Half Marks" : [0xFE20, 0xFE30],
+        "CJK Compatibility Forms" : [0xFE30, 0xFE50],
+        "Small Form Variants" : [0xFE50, 0xFE70],
+        "Arabic Presentation Forms-B" : [0xFE70, 0xFF00],
+        "Halfwidth and Fullwidth Forms" : [0xFF00, 0xFFF0],
+        "Specials" : [0xFFF0, 0x10000],
+        "Linear B Syllabary" : [0x10000, 0x10080],
+        "Linear B Ideograms" : [0x10080, 0x10100],
+        "Aegean Numbers" : [0x10100, 0x10140],
+        "Ancient Greek Numbers" : [0x10140, 0x10190],
+        "Ancient Symbols" : [0x10190, 0x101D0],
+        "Phaistos Disc" : [0x101D0, 0x10200],
+        "Lycian" : [0x10280, 0x102A0],
+        "Carian" : [0x102A0, 0x102E0],
+        "Coptic Epact Numbers" : [0x102E0, 0x10300],
+        "Old Italic" : [0x10300, 0x10330],
+        "Gothic" : [0x10330, 0x10350],
+        "Old Permic" : [0x10350, 0x10380],
+        "Ugaritic" : [0x10380, 0x103A0],
+        "Old Persian" : [0x103A0, 0x103E0],
+        "Deseret" : [0x10400, 0x10450],
+        "Shavian" : [0x10450, 0x10480],
+        "Osmanya" : [0x10480, 0x104B0],
+        "Elbasan" : [0x10500, 0x10530],
+        "Caucasian Albanian" : [0x10530, 0x10570],
+        "Linear A" : [0x10600, 0x10780],
+        "Cypriot Syllabary" : [0x10800, 0x10840],
+        "Imperial Aramaic" : [0x10840, 0x10860],
+        "Palmyrene" : [0x10860, 0x10880],
+        "Nabataean" : [0x10880, 0x108B0],
+        "Hatran" : [0x108E0, 0x10900],
+        "Phoenician" : [0x10900, 0x10920],
+        "Lydian" : [0x10920, 0x10940],
+        "Meroitic Hieroglyphs" : [0x10980, 0x109A0],
+        "Meroitic Cursive" : [0x109A0, 0x10A00],
+        "Kharoshthi" : [0x10A00, 0x10A60],
+        "Old South Arabian" : [0x10A60, 0x10A80],
+        "Old North Arabian" : [0x10A80, 0x10AA0],
+        "Manichaean" : [0x10AC0, 0x10B00],
+        "Avestan" : [0x10B00, 0x10B40],
+        "Inscriptional Parthian" : [0x10B40, 0x10B60],
+        "Inscriptional Pahlavi" : [0x10B60, 0x10B80],
+        "Psalter Pahlavi" : [0x10B80, 0x10BB0],
+        "Old Turkic" : [0x10C00, 0x10C50],
+        "Old Hungarian" : [0x10C80, 0x10D00],
+        "Rumi Numeral Symbols" : [0x10E60, 0x10E80],
+        "Brahmi" : [0x11000, 0x11080],
+        "Kaithi" : [0x11080, 0x110D0],
+        "Sora Sompeng" : [0x110D0, 0x11100],
+        "Chakma" : [0x11100, 0x11150],
+        "Mahajani" : [0x11150, 0x11180],
+        "Sharada" : [0x11180, 0x111E0],
+        "Sinhala Archaic Numbers" : [0x111E0, 0x11200],
+        "Khojki" : [0x11200, 0x11250],
+        "Multani" : [0x11280, 0x112B0],
+        "Khudawadi" : [0x112B0, 0x11300],
+        "Grantha" : [0x11300, 0x11380],
+        "Tirhuta" : [0x11480, 0x114E0],
+        "Siddham" : [0x11580, 0x11600],
+        "Modi" : [0x11600, 0x11660],
+        "Takri" : [0x11680, 0x116D0],
+        "Ahom" : [0x11700, 0x11740],
+        "Warang Citi" : [0x118A0, 0x11900],
+        "Pau Cin Hau" : [0x11AC0, 0x11B00], 
+        "Cuneiform" : [0x12000, 0x12400],
+        "Cuneiform Numbers and Punctuation" : [0x12400, 0x12480],
+        "Early Dynastic Cuneiform" : [0x12480, 0x12550],
+        "Egyptian Hieroglyphs" : [0x13000, 0x13430],
+        "Anatolian Hieroglyphs" : [0x14400, 0x14680],
+        "Bamum Supplement" : [0x16800, 0x16A40],
+        "Mro" : [0x16A40, 0x16A70],
+        "Bassa Vah" : [0x16AD0, 0x16B00],
+        "Pahawh Hmong" : [0x16B00, 0x16B90], 
+        "Miao" : [0x16F00, 0x16FA0],
+        "Kana Supplement" : [0x1B000, 0x1B100],
+        "Duployan" : [0x1BC00, 0x1BCA0],
+        "Shorthand Format Controls" : [0x1BCA0, 0x1BCB0],
+        "Byzantine Musical Symbols" : [0x1D000, 0x1D100],
+        "Musical Symbols" : [0x1D100, 0x1D200],
+        "Ancient Greek Musical Notation" : [0x1D200, 0x1D250],
+        "Tai Xuan Jing Symbols" : [0x1D300, 0x1D360],
+        "Counting Rod Numerals" : [0x1D360, 0x1D380],
+        "Mathematical Alphanumeric Symbols" : [0x1D400, 0x1D7F0],
+        "Sutton SignWriting" : [0x1D800, 0x1DAB0],
+        "Mende Kikakui" : [0x1E800, 0x1E8E0],
+        "Arabic Mathematical Alphabetic Symbols" : [0x1EE00, 0x1F000],
+        "Mahjong Tiles" : [0x1F000, 0x1F030],
+        "Domino Tiles" : [0x1F030, 0x1F0A0],
+        "Playing Cards" : [0x1F0A0, 0x1F100],
+        "Enclosed Alphanumeric Supplement" : [0x1F100, 0x1F200],
+        "Enclosed Ideographic Supplement" : [0x1F200, 0x1F300],
+        "Miscellaneous Symbols and Pictographs" : [0x1F300, 0x1F600],
+        "Emoticons" : [0x1F600, 0x1F680],
+        "Ornamental Dingbats" : [0x1F650, 0x1F680],
+        "Transport And Map Symbols" : [0x1F680, 0x1F700],
+        "Alchemical Symbols" : [0x1F700, 0x1F780],
+        "Geometric Shapes Extended" : [0x1F780, 0x1F800],
+        "Supplemental Arrows-C" : [0x1F800, 0x1F900],
+        "Supplemental Symbols and Pictographs" : [0x1F900, 0x1FA00],
+        "CJK Compatibility Ideographs Ext. B" : [0x20000, 0x2A6E0],
+        "CJK Compatibility Ideographs Ext. C" : [0x2A700, 0x2B740],
+        "CJK Compatibility Ideographs Ext. D" : [0x2B740, 0x2B820],
+        "CJK Compatibility Ideographs Ext. E" : [0x2B820, 0x2CEB0],
+        "CJK Compatibility Ideographs Supplement" : [0x2F800, 0x2FA20],
+        "Tags" : [0xE0000, 0xE0080],
+        "Variation Selectors Supplement" : [0xE0100, 0xE01F0],
+        
+        // Pseudo-blocks
+        "Chess Pieces" : [0x2654, 0x2660],
+        "Suits" : [0x2660, 0x2668],
+        "Dice" : [0x2680, 0x2686],
+        "Currency Symbols (All)" : [0x24, 0x25, 0xA2, 0xA4, 0xA5, 0xA6, 0x20A0, 0x20B7,
+            0x20B8, 0x20BB, 0x20BC, 0x20BE, 0xFE69, 0xFE6A, 0xFF04, 0xFF05, 
+            0xFFE0, 0xFFE2, 0xFFE5, 0xFFE7],
+        "Digits (All)" : [0x30, 0x3A, 0x660, 0x66A, 0x6F0, 0x6FA, 0xAE6, 0x966, 0x970, 0x9E6, 0x9F0, 
+            0xA66, 0xA70, 0xAF0, 0xB66, 0xB70, 0xBE7, 0xBF1, 0xC66, 0xC70, 
+            0xCE6, 0xCF0, 0xD66, 0xD70, 0xE50, 0xE5A, 0xED0, 0xEDA, 0xF20, 0xF2A, 
+            0x1040, 0x104A, 0x1369, 0x137D, 0x17E0, 0x17EA,
+            0x1810, 0x181A, 0x1B50, 0x1B5A, 0x1946, 0x194F, 
+            0x2160, 0x2187, 0x2460, 0x249C, 0x24EA, 0x2500, 
+            0x2776, 0x2794, 0x3007, 0x3008, 0x3021, 0x302A, 0x3038, 0x303B, 0x3220, 0x322A, 
+            0x3251, 0x3260, 0x3280, 0x328A, 0x32B1, 0x32C0,
+            0x4E00, 0x4E01, 0x4E03, 0x4E04, 0x4E07, 0x4E08, 0x4E09, 0x4E0A, 0x4E5D, 0x4E5E, 
+            0x4E8C, 0x4E8D, 0x4E94, 0x4E95, 0x4EBF, 0x4EC0, 0x4EDF, 0x4EE0, 0x4F0D, 0x4F0E, 
+            0x4F70, 0x4F71, 0x5104, 0x5105, 0x516B, 0x516C, 0x516D, 0x516E, 0x5341, 0x5342, 
+            0x5343, 0x5346, 0x53C1, 0x53C5, 0x56DB, 0x56DC, 0x58F1, 0x58F2, 
+            0x58F9, 0x58FA, 0x5EFF, 0x5F00, 0x5F0C, 0x5F0F, 0x5F10, 0x5F11, 0x5FF5, 0x5FF6, 
+            0x62FE, 0x62FF, 0x634C, 0x634D, 0x67D2, 0x67D3, 0x7396, 0x7397, 0x767E, 0x767F, 
+            0x8086, 0x8087, 0x842C, 0x842D, 0x8CAE, 0x8CAF, 0x8CB3, 0x8CB4, 0x8D30, 0x8D31, 
+            0x9621, 0x9622, 0x964C, 0x964D, 0x9646, 0x9647, 0x9778, 0x9679, 0x96F6, 0x96F7,
+            0xFF10, 0xFF1A, 0x10107, 0x10134, 0x10140, 0x1018B, 0x10320, 0x10324, 0x1D360, 0x1D372],
+        "Music Notation" : [0x2669, 0x2670]
+    };
+    
+    // Character groups
+    var cgroups = {
+        unicode : [
+            "US ASCII", "Latin-1 Supplement",  "Latin Extended-A", "Latin Extended-B",
+            "IPA Extensions", "Spacing Modifier Letters", "Combining Diacritical Marks",
+            "Greek and Coptic", "Cyrillic", "Cyrillic Supplement", "Armenian",
+            "Hebrew", "Arabic", "Syriac", "Arabic Supplement", "Thaana", "N'Ko", 
+            "Samaritan", "Mandaic", "Arabic Extended-A", "Devangari", "Bengali", "Gurmukhi", 
+            "Gujarati", "Oriya", "Tamil", "Telugu", "Kannada", "Malayalam", "Sinhala",
+            "Thai", "Lao", "Tibetan", "Myanmar", "Georgian", "Hangul Jamo", "Ethiopic", 
+            "Ethiopic Supplement", "Cherokee", "Unified Canadian Aboriginal Syllabics", 
+            "Ogham", "Runic", "Tagalog", "Hanunoo", "Buhid", "Tagbanwa", "Khmer", 
+            "Mongolian", "Unified Canadian Aboriginal Syllabics Extended", "Limbu", "Tai Le", 
+            "New Tai Lue", "Khmer Symbols", "Buginese", "Tai Tham", 
+            "Combining Diacritical Marks Extended", "Balinese", "Sundanese", 
+            "Batak", "Lepcha", "Ol Chiki", "Sundanese Supplement", "Vedic Extensions", 
+            "Phonetic Extensions", "Phonetic Extensions Supplement", 
+            "Combining Diacritical Marks Supplement", "Latin Extended Additional", 
+            "Greek Extended", "General Punctuation", "Superscripts and Subscripts", 
+            "Currency Symbols", "Combining Diacritical Marks for Symbols", 
+            "Letterlike Symbols", "Number Forms", "Arrows", "Mathematical Operators", 
+            "Miscellaneous Technical", "Control Pictures", "Optical Character Recognition", 
+            "Enclosed Alphanumerics", "Box Drawing", "Block Elements", "Geometric Shapes", 
+            "Miscellaneous Symbols", "Dingbats", "Miscellaneous Mathematical Symbols-A", 
+            "Supplemental Arrows-A", "Braille Patterns", "Supplemental Arrows-B", 
+            "Miscellaneous Mathematical Symbols-B", "Supplemental Mathematical Operators", 
+            "Miscellaneous Symbols and Arrows", "Glagolitic", "Latin Extended-C", "Coptic",
+            "Georgian Supplement", "Tifinagh", "Ethiopic Extended", "Cyrillic Extended-A", 
+            "Supplemental Punctuation", "CJK Radicals Supplement", "Kangxi Radicals", 
+            "Ideographic Description Characters", "CJK Symbols and Punctuation", "Hiragana", 
+            "Katakana", "Bopomofo", "Hangul Compatibility Jamo", "Kanbun", 
+            "Bopomofo Extended", "CJK Strokes", "Katakana Phonetic Extensions", 
+            "Enclosed CJK Letters and Months", "CJK Compatibility", 
+            "CJK Unified Ideographs Ext. A", "Yijing Hexagram Symbols", 
+            "CJK Unified Ideographs", "Yi Syllables", "Yi Radicals", "Lisu", "Vai", 
+            "Cyrillic Extended-B", "Bamum", "Modifier Tone Letters", "Latin Extended-D", 
+            "Syloti Nagri", "Common Indic Number Forms", "Phags-pa", "Saurashtra", 
+            "Devangari Extended", "Kayah Li", "Rejang", "Hangul Jamo Extended-A", 
+            "Javanese", "Myanmar Extended-B", "Cham", "Myanmar Extended-A", "Tai Viet", 
+            "Ethiopic Extended-A", "Latin Extended-E",
+            "Cherokee Supplement", "Meetei Mayek", "Hangul Syllables", "Hangul Jamo Extended-B", 
+            "High Surrogates", "High Private Use Surrogates", "Low Surrogates", 
+            "Private Use Area", "CJK Compatibility Ideographs", 
+            "Alphabetic Presentation Forms", "Arabic Presentation Forms-A", 
+            "Variation Selectors", "Vertical Forms", "Combining Half Marks", 
+            "CJK Compatibility Forms", "Small Form Variants", "Arabic Presentation Forms-B", 
+            "Halfwidth and Fullwidth Forms", "Specials", "Linear B Syllabary", 
+            "Linear B Ideograms", "Aegean Numbers", "Ancient Greek Numbers", 
+            "Ancient Symbols", "Phaistos Disc", "Lycian", "Carian", "Coptic Epact Numbers",
+            "Old Italic", "Gothic", "Old Permic", 
+            "Ugaritic", "Old Persian", "Deseret", "Shavian", "Osmanya", "Elbasan", 
+            "Caucasian Albanian", "Linear A", "Cypriot Syllabary", "Imperial Aramaic", 
+            "Palmyrene", "Nabataean", "Hatran", "Phoenician", "Lydian", "Meroitic Hieroglyphs", 
+            "Meroitic Cursive", "Kharoshthi", "Old South Arabian", "Old North Arabian", 
+            "Manichaean", "Avestan", "Inscriptional Parthian", "Inscriptional Pahlavi", 
+            "Psalter Pahlavi", "Old Turkic", "Old Hungarian",
+            "Rumi Numeral Symbols", "Brahmi", "Kaithi", "Sora Sompeng", "Chakma", 
+            "Mahajani", "Sharada", "Sinhala Archaic Numbers", "Khojki", "Multani", "Khudawadi", 
+            "Grantha", "Tirhuta", "Siddham", "Modi", "Takri", "Ahom", "Warang Citi",
+            "Pau Cin Hau", "Cuneiform", "Cuneiform Numbers and Punctuation", "Early Dynastic Cuneiform",
+            "Egyptian Hieroglyphs", "Anatolian Hieroglyphs", "Bamum Supplement", "Mro", 
+            "Bassa Vah", "Pahawh Hmong", "Miao", "Kana Supplement", "Duployan",
+            "Shorthand Format Controls", 
+            "Byzantine Musical Symbols", "Musical Symbols", "Ancient Greek Musical Notation", 
+            "Tai Xuan Jing Symbols", "Counting Rod Numerals", "Mathematical Alphanumeric Symbols", 
+            "Sutton SignWriting", "Mende Kikakui", 
+            "Arabic Mathematical Alphabetic Symbols", "Mahjong Tiles", "Domino Tiles", "Playing Cards", 
+            "Enclosed Alphanumeric Supplement", "Enclosed Ideographic Supplement", 
+            "Miscellaneous Symbols and Pictographs", "Emoticons", "Ornamental Dingbats", 
+            "Transport And Map Symbols", "Alchemical Symbols", "Geometric Shapes Extended", 
+            "Supplemental Arrows-C", "Supplemental Symbols and Pictographs",
+            "CJK Compatibility Ideographs Ext. B", "CJK Compatibility Ideographs Ext. C", 
+            "CJK Compatibility Ideographs Ext. D", "CJK Compatibility Ideographs Ext. E",
+            "CJK Compatibility Ideographs Supplement", "Tags", "Variation Selectors Supplement"
+        ],
+        latin : [
+            "US ASCII", "Latin-1 Supplement",  "Latin Extended-A", "Latin Extended-B",
+            "Latin Extended Additional", "Letterlike Symbols", "Enclosed Alphanumerics", 
+            "Latin Extended-C", "Latin Extended-D" , "Latin Extended-E", 
+            "Alphabetic Presentation Forms", "Enclosed Alphanumeric Supplement"
+        ],
+        othereuro : [
+            "Greek and Coptic", "Cyrillic", "Cyrillic Supplement", "Armenian", "Georgian",
+            "Greek Extended", "Glagolitic", "Georgian Supplement", "Cyrillic Extended-A", 
+            "Cyrillic Extended-B", "Elbasan"
+        ],
+        drawing : [
+            "Arrows", "Box Drawing", "Block Elements", "Geometric Shapes", 
+            "Supplemental Arrows-A", "Supplemental Arrows-B", "Geometric Shapes Extended",
+            "Supplemental Arrows-C"
+        ],
+        arabic : [
+            "Hebrew", "Arabic", "Arabic Supplement", "Arabic Extended-A", 
+            "Arabic Presentation Forms-A", "Arabic Presentation Forms-B",
+            "Arabic Mathematical Alphabetic Symbols"
+        ],
+        cjk : [
+            "Hangul Jamo", "CJK Radicals Supplement", "Kangxi Radicals", 
+            "Ideographic Description Characters",  "CJK Symbols and Punctuation", 
+            "Hiragana", "Katakana", "Bopomofo",  "Hangul Compatibility Jamo", "Kanbun", 
+            "Bopomofo Extended", "CJK Strokes", "Katakana Phonetic Extensions", 
+            "Enclosed CJK Letters and Months",  "CJK Compatibility", "CJK Unified Ideographs Ext. A", 
+            "Yijing Hexagram Symbols", "CJK Unified Ideographs", "Hangul Jamo Extended-A", 
+            "Hangul Syllables", "Hangul Jamo Extended-B", "CJK Compatibility Ideographs", 
+            "CJK Compatibility Forms", "Small Form Variants", "Halfwidth and Fullwidth Forms", 
+            "Kana Supplement", "Tai Xuan Jing Symbols", "Enclosed Ideographic Supplement",
+            "CJK Compatibility Ideographs Ext. B", "CJK Compatibility Ideographs Ext. C",
+            "CJK Compatibility Ideographs Ext. D", "CJK Compatibility Ideographs Ext. E",
+            "CJK Compatibility Ideographs Supplement"            
+        ],
+        symbols : [
+            "Miscellaneous Symbols", "Dingbats", "Miscellaneous Symbols and Arrows",
+            "Miscellaneous Symbols and Pictographs", "Emoticons", "Ornamental Dingbats", 
+            "Transport And Map Symbols", "Supplemental Symbols and Pictographs"            
+        ],
+        indian : [
+            "Devangari", "Bengali", "Gurmukhi", "Gujarati", "Oriya", "Tamil", 
+            "Telugu", "Kannada", "Malayalam", "Sinhala", "Lepcha", "Ol Chiki",
+            "Vedic Extensions", "Syloti Nagri", "Common Indic Number Forms",
+            "Saurashtra", "Devangari Extended", "Meetei Mayek", "Sora Sompeng",
+            "Chakma", "Sharada", "Multani", "Khudawadi", "Grantha", "Tirhuta", "Takri",
+            "Mro"
+        ],
+        southeast_asian : [
+            "Thai", "Lao", "Myanmar", "Hanunoo", "Buhid", "Khmer", "Khmer Symbols",
+            "Buginese", "Tai Tham", "Balinese", "Sundanese", "Batak",
+            "Sundanese Supplement", "Kayah Li", "Rejang", "Javanese", "Myanmar Extended-B", 
+            "Cham", "Myanmar Extended-A", "Tai Viet", "Pahawh Hmong"            
+        ],
+        otherasian : [
+            "Thaana", "Tibetan", "Mongolian", "Limbu", "Tai Le", "New Tai Lue",
+            "Yi Syllables", "Yi Radicals", "Lisu", "Miao"
+        ],
+        african : [
+            "N'Ko", "Ethiopic", "Ethiopic Supplement", "Coptic", "Tifinagh", "Ethiopic Extended", 
+            "Vai", "Bamum", "Ethiopic Extended-A", "Osmanya", "Bamum Supplement"
+        ],
+        otherworld : [
+            "Cherokee", "Unified Canadian Aboriginal Syllabics", 
+            "Unified Canadian Aboriginal Syllabics Extended", "Cherokee Supplement"
+        ],
+        mathematical : [
+            "Digits (All)", "Superscripts and Subscripts", "Number Forms", "Mathematical Operators",
+            "Miscellaneous Mathematical Symbols-A", "Miscellaneous Mathematical Symbols-B",
+            "Supplemental Mathematical Operators", "Mathematical Alphanumeric Symbols"
+        ],
+        technical : [
+            "Currency Symbols (All)", "Letterlike Symbols", "Miscellaneous Technical",
+            "Control Pictures", "Optical Character Recognition", "Music Notation", "Braille Patterns",
+            "Musical Symbols", "Alchemical Symbols"
+        ],
+        games : [
+            "Chess Pieces", "Suits", "Dice", "Mahjong Tiles", "Domino Tiles", "Playing Cards"
+        ],
+        archaic : [
+            "Syriac", "Samaritan", "Mandaic", "Runic", "Ogham", "Tagalog", "Tagbanwa",
+            "Glagolitic", "Coptic", "Phags-pa", "Linear B Syllabary", "Linear B Ideograms", 
+            "Aegean Numbers", "Ancient Greek Numbers", "Ancient Symbols", "Phaistos Disc", "Lycian",
+            "Carian", "Coptic Epact Numbers", "Old Italic", "Gothic", "Old Permic", 
+            "Ugaritic", "Old Persian", "Elbasan", "Caucasian Albanian", "Linear A",
+            "Cypriot Syllabary", "Imperial Aramaic", "Palmyrene", "Nabataean", "Hatran", "Phoenician", "Lydian", 
+            "Meroitic Hieroglyphs", "Meroitic Cursive", "Kharoshthi", 
+            "Old South Arabian", "Old North Arabian", "Manichaean", "Avestan", 
+            "Inscriptional Parthian", "Inscriptional Pahlavi", "Psalter Pahlavi", 
+            "Old Turkic", "Old Hungarian", "Rumi Numeral Symbols", "Brahmi",
+            "Kaithi", "Mahajani", "Sinhala Archaic Numbers", "Khojki", "Multani", "Siddham", 
+            "Modi", "Ahom", 
+            "Cuneiform", "Cuneiform Numbers and Punctuation",
+            "Early Dynastic Cuneiform", "Egyptian Hieroglyphs", "Anatolian Hieroglyphs", 
+            "Byzantine Musical Symbols", "Ancient Greek Musical Notation",
+            "Counting Rod Numerals"
+        ],
+        phonetic : [
+            "IPA Extensions", "Spacing Modifier Letters", "Phonetic Extensions", 
+            "Phonetic Extensions Supplement", "Modifier Tone Letters"
+        ],
+        punctuation : [
+            "General Punctuation", "Supplemental Punctuation", "CJK Symbols and Punctuation"
+        ],
+        invented : [
+            "Deseret", "Shavian", "Warang Citi", "Pau Cin Hau", "Bassa Vah", 
+            "Duployan", "Sutton SignWriting", "Mende Kikakui"
+        ]
+    };
+    
+    // Group names
+    var groupNames = {
+        unicode : "Unicode",
+        latin : "Latin",
+        othereuro : "Other European Scripts",
+        arabic : "Arabic and Hebrew",
+        indian : "Indian Scripts",
+        cjk : "Chinese, Japanese and Korean",
+        southeast_asian : "Southeast Asian Scripts",
+        otherasian : "Other Asian Scripts",
+        african : "African Scripts",
+        otherworld : "Other World Scripts",
+        drawing : "Arrows and Drawing",
+        symbols : "Symbols, Dingbats and Emoticons",
+        games : "Gaming Pieces",
+        phonetic : "Phonetic Symbols",
+        mathematical : "Mathematical Symbols and Notation",
+        technical : "Technical Symbols",
+        punctuation : "Punctuation",
+        archaic : "Archaic Scripts",
+        invented : "Invented Scripts"
+        
+    }, activeGroup, gLabel = _ele("selected-group"), 
+        menu = _ele("group-choice"), _evt = UsefulJS.Event, _cList = UsefulJS.ClassList;
+    
+    // If key supplied through query parameters is bogus, use the default
+    if (!groupNames.hasOwnProperty(key)) {
+        key = defKey;
+    }
+    
+    // Format for the indvidual fields: decimal, hex, character, utf-8
+    // Depending on the range, we want to print hex as XX, XXXX or XXXXXX
+    var fmt = "%5$*u\xA0%6$*s%05$*X\xA0<span class=\"chr\" id=\"%5$X\">%7$s</span>\xA0%8$-*s";
+    
+    var _fmtGroups = function(key) {
+        var members = clone(cgroups[key]), gName = groupNames[key];
+        // Set the text of the selected group
+        gLabel.innerHTML = _hEscape(gName);
+        
+        if (activeGroup) {
+            if (activeGroup === key) {
+                // Nothing to do here
+                return;
+            }
+            // Remove the "active" designation from the previously active group
+            _cList.get("group-" + activeGroup).remove("active");
+        }
+        // Store the selected group
+        activeGroup = key;
+        // Add the "active" designation to the active group
+        _cList.get("group-" + activeGroup).add("active");
+        
+        // Take a copy of the active group so that we can stop rendering if another
+        // selection is made
+        var  _ag = activeGroup;
+        
+        // Clear what went before
+        pre.innerHTML = "";
+              
+        var _fmtBlock = function() {
+            if (_ag !== activeGroup) {
+                return;
+            }
+            var member = members.shift();
+            if (rdefs[member]) {
+                var ranges = clone(rdefs[member]), 
+                    start = ranges.shift(), n = start, end = ranges.shift(), 
+                    i = 0, c, h = document.createElement("h4"), txt = "";
+                h.appendChild(document.createTextNode(member));
+                pre.appendChild(h);
+                txt += hdr;
+        
+                // Don't try and render too many characters at a time
+                var perTimeSlice = 64 + 64 % perRow, cp, u8;
+                
+                var _fmtBlockInner = function() {
+                    if (_ag !== activeGroup) {
+                        return;
+                    }                
+                    var d = document.createElement("span"), j = 0, _hW, _spW;
+                    // Relative width of hex and spacer
+                    if (n >= 65536) {
+                        _hW = 6;
+                        _spW = 0;
+                    }
+                    else if (n >= 256) {
+                        _hW = 4;
+                        _spW = 2;
+                    }
+                    else {
+                        _hW = 2;
+                        _spW = 4;
+                    }
+                    for (; n < end && j < perTimeSlice; ++i, ++n, ++j) {
+                        if (i && j) {
+                            if (0 === i % perRow) {
+                                txt += "<br>";
+                            }
+                            else {
+                                txt += sep;
+                            }
+                        }
+                        if (n >= 0xD800 && n < 0xE000) {
+                            // No visible representation
+                            c = "";
+                            // Can't appear in legit UTF-8; may appear in variant or
+                            // incorrectly programmed UTF-8
+                            var m = n, b1, b2, b3 = 0x80 | (m & 0x3F);
+                            m >>= 6;
+                            b2 = 0x80 | (m & 0x3F);
+                            m >>= 6;
+                            b1 = 0xE0 | m;
+                            u8 = "[" + [b1, b2, b3].map(function(x) {
+                                return x.toString(16).toUpperCase().padLeft(2, '0');
+                            }).join(nbsp) + "]";
+                        }
+                        else {
+                            cp = _u.fromCodePoint(n);
+                            c = c0c1[n] || cp;
+                            u8 = Array.from(_toUtf8(cp), function(c) {
+                                return c.charCodeAt(0).toString(16).padLeft(2, '0');
+                            }).join(nbsp).toUpperCase();
+                        }
+        
+                        txt += _sprintf(fmt, decW, _spW, _hW, utf8W, n, "", c, u8);
+                    }
+                    if (txt) {
+                        if (0 === i % perRow && !txt.endsWith("<br>")) {
+                            txt += "<br>";
+                        }
+                        else {
+                            txt += sep;
+                        }
+                    }
+                    d.innerHTML = txt;
+                    txt = "";
+                    pre.appendChild(d);
+                    if (n < end) {
+                        setTimeout(_fmtBlockInner, 5);
+                    }
+                    else if (ranges.length) {
+                        start = ranges.shift();
+                        n = start;
+                        end = ranges.shift();
+                        _fmtBlockInner();
+                    }
+                    else if (members.length) {
+                        setTimeout(_fmtBlock, 10);
+                    }
+                }
+                _fmtBlockInner();
+            }
+        };
+        _fmtBlock();
+    };
+    
+    // Create links for each group
+    _u.forEach(groupNames, function(gName, gId) {
+        var li = document.createElement("li"), link = document.createElement("a");
+        link.href = "#";
+        link.appendChild(document.createTextNode(gName));
+        li.id = "group-" + gId;
+        li.appendChild(link);
+        _evt.register(li, "click", function() {
+            _cList.get(menu.parentNode).remove("open");
+            setTimeout(_fmtGroups.bind(null, [gId]), 5);
+            return false;
+        });
+        menu.appendChild(li); 
+    });
+    
+    // Character popup
+    var pShowing = false, cpop = _ele("cpop"), cpInner = _ele("cpop-inner"),
+        pShow = function(x, y, c) {
+        if (!pShowing) {
+            cpop.style.visibility = "hidden";
+            cpop.style.display = "";
+        }
+        // Center popup over mouse
+        y -= cpop.offsetHeight / 2;
+        
+        x -= cpop.offsetWidth / 2;
+        cpop.style.top = y + "px";
+        cpop.style.left = x + "px";
+        if (!pShowing) {
+            cpop.style.visibility = "visible";
+        }
+        cpInner.innerHTML = c;
+        pShowing = true;
+    }, pHide = function() {
+        cpop.style.display = "none";
+        pShowing = false;
+    };
+    
+    // Set mouseover handler for the character table
+    _evt.register(ctr, "mouseover", function(event, eventType, eSrc, eReg) {
+        if ("chr" === eSrc.className) {
+            var x = eSrc.offsetLeft + eSrc.offsetWidth / 2, 
+                y = eSrc.offsetTop + eSrc.offsetHeight / 2;
+            pShow(x, y, eSrc.innerHTML);
+        }
+        else {
+            pHide();
+        }
+    });
+    
+    _fmtGroups(key);
+};
+
+        </script>
+    </body>
+</html>

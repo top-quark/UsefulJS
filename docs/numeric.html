@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>UsefulJS.Number</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body data-spy="scroll" data-target="#sidebar">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="core.html">UsefulJS.Core</a></li>
+                            <li><a href="array.html">UsefulJS.Array</a></li>
+                            <li><a href="classlist.html">UsefulJS.ClassList</a></li>
+                            <li><a href="date.html">UsefulJS.Date</a></li>
+                            <li><a href="event.html">UsefulJS.Event</a></li>
+                            <li><a href="math.html">UsefulJS.Math</a></li>
+                            <li><a href="query.html">UsefulJS.Query</a></li>
+                            <li><a href="storage.html">UsefulJS.Storage</a></li>
+                            <li><a href="string.html">UsefulJS.String</a></li>
+                            <li><a href="locale.html">UsefulJS.Locale</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="browser.html">UsefulJS.Browser</a></li>
+                            <li><a href="currency.html">UsefulJS.Currency</a></li>
+                            <li><a href="dnd.html">UsefulJS.DnD</a></li>
+                            <li><a href="skin.html">UsefulJS.Skin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container">
+            <h1>UsefulJS.Number</h1>
+            <p>The Number module provides a <code>Format</code> class for number 
+            formatting and parsing that uses an identical API to 
+            <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NumberFormat"
+                target="_blank">Intl.NumberFormat</a>:</p>
+<pre>var n = 10000.011,
+    opts = { maximumFractionDigits : 2 },
+    fmt = new UsefulJS.Number.Format("fr", opts),
+    numberStr = fmt.format(n);                // "10&nbsp;000,01"</pre>
+            <p>The values provided by Intl.NumberFormat are strictly one way: there is no way to read
+            them back. UsefulJS.Number.Format objects can take localized number strings and turn them
+            back into numbers:</p>
+            <pre>n = fmt.parse("10&nbsp;000,01");                   // 10000.01</pre>
+            <p>UsefulJS.Number.Format offers the same styles as Intl.NumberFormat - decimal, percent and currency - and
+            adds two more - scientific and engineering - since people who deal routinely with very large or very small
+            numbers tend not to write them in longhand:</p>
+            <pre>var n = 9.9999e13,
+    opts = { style : "scientific", maximumSignificantDigits : 5 },
+    fmt = new UsefulJS.Number.Format("en", opts),
+    numberStr = fmt.format(n);                // "9.9999&nbsp;×&nbsp;10¹³"
+</pre>
+            <p>Values formatted in scientific notation can be read back:</pre>
+            <pre>var opts = { style : "scientific" },
+    parser = new UsefulJS.Number.Format("en", opts),
+    n = parser.parse("9.9999&nbsp;×&nbsp;10¹³");       // 9.9999e13</pre>
+            <p>UsefulJS.Number.Format offers another option for displaying large or small numbers: scaled values (with 
+            optional units):</p>
+            <pre>var fmt = new UsefulJS.Number.Format("en", { scale : "auto", unit : "tonne" });
+// Tactical nuke
+var explosiveForce = fmt.format(20000);      // "20&nbsp;kt"
+// Strategic nuke
+explosiveForce = fmt.format(10000000);       // "10&nbsp;Mt"
+</pre>
+            <p>For an international technical audience, UsefulJS.Number.Format exposes an SI option which ignores most
+            locale settings and formats vales according to SI (Système international) rules. This may be combined with
+            other options and styles to produce standardized, locale-neutral output:</p>
+            <pre>// hi locale normally uses Devangaric digits
+var fmt = new UsefulJS.Number.Format("hi", { SI : true, scale : "auto", unit : "metre second-1" }),
+    c_in_vacuo = fmt.format(299792458);     // "299&nbsp;792.458&nbsp;km·s⁻¹"
+// For diehard cgs enthusiasts
+fmt = new UsefulJS.Number.Format("hi", 
+    { SI : true, scale : "c", unit : "metre second-1", style : "scientific", maximumSignificantDigits : 9 });
+c_in_vacuo = fmt.format(299792458);         // <span class="scientific">"2.99792458&nbsp;×&nbsp;10¹⁰&nbsp;cm·s⁻¹"</span>
+</pre>
+            <p>It won't be replacing 
+            T<span style="vertical-align: -0.5ex; margin-left: -0.1667em; margin-right: -0.125em;">E</span>X
+            in the scientist's armoury, but this should be perfectly acceptable output for a scientific application.</p>
+            <p>These formats are parseable too:</p>
+            <pre>// Units and scale are detected automatically on parsing
+var parser = new UsefulJS.Number.Format("hi"),
+    n = parser.parse("299&nbsp;792.458&nbsp;km·s⁻¹"); // 299792458</pre>
+            <h2>Rounding</h2>
+            <h3>Algorithms</h3>
+            <p>Formatting floating point numbers for display inevitably involves rounding them.
+            UsefulJS.Number offers three rounding algorithms to determine how ties are settled
+            when the least significant digit in the rounded output could go either way.</p>
+            <h4>UsefulJS.Number.ROUND_HALF_TO_PLUS_INFINITY</h4>
+            <p>This is the rounding you will have learned in school: round half up; this algorithm
+            also rounds negative numbers up to become less negative: 0.25 to one decimal place
+            is rounded up to 0.3 while -0.25 is rounded up to -0.2. This algorithm introduces
+            positive bias since the average of a collection of rounded numbers will be 
+            slightly more than the average of the unrounded ones. This is the behaviour of
+            <code>Math.round</code>.</p>
+            <h4>UsefulJS.Number.ROUND_HALF_AWAY_FROM_ZERO</h4>
+            <p>This is rounding half up if the number is positive but down if the number is
+            negative. 0.25 to one decimal place is rounded up to 0.3 while -0.25 is rounded 
+            down to -0.3. This algorithm produces unbiased output only when the unrounded values are
+            distributed evenly around 0. This is the behaviour of <code>Number.toFixed</code>.</p>
+            <h4>UsefulJS.Number.ROUND_HALF_TO_EVEN</h4>
+            <p>Half is rounded up when the least significant digit in the rounded value is
+            even, otherwise it is rounded down. 0.25 to one decimal place is rounded <em>down</em>
+            to 0.2 while -0.25 is rounded <em>up</em> to -0.2. 0.35, on the other hand, is rounded <em>up</em>
+            to 0.4 while -0.35 is rounded <em>down</em> to -0.4. This algorithm produces unbiased 
+            output and is the default rounding algorithm for the IEEE Standard for Floating Point Arithmetic.</p>
+            <h3>Controlling rounding</h3>
+            <p>You select the rounding algorithm to be used for formatting through the
+            <code>UsefulJS.Number.rounding</code> property which should be set to one of
+            the three values above. The default algorithm is ROUND_HALF_TO_EVEN.</p>
+            <div class="alert alert-info">Changing the rounding algorithm also affects
+            the formatting of %d and %f fields by <code>UsefulJS.String.sprintf</code>.</div>
+            <h3>Floating point errors</h3>
+            <p>The rounding algorithms detect and compensate for rounding errors in the 
+            floating point hardware. Running the following code will produce surprising
+            output:</p>
+            <pre>(1.015).toFixed(2);  // "1.01"</pre>
+            <p>The reason, presumably, is hardware floating point error:</p>
+            <pre>1.015 * 100;         // 101.49999999999999</pre>
+            <p>Compare with the UsefulJS drop-in replacement for toFixed:</p>
+            <pre>(1.015)._toFixed(2); // "1.02"</pre>
+            <p>Do not confuse floating point error with choice of rounding algorithm:</p>
+            <pre>(1.045).toFixed(2);  // 1.04: WRONG
+(1.045)._toFixed(2); // 1.04: ROUND_HALF_TO_EVEN
+UsefulJS.Number.rounding = UsefulJS.Number.ROUND_HALF_AWAY_FROM_ZERO;
+(1.045)._toFixed(2); // 1.05</pre>        
+            <h2>Formatting numbers</h2>
+            <h3>UsefulJS.Number.Format</h3>
+            <p>Constructor for the class.</p>
+            <h5>Syntax</h5>
+            <pre>new UsefulJS.Number.Format([requestedLocales[, options]])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>requestedLocales</code> <b>String or Array</b><br>
+                See "Locales" below.</li>
+                <li><code>options</code> <b>Object</b><br>
+                Options to control how numbers are formatted and parsed. See "Options" below.</li>
+            </ul>
+            <h3>Locales</h3>
+            <p>The <code>requestedLocales</code> parameter is specified either as a single BCP-47 locale tag ("en" or
+            "en-GB") or an array of such values indicating the preferred locale and one or more fallbacks. For example,
+            ["quz-PE", "es-PE", "es"] would result in the "es-PE" locale being selected for number formatting
+            since Quechua is not a supported language whereas Spanish is and there is a locale object for 
+            Spanish (Peru).</p>
+            <div class="alert alert-info">The <code>requestedLocales</code> parameter is optional. You can set 
+                <code>UsefulJS.Locale.current</code> to control the default locale.</div>
+            <h4>Unicode extensions</h4>
+            <p>Together with selecting the locale itself, you may specifiy Unicode extensions to control the
+            numbering system used. "-u-" is used to specify an extension and then
+            "nu-&lt;N&gt;" for the numbering system. For example, to do number
+            formatting in Hindi using Latin digits rather than the locale default, you would specify
+            "hi-u-nu-latn". Latin ("latn") digits are the default for most locales.</p>
+            <h4>Numbering systems</h4>
+            <p>You may specify the following values for the numbering system: "arab", "arabext", "bali", "beng", "deva",
+            "fullwide", "gujr", "guru", "hanidec", "khmr", "knda", "laoo", "latn", "limb", "mlym", "mong", "mymr", "orya",
+            "tamldec", "telu", "thai" and "tibt". Of these "arab" is the default numbering system used in Arabic locales,
+            "arabext" is the default for "fa" (Iran), "deva" is the default for "hi" (Hindi) and
+            "beng" is the default for "bn" (Bengali) and "bn-BD" (Bangladesh).</p>
+            <h3>Options</h3>
+            <p>The options hash passed to the constructor may contain combinations of various named values that control
+            the formatting of numeric values. The options and their permissible values are detailed below (options 
+            and values marked with '*' are specific to UsefulJS):</p>
+            <table class="table">
+                <tr>
+                    <th>Option name</th>
+                    <th>Values</th>
+                    <th>Default</th>
+                    <th>Notes</th>
+                </tr>
+                <tr>
+                    <td>minimumSignificantDigits</td>
+                    <td>1 - 21</td>
+                    <td>1</td>
+                    <td>The fractional part of the number string will be right-padded with zeroes to make up the 
+                    required number of significant digits.</td>
+                </tr>
+                <tr>
+                    <td>maximumSignificantDigits</td>
+                    <td>1 - 21</td>
+                    <td>minimumSignificantDigits</td>
+                    <td>Insignificant digits in the number string will be replaced with zeroes. If a fractional part 
+                    is not required, it won't be emitted</td>
+                </tr>
+                <tr>
+                    <td>minimumFractionDigits</td>
+                    <td>1 - 21</td>
+                    <td>0</td>
+                    <td>The fractional part of the number string will be right-padded with zeroes to make up the 
+                    required number of fraction digits.</td>
+                </tr>
+                <tr>
+                    <td>maximumFractionDigits</td>
+                    <td>1 - 21</td>
+                    <td>max(minimumFractionDigits, 3)</td>
+                    <td>The fractional part of the number string will be truncated. Trailing zeroes will be suppressed,
+                    possibly removing the fractional part altogether. For currency formatting, the maximum number of
+                    fractional digits is a property of the currency itself (usually 2 but sometimes 0 or 3) and
+                    should only be overridden when your application requires it.</td>
+                </tr>
+                <tr>
+                    <td>style</td>
+                    <td>decimal, percent, currency, *scientific, *engineering</td>
+                    <td>decimal</td>
+                    <td>The engineering style is the same as scientific except that the exponent will always be 
+                    in multiples of three.</td>
+                </tr>
+                <tr>
+                    <td>currency</td>
+                    <td>The ISO 4217 currency code (<a href="http://www.currency-iso.org/dam/downloads/table_a1.xml"
+                        target="_blank">found here</a>)</td>
+                    <td>-</td>
+                    <td>When the style is "currency", not specifying a currency option causes
+                    a <code>TypeError</code> to be raised. This follows the practice of the
+                    Intl API.</td>
+                </tr>
+                <tr>
+                    <td>currencyDisplay</td>
+                    <td>code, symbol, name</td>
+                    <td>symbol</td>
+                    <td>The "name" value is treated the same as "code" (I am not going to localize the names of around a
+                    hundred currencies into fifty languages to satisfy a questionable option value!).
+                </tr>
+                <tr>
+                    <td>useGrouping</td>
+                    <td>true, false</td>
+                    <td>true</td>
+                    <td>Determines whether group separators (such as ',') are inserted between groups of digits</td>
+                </tr>
+                <tr>
+                    <td>*SI</td>
+                    <td>true, false</td>
+                    <td>false</td>
+                    <td>Whether numbers are formatted according to SI rules: numbering system is "latn", grouping 
+                    character is NO-BREAK SPACE (\u00A0), number grouping is [3] and the decimal separator is '.',
+                    unless the value for the locale is ','.</td>
+                </tr>
+                <tr>
+                    <td>*keep1</td>
+                    <td>true, false</td>
+                    <td>false</td>
+                    <td>When using the scientific and engineering styles, the mantissa is suppressed if it is equal
+                    to 1 unless the keep1 option is <b>true</b>.</td>
+                </tr>
+                <tr>
+                    <td>*unit</td>
+                    <td>See below</td>
+                    <td>-</td>
+                    <td>A space separated string containing one or more SI-units (and a handful of non-SI units)
+                    together with an optional +n/-n to scale the unit. Unit values in the output string
+                    are joined with the MIDDLE DOT (\u00B7) character</td>
+                </tr>
+                <tr>
+                    <td>*scale</td>
+                    <td>auto, other</td>
+                    <td>-</td>
+                    <td>Scales numbers so that the output reads more naturally. See the "Scales" table below.</td>
+                </tr>
+                <tr>
+                    <td>*base10</td>
+                    <td>true, false</td>
+                    <td>false</td>
+                    <td>When dealing with byte values makes format and parse operations use powers of ten rather
+                    than powers of two. Useful when dealing with, for example, hard disk space.</td>
+                </tr>
+            </table>
+            <p>The options parameter to the constructor is optional; if not supplied the effect will be the same as
+            <code>{ style : "decimal" }</code>.</p>
+            <p>If creating an object to parse number strings, many of the options are not required: significant
+            digits, fraction digits and integer digits are irrelevant as are keep1 and useGrouping. 
+            The scale value is obtained automatically as
+            are any units (although you may want to specify a unit to ensure that the value is parsed correctly).
+            <p>The internationalization API allows for an additional parameter: localeMatcher.
+            This is ignored - the algorithm used is "lookup".</p>
+            <p>The percent style automatically scales the value up by a factor of 100:</p>
+            <pre>var fmt = new UsefulJS.Number.Format("en", { style : "percent" }),
+    nStr = fmt.format(0.85);    // "85%"</pre>
+            <h3>Units</h3>
+            <p>The unit option is a space-separated string of one or more unit values with an optional +/-<em>n</em> scale
+            if the magnitude of the unit is not 1. For example, to express density ("kilograms per cubic metre"), the 
+            corresponding unit string would be "kilogram metre-3" while volume ("cubic metres") would be "metre+3". When
+            combined with a scale, the magnitude of the unit is taken into account when scaling the value. For example,
+            here is a rather CPU-intensive way of converting from cubic metres to cubic centimetres:</p>
+            <pre>var fmt = new UsefulJS.Number.Format("en", { scale : "c", unit : "metre+3" }),
+    volume = fmt.format(1);     // "1,000,000&nbsp;cm³"</pre>
+            <div class="alert alert-info">Scaling with the magnitude of the unit only works with the <em>first</em> unit, 
+            meaning that you can't use this capability to scale from kilograms per cubic metre to micrograms 
+            per cubic millimetre.</div>
+            <p>Here is the complete list of units:</p>
+            <table class="table">
+                <tr>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Symbol</th>
+                </tr>
+                <tr>
+                    <td>metre</td>
+                    <td>Length</td>
+                    <td>m</td>
+                </tr>
+                <tr>
+                    <td>kilogram</td>
+                    <td>Mass</td>
+                    <td>kg</td>
+                </tr>
+                <tr>
+                    <td>second</td>
+                    <td>Time</td>
+                    <td>s</td>
+                </tr>
+                <tr>
+                    <td>ampere</td>
+                    <td>Electric current</td>
+                    <td>A</td>
+                </tr>
+                <tr>
+                    <td>kelvin</td>
+                    <td>Thermodynamic temperature</td>
+                    <td>K</td>
+                </tr>
+                <tr>
+                    <td>mole</td>
+                    <td>Amount of substance</td>
+                    <td>mol</td>
+                </tr>
+                <tr>
+                    <td>candela</td>
+                    <td>Luminous intensity</td>
+                    <td>cd</td>
+                </tr>
+                <tr>
+                    <td>radian</td>
+                    <td>Angle</td>
+                    <td>rad</td>
+                </tr>
+                <tr>
+                    <td>steradian</td>
+                    <td>Solid angle</td>
+                    <td>sr</td>
+                </tr>
+                <tr>
+                    <td>hertz</td>
+                    <td>Frequency</td>
+                    <td>Hz</td>
+                </tr>
+                <tr>
+                    <td>newton</td>
+                    <td>Force</td>
+                    <td>N</td>
+                </tr>
+                <tr>
+                    <td>pascal</td>
+                    <td>Pressure</td>
+                    <td>Pa</td>
+                </tr>
+                <tr>
+                    <td>joule</td>
+                    <td>Energy, work</td>
+                    <td>J</td>
+                </tr>
+                <tr>
+                    <td>watt</td>
+                    <td>Power</td>
+                    <td>W</td>
+                </tr>
+                <tr>
+                    <td>coulomb</td>
+                    <td>Electric charge</td>
+                    <td>C</td>
+                </tr>
+                <tr>
+                    <td>volt</td>
+                    <td>Electrical potential difference, electromotive force</td>
+                    <td>V</td>
+                </tr>
+                <tr>
+                    <td>farad</td>
+                    <td>Electric capacitance</td>
+                    <td>F</td>
+                </tr>
+                <tr>
+                    <td>ohm</td>
+                    <td>Electric resistance</td>
+                    <td>Ω</td>
+                </tr>
+                <tr>
+                    <td>siemens</td>
+                    <td>Electrical conductance</td>
+                    <td>S</td>
+                </tr>
+                <tr>
+                    <td>weber</td>
+                    <td>Magnetic flux</td>
+                    <td>Wb</td>
+                </tr>
+                <tr>
+                    <td>tesla</td>
+                    <td>Magnetic field strength</td>
+                    <td>T</td>
+                </tr>
+                <tr>
+                    <td>henry</td>
+                    <td>Inductance</td>
+                    <td>H</td>
+                </tr>
+                <tr>
+                    <td>celsius</td>
+                    <td>Temperature (relative to 273.15K)</td>
+                    <td>°C</td>
+                </tr>
+                <tr>
+                    <td>lumen</td>
+                    <td>Luminous flux</td>
+                    <td>lm</td>
+                </tr>
+                <tr>
+                    <td>lux</td>
+                    <td>Illuminance</td>
+                    <td>lx</td>
+                </tr>
+                <tr>
+                    <td>becquerel</td>
+                    <td>Radioactivity (decays per second)</td>
+                    <td>Bq</td>
+                </tr>
+                <tr>
+                    <td>gray</td>
+                    <td>Absorbed dose of radiation</td>
+                    <td>Gy</td>
+                </tr>
+                <tr>
+                    <td>sievert</td>
+                    <td>Equivalent dose of radiation</td>
+                    <td>Sv</td>
+                </tr>
+                <tr>
+                    <td>katal</td>
+                    <td>Catalytic activity</td>
+                    <td>kat</td>
+                </tr>
+                <tr>
+                    <td>gram</td>
+                    <td>Mass</td>
+                    <td>g</td>
+                </tr>
+                <tr>
+                    <td>minute</td>
+                    <td>Time</td>
+                    <td>min</td>
+                </tr>
+                <tr>
+                    <td>hour</td>
+                    <td>Time</td>
+                    <td>h</td>
+                </tr>
+                <tr>
+                    <td>day</td>
+                    <td>Time</td>
+                    <td>d</td>
+                </tr>
+                <tr>
+                    <td>year</td>
+                    <td>Time</td>
+                    <td>y</td>
+                </tr>
+                <tr>
+                    <td>degree</td>
+                    <td>Angle</td>
+                    <td>°</td>
+                </tr>
+                <tr>
+                    <td>arcminute</td>
+                    <td>Angle</td>
+                    <td>&#x2032;</td>
+                </tr>
+                <tr>
+                    <td>arcsecond</td>
+                    <td>Angle</td>
+                    <td>&#x2033;</td>
+                </tr>
+                <tr>
+                    <td>hectare</td>
+                    <td>Area</td>
+                    <td>ha</td>
+                </tr>
+                <tr>
+                    <td>litre</td>
+                    <td>Volume</td>
+                    <td>l</td>
+                </tr>
+                <tr>
+                    <td>tonne</td>
+                    <td>Mass</td>
+                    <td>t</td>
+                </tr>
+                <tr>
+                    <td>angstrom</td>
+                    <td>Length (10<sup>-10</sup>&nbsp;m)</td>
+                    <td>Å</td>
+                </tr>
+                <tr>
+                    <td>bytes</td>
+                    <td>Data size</td>
+                    <td>B</td>
+                </tr>
+                <tr>
+                    <td>meter</td>
+                    <td>Length (alternate spelling)</td>
+                    <td>m</td>
+                </tr>
+                <tr>
+                    <td>liter</td>
+                    <td>Volume (alternate spelling and preferred US symbol)</td>
+                    <td>L</td>
+                </tr>
+            </table>
+            <p>There is nothing to stop you supplying your own units, but you need to specify the symbol explicitly:</p>
+            <pre>var massOfElectron = 511000,
+    fmt = new UsefulJS.Number.Format("en", { scale : "M", unit : "eV" }),
+    nStr = fmt.format(massOfElectron);      // "0.511&nbsp;MeV"</pre>
+            <p>Since values with units are intended for technical applications, there is no attempt to localize the
+            symbols.</p>
+            <h3>Scale values</h3>
+            <p>These are the scale values that you can specify:</p>
+            <table class="table">
+                <tr>
+                    <th>Scale</th>
+                    <th>Name</th>
+                    <th>Multiplier (base 10)</th>
+                    <th>Multiplier (base 2)</th>
+                </tr>
+                <tr>
+                    <td>Y</td>
+                    <td>yotta-</td>
+                    <td class="scientific">10²⁴</td>
+                    <td class="scientific">2⁸⁰</td>
+                </tr>
+                <tr>
+                    <td>Z</td>
+                    <td>zetta-</td>
+                    <td class="scientific">10²¹</td>
+                    <td class="scientific">2⁷⁰</td>
+                </tr>
+                <tr>
+                    <td>E</td>
+                    <td>exa-</td>
+                    <td class="scientific">10¹⁸</td>
+                    <td class="scientific">2⁶⁰</td>
+                </tr>
+                <tr>
+                    <td>P</td>
+                    <td>peta-</td>
+                    <td class="scientific">10¹⁵</td>
+                    <td class="scientific">2⁵⁰</td>
+                </tr>
+                <tr>
+                    <td>T</td>
+                    <td>tera-</td>
+                    <td class="scientific">10¹²</td>
+                    <td class="scientific">2⁴⁰</td>
+                </tr>
+                <tr>
+                    <td>G</td>
+                    <td>giga-</td>
+                    <td class="scientific">10⁹</td>
+                    <td class="scientific">2³⁰</td>
+                </tr>
+                <tr>
+                    <td>M</td>
+                    <td>mega-</td>
+                    <td class="scientific">10⁶</td>
+                    <td class="scientific">2²⁰</td>
+                </tr>
+                <tr>
+                    <td>k</td>
+                    <td>kilo-</td>
+                    <td class="scientific">10³</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>K</td>
+                    <td>kilo-</td>
+                    <td>-</td>
+                    <td class="scientific">2¹⁰</td>
+                </tr>
+                <tr>
+                    <td>h</td>
+                    <td>hecto-</td>
+                    <td class="scientific">10²</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>da</td>
+                    <td>deca-</td>
+                    <td class="scientific">10¹</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>d</td>
+                    <td>deci-</td>
+                    <td class="scientific">10⁻¹</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>c</td>
+                    <td>centi-</td>
+                    <td class="scientific">10⁻²</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>m</td>
+                    <td>milli-</td>
+                    <td class="scientific">10⁻³</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>µ / micro</td>
+                    <td>micro-</td>
+                    <td class="scientific">10⁻⁶</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>n</td>
+                    <td>nano-</td>
+                    <td class="scientific">10⁻⁹</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>p</td>
+                    <td>pico-</td>
+                    <td class="scientific">10⁻¹²</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>f</td>
+                    <td>femto-</td>
+                    <td class="scientific">10⁻¹⁵</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>a</td>
+                    <td>atto-</td>
+                    <td class="scientific">10⁻¹⁸</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>z</td>
+                    <td>zepto-</td>
+                    <td class="scientific">10⁻²¹</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>y</td>
+                    <td>yocto-</td>
+                    <td class="scientific">10⁻²⁴</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>auto</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+            </table>
+            <p>The base-2 column is for the bytes unit:</p>
+            <pre>var fmt = new UsefulJS.Number.Format("en", { scale : "auto", unit : "bytes" }),
+    eightGig = fmt.format((1 &lt;&lt; 30) * 8);    // "8&nbsp;GB"</pre>
+            <p>The kilo- scale for bytes is formatted as "K" rather than "k":</p>
+            <pre>var twoPointFiveK = fmt.format(2560);        // "2.5&nbsp;KB"</pre>
+            <p>When dealing with, for example, hard disk space, a kilobyte is 1000 bytes, rather than 1024 bytes. You
+            can use the base10 option to control whether powers of ten rather than powers of two are used:</p>
+            <pre>var fmt = new UsefulJS.Number.Format("en", { scale : "auto", unit : "bytes", base10 : true }),
+    diskSize = fmt.format(2e12);    // "2&nbsp;TB"</pre>
+            <p>The "µ" scale may be specified as "micro" since "µ" is hard to type. Note that the character used is
+            MICRO SIGN (\u00B5) rather than GREEK SMALL LETTER MU (\u03BC).</p>
+            <p>With some units, scaling is ignored: kelvin, celsius,
+            radian, steradian, minute, hour, day, degree, arcminute, arcsecond, angstrom.</p>
+            <p>Units are formatted with a NO-BREAK SPACE between the quantity and the unit except for degree,
+            arcminute and arcsecond where the unit is flush against the quantity.</p>
+            <p>The "auto" scaling algorithm attempts to end up with a quantity between 1 and 1000 without the result
+            being silly. I've not heard of a "megagram" or "megametre", so the auto-scaling does not output "Mg" or
+            "Mm". The "c" scale is only applied automatically when the unit is metre or litre (or, if you prefer,
+            "meter" or "liter") and other scales that are not multiples of three are never applied automatically. The
+            kilogram unit isn't scaled down to grams, only to milligrams and smaller, and it isn't scaled up at all. That
+            said, the algorithm isn't infallible:</p>
+            <pre>var gravitationalConstant = 6.67384e-11,
+    fmt = new UsefulJS.Number.Format("en", { SI : true, scale : "auto", unit : "metre+3 kilogram-1 second-2" }),
+    nStr = fmt.format(gravitationalConstant;    // "66&nbsp;738&nbsp;400&nbsp;µm³·kg⁻¹·s⁻²"</pre>
+            <p>The result is <em>correct</em> but rather weird.</p>
+            <p>When parsing values, an SI unit is preferred to a scale-plus-unit when there is any ambiguity:</p>
+            <pre>var universeAge = 1.38e10,
+    fmt = new UsefulJS.Number.Format("en", { scale : "auto", unit : "year" }),
+    nStr = fmt.format(universeAge);             // "13.8&nbsp;Gy"
+// nStr will be parsed as though the unit were Gray rather than giga-years
+var parser = new UsefulJS.Number.Format(),
+    radiationDose = parser.parse("13.8&nbsp;Gy");    // 13.8
+// Remove ambiguity by specifying the unit in the parse options
+parser = new UsefulJS.Number.Format(null, { unit : "year" });
+universeAge = parser.parse("13.8&nbsp;Gy");          // 1.38e10
+</pre>
+            <h3>UsefulJS.Number.Format instance methods</h3>
+            <h4 class="api-doc">format</h4>
+            <p>Formats a number according the configured style and options.</p>
+            <h5>Syntax</h5>
+            <pre>format(n)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>n</code> <b>Number</b><br>
+                The number to format.</li>
+            </ul>
+            <p>Returns: <b>String</b>. The formatted number</p>
+            <h5>Description</h5>
+            <p>If the input cannot be coerced into a sensible number, the return value is "NaN". If the input is
+            Number.POSITIVE_INFINITY, the return value is "∞" substituted into the appropriate positive number
+            pattern (for example, "∞%"). If the input is Number.NEGATIVE_INFINITY, the return value is "∞" 
+            substituted into the appropriate negative number pattern.</p>
+            <p>When using scientific / engineering format in a locale that does not use Latin digits, the exponent
+            is still formatted using Latin digits. I've not been able to find out how to do scientific notation in,
+            say, Arabic so this is my best guess, especially as superscript digits are only available in Latin form.</p>
+            <p>The native Intl.NumberFormat objects use the same rather broken truncation algorithm as 
+            <code>Number.toFixed</code> when formatting using the decimal style and round-half-away-from-zero 
+            when formatting currency. UsefulJS.Number.Format objects use the rounding algorithm
+            specified through the <code>UsefulJS.Number.rounding</code> property. Certain
+            locales may specify a currency rounding algorithm.</p>
+            <p>The format method is bound to its instance, meaning that you can use a pointer to the instance 
+            method where a function pointer is expected. For example, if you have a whole bunch of numbers to be 
+            formatted, you can pass <code>fmt.format</code> to <code>Array.prototype.map</code>.</p>
+            <h5>Usage</h5>
+            <p>See above for <em>lots</em> of usage examples!</p>
+            <h4 class="api-doc">parse</h4>
+            <p>Parses a string produced by a Format object back into a number.</p>
+            <h5>Syntax</h5>
+            <pre>parse(numberStr)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>numberStr</code> <b>String</b><br>
+                The value to parse.</li>
+            </ul>
+            <p>Returns: <b>Number</b>. The parsed value.</p>
+            <h5>Description</h5>
+            <p>You need to set the correct style when parsing a number string if you are not to get Number.NaN back.
+            This is because the digits first need to be extracted from locale-specific patterns before they can be 
+            parsed. You don't need to set scale and unit because they are picked up automatically and the scaling is 
+            reversed (as it is with the percent style). If the value extracted from a pattern is "∞", the return
+            value will be an infinity; which one depends on whether the pattern matched was a positive or negative
+            number pattern. If the value is plain not number-like, the return will be Number.NaN.</p>
+            <p>The parse method is bound to its instance.</p>
+            <h5>Usage</h5>
+            <pre>// Parse percent strings formatted for the tu (Turkey) locale
+var parser = new UsefulJS.Number.Format("tr", { style : "percent" }),
+    numberStrings = ["%\u00a085", "-%\u00a050"],
+    numbers = numberStrings.map(parser.parse);  // [0.85, -0.5]
+</pre>
+            <h4 class="api-doc">resolvedOptions</h4>
+            <p>Gets an Object showing what the requested options resolved to. The <code>locale</code> property is useful
+            in that it gives the actual locale being used (unlike <code>supportedLocalesOf</code>). See the
+            Intl.NumberFormat documentation for more information.</p>
+            <h5>Syntax</h5>
+            <pre>resolvedOptions()</pre>
+            <h4 class="api-doc">supportedLocalesOf</h4>
+            <p>Part of the internationalization API and not terribly useful. Takes an array of locale codes and returns
+            the locales that are "supported" in the sense that they do not resolve to the default locale. For example,
+            "ru-UK" (Ukrainian Russian) would return as "supported", even though the locale that is actually supported
+            is "ru", i.e. Russian Russian. See the Intl documentation for more information.</p>
+            <h5>Syntax</h5>
+            <pre>supportedLocalesOf(locales[, options])</pre>
+            <h3>Interoperability with Intl.NumberFormat</h3>
+            <p>The UsefulJS.Number.Format API is a superset of the Intl.NumberFormat API, with a couple of
+            additional styles and some extra options. Unlike date and time formatting, number formatting is a 
+            well-defined problem: no English speaker separates groups of digits with a space and sticks a comma
+            between the integer and fractional parts; likewise no French speaker uses commas and dots as
+            separators. This means that UsefulJS.Number.Format should produce the same value as a native
+            Intl.NumberFormat implementation bar differences in how half-values are rounded. 
+            It also means that UsefulJS.Number.Format should be able to parse
+            values produced by Intl.NumberFormat.</p>
+            <h2>Additional UsefulJS.Number properties and methods</h2>
+            <h4 class="api-doc">EPSILON</h4>
+            <p>The smallest interval between distinct floating point numbers for a given architecture. Since 
+            JavaScript uses 64-bit floating point numbers, the value is approximately 2.22045e-16. If the value is 
+            available as a property of Number, then that property is used. Otherwise it is computed (and found
+            to be 2.220446049250313e-16). A module fix can make this a property of Number. It is used to detect
+            errors that come from the floating point architecture itself, such as the sum of 0.1 and 0.2 being not 
+            quite 0.3.</p>
+            <h4 class="api-doc">units, scales, byte_scales</h4>
+            <p>The unit and scale values used by the Format class are also available as public properties of
+            UsefulJS.Number.</p>
+            <h4 class="api-doc">rounding</h4>
+            <p>The rounding algorithm to use. See above for the available algorithms.</p>
+            <h2>Fixes</h2>
+            <p>The fixes for the Number module are in the _number namespace of the fix options. All fixes are
+            applied by default.</p>
+            <h4 class="api-doc">EPSILON / MAX_SAFE_INTEGER / MIN_SAFE_INTEGER</h4>
+            <p>Adds the relevant static property to the Number class if not already present.</p>
+            <h4 class="api-doc">fixToLocaleString</h4>
+            <p>Patches Number.prototype.toLocaleString to take locale and formatting options, just like
+            Intl.NumberFormat. The output property is "toLocaleStringFixed".</p>
+            <h4 class="api-doc">intl_NumberFormat</h4>
+            <p>Makes the UsefulJS.Number.Format class available through the Intl.NumberFormat namespace. This allows for
+            completely portable, locale-aware number formatting that runs in pretty much any browser, using the
+            native object when available.</p>
+            <h4 class="api-doc">_toFixed</h4>
+            <p>Adds a method called _toFixed to Number.prototype which is intended as a drop-in
+            replacement for <code>toFixed</code>. Details of the method are as follows:</p>
+            <h4 class="api-doc">Number.prototype._toFixed</h4>
+            <p>Truncates the string representation of a floating point number to a specified 
+            precision, rounding the result correctly.</p>
+            <h5>Syntax</h5>
+            <pre>&ltN&gt;._toFixed([maxPrecision[, minPrecision]])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>maxPrecision</code> <b>Number</b><br>
+                The maximum number of digits after the decimal point to display; defaults
+                to 0 if not specified; value is unlimited</li>
+                <li><code>MinPrecision</code> <b>Number</b><br>
+                The minimum number of digits after the decimal point to display.</li>
+            </ul>
+            <p>Returns: <b>String</b>. The fixed-precision output.</p>
+            <h5>Description</h5>
+            <p>I <em>hate</em> <code>Number.toFixed</code>. Even if the implementation isn't
+            so brain-damaged that it rounds 0.9 to 0, it still uses an <a target="_blank"
+            href="http://www.ecma-international.org/ecma-262/5.1/#sec-15.7.4.5">algorithm</a> 
+            that incorrectly rounds values for a wide range of inputs and gives you the
+            number of digits after the decimal point whether you want them or not. 
+            <code>_toFixed</code> rounds numbers correctly, suppresses meaningless zeroes
+            at the end of the output and allows you to override this behaviour through the
+            <code>minPrecision</code> parameter:</p>
+            <pre>(1).toFixed(2);      // 1.00
+(1)._toFixed(2);     // 1
+(1)._toFixed(2, 2);  // 1.00</pre>
+            <p>Very large and very small numbers are handled:</p>
+            <pre>(1.23e50).toFixed();     // "1.23e+50"
+(1.23e50)._toFixed();    // "123000000000000000000000000000000000000000000000000"
+(1.23e-21).toFixed(22);  // throws
+(1.23e-21)._toFixed(22); // "0.0000000000000000000012"</pre>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

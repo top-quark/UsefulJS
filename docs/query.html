@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>UsefulJS.Query</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body data-spy="scroll" data-target="#sidebar">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="core.html">UsefulJS.Core</a></li>
+                            <li><a href="array.html">UsefulJS.Array</a></li>
+                            <li><a href="classlist.html">UsefulJS.ClassList</a></li>
+                            <li><a href="date.html">UsefulJS.Date</a></li>
+                            <li><a href="event.html">UsefulJS.Event</a></li>
+                            <li><a href="math.html">UsefulJS.Math</a></li>
+                            <li><a href="numeric.html">UsefulJS.Number</a></li>
+                            <li><a href="storage.html">UsefulJS.Storage</a></li>
+                            <li><a href="string.html">UsefulJS.String</a></li>
+                            <li><a href="locale.html">UsefulJS.Locale</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="browser.html">UsefulJS.Browser</a></li>
+                            <li><a href="currency.html">UsefulJS.Currency</a></li>
+                            <li><a href="dnd.html">UsefulJS.DnD</a></li>
+                            <li><a href="skin.html">UsefulJS.Skin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container">
+            <h1>UsefulJS.Query</h1>
+            <p>The Query module provides methods to parse and build query strings and may optionally parse
+            <code>location.search</code>, exposing the parsed value through the <code>UsefulJS.Query.parameters</code>
+            object.</p>
+            <h2>Anatomy of a query string</h2>
+            <p>The following might be the query string supplied to an online pizza ordering application:</p>
+            <pre>?pickup&amp;size=14&amp;topping=pepperoni&amp;topping=extra+cheese&amp;coupon=0144732</pre>
+            <p>The query part of the URL is denoted by '?'. The invidual items in the query string are separated by
+            '&amp;' and the keys and values are separated by '='. Certain characters need to be escaped (note "extra+cheese",
+            where '+' is the escaped value for ' '). The general form of an escaped character is "%XY", where "XY" is the
+            hexadecimal representation of the character code value. A key with no associated value is a simple boolean
+            flag.</p>
+            <p><code>UsefulJS.Query.parse</code> method will turn the above string into the following value:</p>
+            <pre>{
+    pickup : true,
+    size : 14,
+    topping : ["pepperoni", "extra cheese"],
+    coupon : "0144732"
+}</pre>
+            <h2>Static methods</h2>
+            <h4 class="api-doc">parse</h4>
+            <p>Parses a query string into a JavaScript Object</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Query.parse(s)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>s</code> <b>String</b><br>
+                The query string to parse.</li>
+            </ul>
+            <p>Returns: <b>Object</b> The parsed query parameters.</p>
+            <h5>Description</h5>
+            <p>The input string is parsed according to the following rules:</p>
+            <ul>
+                <li>If there is a key but no associated value, the output property is boolean <code>true</code></li>
+                <li>If the value looks like a number (<code>String(parseInt(v, 10)) === v)</code>), the output property is a
+                <code>Number</code></li>
+                <li>For other values, the output property is a <code>String</code></li>
+                <li>If a key appears more than once in the input string, the output property is promoted to an
+                <code>Array</code>.</li>
+            </ul>
+            <h4 class="api-doc">append</h4>
+            <p>Used to build up a query string one key-value pair at a time</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Query.append(s, n, v)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>s</code> <b>String</b><br>
+                The existing query string to append to.</li>
+                <li><code>n</code> <b>String</b><br>
+                The name of the key to add.</li>
+                <li><code>v</code> <b>Boolean|String|Number|Array</b><br>
+                The value associated with the key.</li>
+            </ul>
+            <p>Returns: <b>String</b> The modified query string.</p>
+            <h5>Description</h5>
+            <p>The value to add may be one of the following types:</p>
+            <ul>
+                <li>Boolean true: appends just the key</li>
+                <li>String, Number: appends "key=value"</li>
+                <li>Array: appends "key=value[0]&amp;key=value[1]..."</li>
+            </ul>
+            <p>The appended key-value pair is correctly URI-encoded.</p>
+            <h5>Usage</h5>
+            <pre>// Outputs size=14&amp;topping=pepperoni&amp;topping=extra%20cheese
+var q = UsefulJS.Query,
+    queryStr = q.append(q.append("", "size", 14), "topping", ["pepperoni", "extra cheese"]);</pre>
+            <h4 class="api-doc">build</h4>
+            <p>Convenience method to assemble a query string in one go.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Query.build(params)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>params</code> <b>Object</b><br>
+                A collection of keys and values to to turn into a query string</li>
+            </ul>
+            <p>Returns: <b>String</b> The assembled query string.</p>
+            <h5>Description</h5>
+            <p>Each value in the params Object must be Boolean <code>true</code>, a String, a Number 
+            or an Array as with the <code>v</code> parameter to the <code>append</code> method. The
+            return value will be correctly URI-encoded.</p>
+            <h5>Usage</h5>
+            <pre>// Outputs pickup&amp;size=14&amp;topping=pepperoni&amp;topping=extra%20cheese
+var q = UsefulJS.Query,
+    params = { pickup : true, size : 14, topping : ["pepperoni", "extra cheese"] },
+    queryStr = q.build(params);</pre>
+            <h2>UsefulJS.Query.parameters</h2>
+            <p>This property is an interface to the query parameters for the current page. It provides three methods to
+            manage the query string.</p>
+            <h4 class="api-doc">parse</h4>
+            <p>Parses <code>location.search</code>.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Query.parameters.parse()</pre>
+            <h4 class="api-doc">get</h4>
+            <p>Gets the value of a parameter.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Query.parameters.get(prop, def)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>prop</code> <b>String</b><br>
+                The name of the desired parameter</li>
+                <li><code>def</code> <b>Any</b><br>
+                The value to return if <code>prop</code> is not found in the query parameters</li>
+            </ul>
+            <p>Returns: <b>Any</b> The value associated with the parameter or <code>def</code> if the
+            property is not found.</p>
+            <h4 class="api-doc">all</h4>
+            <p>Clones the parsed query parameters for the page and returns them. Modifications to the return value will not
+            affect the original parameters object.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Query.parameters.all()</pre>
+            <h5>Usage</h5>
+            <pre>// Are we running in debug mode?
+var qparams = UsefulJS.Query.parameters,
+    logLevel = 0;
+qparams.parse();
+if (qparams.get("debug", false)) {
+    logLevel = qparams.get("verbose", 1);
+}</pre>
+            <h2>Fixes</h2>
+            <p>The fixes for the Query module are defined in the _query namespace of the fix options.</p>
+            <h4 class="api-doc">parse</h4>
+            <p>The <code>parse</code> fix parses any query string supplied to the current page. It is enabled by
+            default. The property set in the return value is a boolean value called "parsed".</p>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

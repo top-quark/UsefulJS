@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>UsefulJS.Math</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="core.html">UsefulJS.Core</a></li>
+                            <li><a href="array.html">UsefulJS.Array</a></li>
+                            <li><a href="classlist.html">UsefulJS.ClassList</a></li>
+                            <li><a href="date.html">UsefulJS.Date</a></li>
+                            <li><a href="event.html">UsefulJS.Event</a></li>
+                            <li><a href="numeric.html">UsefulJS.Number</a></li>
+                            <li><a href="query.html">UsefulJS.Query</a></li>
+                            <li><a href="storage.html">UsefulJS.Storage</a></li>
+                            <li><a href="string.html">UsefulJS.String</a></li>
+                            <li><a href="locale.html">UsefulJS.Locale</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="browser.html">UsefulJS.Browser</a></li>
+                            <li><a href="currency.html">UsefulJS.Currency</a></li>
+                            <li><a href="dnd.html">UsefulJS.DnD</a></li>
+                            <li><a href="skin.html">UsefulJS.Skin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container">
+            <h1>UsefulJS.Math</h1>
+            <p>The Math module fills in some gaps in the standard Math library.</p>
+            <h2>Static methods</h2>
+            <h4 class="api-doc">fcorrect</h4>
+            <p>Corrects floating point errors</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Math.fcorrect(n[, precision])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>n</code> <b>Number</b><br>
+                The number whose value you want to check.</li>
+                <li><code>precision</code> <b>Number</b><br>
+                The precision you want: 0 to check (what should be) integer values, 1 to check the
+                first decimal place, etc. Defaults to 0.</li>
+            </ul>
+            <p>Returns: <b>Number</b> The input, possibly corrected for floating point error. If the
+            input is not a finite number, the return will be the result of converting the input to a
+            number, <code>Number.NaN</code> in most cases.</p>
+            <h5>Description</h5>
+            <p>Tiny, uncorrected floating point errors can throw up surprising results:</p>
+<pre>// What's the base 10 logarithm of 1 billion?
+Math.log(1e9) / Math.LN10           // 8.999999999999998;   almost
+// What's the tangent of 45 degrees?
+Math.tan(Math.PI / 4)               // 0.9999999999999999;  so close
+// What's the sum of 0.1 and 0.2
+0.1 + 0.2                           // 0.30000000000000004; really?</pre>
+            <p><code>fcorrect</code> calculates the relative error of its input compared to the result
+            of rounding it to the specified precision. If this value is &lt; the epsilon value of
+            the system, it assumes that the input has an error and returns the rounded value:</p>
+<pre>var cFn = UsefulJS.Math.fcorrect;
+cFn(Math.log(1e9) / Math.LN10)           // 9
+cFn(Math.tan(Math.PI / 4))               // 1
+cFn(0.1 + 0.2, 1)                        // 0.3; note the precision value</pre>
+            <p>You don't have to wrap all your calculations in <code>fcorrect</code>, but if you see
+            some silly results in your output, this method may make them sensible.</p>
+            <h4 class="api-doc">logn</h4>
+            <p>Calculates logarithms to any base, not just <code>Math.E</code>.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Math.logn(n, base)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>n</code> <b>Number</b><br>
+                The number whose logarithm you want to take.</li>
+                <li><code>base</code> <b>Number</b><br>
+                The base to use, for example, 10. Must be &gt;= 0</li>
+            </ul>
+            <p>Returns: <b>Number</b> The logarithm to the specified base.</p>
+            <p>Throws: <b>RangeError</b> when base is &lt; 0 or not finite.</p>
+            <h5>Description</h5>
+            <p>Silly inputs tend to produce silly results. If <code>n</code> is 0, the result will generally
+            be negative infinity. If <code>base</code> is 1 the result will generally be positive infinity.
+            If <code>n</code> is &lt; 0, the result is NaN.</p>
+            <h4 class="api-doc">deg</h4>
+            <p>Converts an angle in radians to degrees</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Math.deg(theta)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>theta</code> <b>Number</b><br>
+                An angle in radians.</li>
+            </ul>
+            <p>Returns <b>Number</b> A value in degrees (may be fractional)</p>
+            <p>Throws: <b>TypeError</b> when <code>theta</code> is not a finite value.</p>
+            <h5>Description</h5>
+            <p>The Math trigonometric functions work in radians; humans tend to think in terms of degrees.
+            Conversion between the two is straightforward but tedious. Given the growing popularity of game
+            programming, one wonders why angle conversion is not part of the standard library.</p>
+            <h5>Usage</h5>
+            <pre>UsefulJS.Math.deg(Math.PI / 4); // 45</pre>
+            <h4 class="api-doc">dms</h4>
+            <p>Converts an angle in radians to degrees, minutes and seconds</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Math.dms(theta)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>theta</code> <b>Number</b><br>
+                An angle in radians.</li>
+            </ul>
+            <p>Returns <b>Array</b> A triplet: degrees, minutes, seconds</p>
+            <p>Throws: <b>TypeError</b> when <code>theta</code> is not a finite value.</p>
+            <h5>Usage</h5>
+            <pre>UsefulJS.Math.dms(1); // [57,17,44.80624709636322]</pre>
+            <h4 class="api-doc">rad</h4>
+            <p>Converts an angle in degrees (and possibly minutes and seconds) to radians.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Math.rad(degrees[, minutes, seconds])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>degrees</code> <b>Number</b><br>
+                An angle in degrees.</li>
+                <li><code>minutes</code> <b>Number</b><br>
+                Fractional part of a degree.</li>
+                <li><code>seconds</code> <b>Number</b><br>
+                Fractional part of a minute.</li>
+            </ul>
+            <p>Returns <b>Number</b> A value in radians</p>
+            <p>Throws: <b>TypeError</b> when one or more of the arguments are not finite.</p>
+            <h5>Description</h5>
+            <p><code>rad</code> may take one, two or three arguments.</p>
+            <h5>Usage</h5>
+<pre>UsefulJS.Math.fcorrect(UsefulJS.Math.rad(57, 17, 44.8062470964)); // 1
+
+// Construct a lookup table of sines from 0 to 360 degrees
+var sines = (new Array(361)).join('-').split('-').map(function(item, i) {
+    return Math.sin(UsefulJS.Math.rad(i));
+});</pre>
+            <h2>Fixes - ES6 Math functions</h2>
+            <p>The fixes for the UsefulJS.Math module are defined in the _math namespace of the input and
+            output properties of the <code>fix</code> call. All are applied by default. The property names 
+            are the method names: "sinh", "hypot", "expm1", etc.</p>
+            <div class="alert alert-info">In case you're wondering why there's a dedicated 
+            <code>expm1</code> function to calculate e<sup>x</sup> - 1 (or a dedicated 
+            <code>log1p</code> function to calculate log(x + 1)), the reason is avoidance
+            of catastrophic loss of precision for small values of x. For small values of x,
+            e<sup>x</sup> and 1 + x are very close to 1. Because of the nature of the floating
+            point representation of numbers, values closer to 1 than the epsilon value are
+            indistinguishable from 1 while values closer to 0 than the epsilon value remain
+            distinguishable from 0. <code>Math.expm1(1e-16)</code> and <code>Math.log1p(1e-16)</code>
+            should both return 10<sup>-16</sup> while <code>Math.exp(1e-16) - 1</code> and
+            <code>Math.log(1 + 1e-16)</code> will both return 0, a 100% loss of accuracy.</div>
+            <h3>Static Math methods</h3>
+            <h4 class="api-doc">Math.acosh</h4>
+            <h5>Syntax</h5>
+            <pre>Math.acosh(v)</pre>
+            <h5>Description</h5>
+            <p>Calculates the hyperbolic area cosine of <code>v</code>.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/acosh"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Math.asinh</h4>
+            <h5>Syntax</h5>
+            <pre>Math.asinh(v)</pre>
+            <h5>Description</h5>
+            <p>Calculates the hyperbolic area sine of <code>v</code>.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/asinh"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Math.atanh</h4>
+            <h5>Syntax</h5>
+            <pre>Math.atanh(v)</pre>
+            <h5>Description</h5>
+            <p>Calculates the hyperbolic area tangent of <code>v</code>.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/atanh"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Math.cbrt</h4>
+            <h5>Syntax</h5>
+            <pre>Math.cbrt(v)</pre>
+            <h5>Description</h5>
+            <p>Calculates the cube root of <code>v</code>.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/cbrt"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Math.clz32</h4>
+            <h5>Syntax</h5>
+            <pre>Math.clz32(v)</pre>
+            <h5>Description</h5>
+            <p>Counts the number of leading 0-bits in the 32-bit unsigned int representation of <code>v</code>.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/clz32"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Math.cosh</h4>
+            <h5>Syntax</h5>
+            <pre>Math.cosh(v)</pre>
+            <h5>Description</h5>
+            <p>Calculates the hyperbolic cosine of <code>v</code>.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/cosh"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Math.expm1</h4>
+            <h5>Syntax</h5>
+            <pre>Math.expm1(v)</pre>
+            <h5>Description</h5>
+            <p>Calculates the value of e<sup><code>v</code></sup> - 1.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/expm1"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Math.hypot</h4>
+            <h5>Syntax</h5>
+            <pre>Math.hypot(a[, b[, c ... ]])</pre>
+            <h5>Description</h5>
+            <p>Performs Pythagorean addition on its arguments (i.e. <code>Math.sqrt(a * a + b * b)</code>)
+            while avoiding overflow in the intermediate products.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/hypot"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Math.imul</h4>
+            <h5>Syntax</h5>
+            <pre>Math.imul(a, b)</pre>
+            <h5>Description</h5>
+            <p>Calculates the 32-bit signed integer product of <code>a</code> and <code>b</code>.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/imul"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Math.log1p</h4>
+            <h5>Syntax</h5>
+            <pre>Math.log1p(v)</pre>
+            <h5>Description</h5>
+            <p>Calculates the natural logarithm of <code>v</code> + 1.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/log1p"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Math.log10</h4>
+            <h5>Syntax</h5>
+            <pre>Math.log10(v)</pre>
+            <h5>Description</h5>
+            <p>Calculates the base-10 logarithm of <code>v</code>.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/log10"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Math.log2</h4>
+            <h5>Syntax</h5>
+            <pre>Math.log2(v)</pre>
+            <h5>Description</h5>
+            <p>Calculates the base-2 logarithm of <code>v</code>.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/log2"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Math.sign</h4>
+            <h5>Syntax</h5>
+            <pre>Math.sign(v)</pre>
+            <h5>Description</h5>
+            <p>Calculates the sign of <code>v</code>.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Math.sinh</h4>
+            <h5>Syntax</h5>
+            <pre>Math.sinh(v)</pre>
+            <h5>Description</h5>
+            <p>Calculates the hyperbolic sine of <code>v</code>.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sinh"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Math.tanh</h4>
+            <h5>Syntax</h5>
+            <pre>Math.tanh(v)</pre>
+            <h5>Description</h5>
+            <p>Calculates the hyperbolic tangent of <code>v</code>.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/tanh"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Math.trunc</h4>
+            <h5>Syntax</h5>
+            <pre>Math.trunc(v)</pre>
+            <h5>Description</h5>
+            <p>Removes the fractional part of <code>v</code>, rounding towards 0.
+            See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/trunc"
+                target="_blank">the MDN documentation</a> for details</p>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

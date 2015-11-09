@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>UsefulJS.DnD</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body data-spy="scroll" data-target="#sidebar">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="core.html">UsefulJS.Core</a></li>
+                            <li><a href="array.html">UsefulJS.Array</a></li>
+                            <li><a href="classlist.html">UsefulJS.ClassList</a></li>
+                            <li><a href="date.html">UsefulJS.Date</a></li>
+                            <li><a href="event.html">UsefulJS.Event</a></li>
+                            <li><a href="math.html">UsefulJS.Math</a></li>
+                            <li><a href="numeric.html">UsefulJS.Number</a></li>
+                            <li><a href="query.html">UsefulJS.Query</a></li>
+                            <li><a href="storage.html">UsefulJS.Storage</a></li>
+                            <li><a href="string.html">UsefulJS.String</a></li>
+                            <li><a href="locale.html">UsefulJS.Locale</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="browser.html">UsefulJS.Browser</a></li>
+                            <li><a href="currency.html">UsefulJS.Currency</a></li>
+                            <li><a href="skin.html">UsefulJS.Skin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container">
+            <h1>UsefulJS.DnD</h1>
+            <p>The DnD extension builds on UsefulJS.Event to provide a simple framework
+            for dragging elements around the page using the mouse or touchscreen.</p>
+            <h2>Static methods</h2>
+            <h4 class="api-doc">register</h4>
+            <p>Registers an element for drag and drop</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.DnD.register(elem[, boundingElem[, startCallback[, updateCallback[, ctx]]]])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>elem</code> <b>String|Element</b><br>
+                The element (or ID of the element) for which you want drag behaviour.</li>
+                <li><code>boundingElem</code> <b>String|Element</b> (optional)<br>
+                The element (or ID of the element) that forms the bounding rectangle of the
+                area in which <code>elem</code> is allowed to move; defaults to <code>document.body</code></li>
+                <li><code>startCallback</code> <b>Function</b> (optional)<br>
+                Callback for when the drag operation begins; see the description below for 
+                details of the function parameters</li>
+                <li><code>updateCallback</code> <b>Function</b> (optional)<br>
+                Callback for when the dragged element is moved or the drag operation ends; 
+                see the description below for details of the function parameters</li>
+                <li><code>ctx</code> <b>Object</b> (optional)<br>
+                The calling context (i.e. "this") for the callbacks.</li>
+            </ul>
+            <p>Throws <b>TypeError</b>: if <code>elem</code> is not an element or a 
+            string that resolves to an element.</p>
+            <h5>Description</h5>
+            <p>The start callback function takes has the following form:</p>
+            <pre>startCallback(event, eventSource, registeredElement)</pre>
+            <p><code>event</code> will be a mousedown or touchstart event. 
+            <code>eventSource</code> may well not be the same element that was passed to
+            <code>register</code> but <code>registeredElement</code> will be.</p>
+            <p>The callback should return the element that is to be dragged; this may not
+            be the registered element. For example, in a chess game, the elements that are 
+            dragged around may be small images but the element registered for drag events 
+            is a much larger container element allowing pieces to be moved when using a 
+            touchscreen. The callback is also responsible for making the returned element
+            suitable for dragging (for example, removing the element to be dragged from 
+            its current parent node, adding the element as a child node of the bounding element
+            and positioning it absolutely). If you want to prevent the drag behaviour (for
+            example, <code>eventtSource</code> is not an element that you want to allow
+            to initiate drag operations) your callback function can return <code>null</code>.
+            <div class="alert alert-info">You can distinguish touch events in your callback
+            by the presence of a <code>touches</code> property in <code>event</code>. For
+            example, when using a touch screen you may want to position the drag element
+            differently so that it is not obscured by the user's finger.</div>
+            <p>If no <code>startCallback</code> function is supplied, the framework will
+            use the registered element for dragging and will set style attributes on it
+            (position: absolute; left, top: the clientX, clientY positions of the event). 
+            <p>The update callback function takes has the following form:</p>
+            <pre>updateCallback(event, x, y, dragElement, complete)</pre>
+            <p>If <code>complete</code> is true, <code>event</code> will be a mouseup or touchend event. 
+            Otherwise it will be a mousemove / touchmove event. <code>dragElement</code>
+            is the element being dragged and <code>x</code> and <code>y</code> are the
+            co-ordinates of its top left corners.</p>
+            <div class="alert alert-warning">If an element is removed from the document tree
+            when it has been registered for drag-and-drop (for example, one chess piece takes
+            another), it should be deregistered first;
+            this is both to free resources used and to allow drag-and-drop to work if you
+            later register an element which re-uses the same element ID.</div>
+            <h4 class="api-doc">deregister</h4>
+            <p>Deregisters an element previously registered for drag-and-drop.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.DnD.deregister(elem)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>elem</code> <b>String|Element</b><br>
+                The element (or ID of the element) for which you no longer want drag behaviour.</li>
+            </ul>
+            <p>Throws <b>TypeError</b>: if <code>elem</code> is not an element or a 
+            string that resolves to an element.</p>
+            <h5>Description</h5>
+            <p>Removes event handlers that were added to <code>elem</code> by the 
+            <code>UsefulJS.DnD.register</code> call.</p>
+            <div class="alert alert-info">If you want to register an element for drag-and-drop
+            using different parameters (for example, a different bounding element), you must
+            deregister it first.</div>
+            <h4 class="api-doc">elementOffset</h4>
+            <p>Gets the x- and y-offsets of one element from another</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.DnD.elementOffset(elem[, eRel])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>elem</code> <b>String|Element</b><br>
+                The (ID of the) element that you're interested in</li>
+                <li><code>eRel</code> <b>String|Element</b> (optional)<br>
+                The (ID of the) element to be used as a reference; defaults to 
+                document.body.</li>
+            </ul>
+            <p>Returns <b>Array</b>: the x and y co-ordinates of <code>elem</code> relative
+            to eRel.</p>
+            <p>Throws <b>TypeError</b>: if <code>elem</code> is not an element or a 
+            string that resolves to an element.</p>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>UsefulJS.Browser</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body data-spy="scroll" data-target="#sidebar">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="core.html">UsefulJS.Core</a></li>
+                            <li><a href="array.html">UsefulJS.Array</a></li>
+                            <li><a href="classlist.html">UsefulJS.ClassList</a></li>
+                            <li><a href="date.html">UsefulJS.Date</a></li>
+                            <li><a href="event.html">UsefulJS.Event</a></li>
+                            <li><a href="math.html">UsefulJS.Math</a></li>
+                            <li><a href="numeric.html">UsefulJS.Number</a></li>
+                            <li><a href="query.html">UsefulJS.Query</a></li>
+                            <li><a href="storage.html">UsefulJS.Storage</a></li>
+                            <li><a href="string.html">UsefulJS.String</a></li>
+                            <li><a href="locale.html">UsefulJS.Locale</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="currency.html">UsefulJS.Currency</a></li>
+                            <li><a href="dnd.html">UsefulJS.DnD</a></li>
+                            <li><a href="skin.html">UsefulJS.Skin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container">
+            <h1>UsefulJS.Browser</h1>
+            <p>The Browser extension implements user agent detection. The following values are
+            exposed as properties of the module:</p>
+            <table class="table">
+                <thead>
+                    <tr><th width="25%">Property name</th><th>Type</th><th>Details</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>name</code></td><td><b>String</b></td>
+                        <td>The browser name, for example, "Firefox" or "Internet Explorer"</td></tr>
+                    <tr><td><code>version</code></td><td><b>String</b></td>
+                        <td>The unparsed version number of the browser software</td></tr>
+                    <tr><td><code>major</code></td><td><b>Number</b></td>
+                        <td>The major version number</td></tr>
+                    <tr><td><code>minor</code></td><td><b>Number</b></td>
+                        <td>The minor version number</td></tr>
+                    <tr><td><code>engineVersion</code></td><td><b>String</b></td>
+                        <td>The unparsed version number of the browser engine</td></tr>
+                    <tr><td><code>engineMajor</code></td><td><b>Number</b></td>
+                        <td>The major engine version number</td></tr>
+                    <tr><td><code>engineMinor</code></td><td><b>Number</b></td>
+                        <td>The minor engine version number</td></tr>
+                    <tr><td><code>mobile</code></td><td><b>Boolean</b></td>
+                        <td>An educated guess as to whether this is a mobile platform</td></tr>
+                </tbody>
+            </table>
+            <div class="alert alert-info">
+            The engine name (which is more significant than the browser name) will be one of "webkit",
+            "gecko", "trident", "presto" or "khtml". Internet Explorer prior to version 8 did not
+            advertise an engine. If IE7 or earlier is detected, the engine name is set to "msie" and the version is
+            set to the browser version. Since being forced to support old versions of Internet Explorer
+            is a primary use case for user agent detection in the first place, this is a reasonable fallback.
+            </div>
+            <p>User-agent detection is not highly favoured these days. Possibly this is because it's been done
+            badly in the past: comparing version numbers as strings and finding that "10" is less than "9" or
+            only allowing for one major version digit in a regular expression and then blowing up with a null pointer
+            exception when the regex fails to match. This is compounded by a history of obfuscation and downright
+            dishonesty in the user agent string that makes it ridiculously hard to mine for correct and useful
+            information  One might imagine that there's an industry-wide conspiracy to ensure that
+            no property of the <code>navigator</code> object returns a usable value (examine
+            <code>navigator.appName</code>; it is almost <em>always</em> "Netscape").</p>
+            <p>Since corporate IT departments are <em>very</em> resistant to change, many professional developers
+            are forced to support browsers that are now very legacy indeed. Many home users are perfectly happy
+            with Windows XP which means that we'll have to support Internet Explorer 8 for some time to come.
+            These legacy browsers throw up issues that no amount of feature detection can overcome. For example,
+            imagine that you have some dynamic, pre-formatted content that you need to display so you set it
+            as the <code>innerHTML</code> of a &lt;pre&gt; element. If the text is separated by "\n", it displays fine
+            on IE8 and every other browser, but on IE7 the lines do not break. So you replace all "\n" with "\r\n".
+            Now it displays fine on IE7 and every other browser, but on IE8 the text has extra line breaks.
+            You <em>could</em> maybe set it, examine the offset height (assuming you know what the "correct" offset
+            height might be) and make a correction. Or, simpler and more reliable, you can determine that your code is
+            running on a known problem platform and compensate.</p>
+            <h2>Fixes</h2>
+            <p>The fixes for the Browser extension are defined in the _browser namespace of the fix options.</p>
+            <h4 class="api-doc">identify</h4>
+            <p>The <code>identify</code> fix does something useful with the user agent information: it adds three
+            classes to the document element identifying the engine, engine major version and engine minor version.
+            For example, on Firefox 24 (engine version "Gecko 24.0"), these classes are added to the &lt;html&gt;
+            element:</p>
+            <pre>gecko gecko-24 gecko-24-0</pre>
+            <p>You can use these classes to help overcome CSS issues thrown up by different engines (you know: the same
+            line of CSS positions an element slightly differently on every browser and only one is right).</p>
+            <p>This fix has to be explicitly enabled:</p>
+<pre>UsefulJS.fix({
+    _browser : {
+        identify : true
+    }
+});</pre>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

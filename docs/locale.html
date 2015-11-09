@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>UsefulJS.Locale</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body data-spy="scroll" data-target="#sidebar">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="core.html">UsefulJS.Core</a></li>
+                            <li><a href="array.html">UsefulJS.Array</a></li>
+                            <li><a href="classlist.html">UsefulJS.ClassList</a></li>
+                            <li><a href="date.html">UsefulJS.Date</a></li>
+                            <li><a href="event.html">UsefulJS.Event</a></li>
+                            <li><a href="math.html">UsefulJS.Math</a></li>
+                            <li><a href="numeric.html">UsefulJS.Number</a></li>
+                            <li><a href="query.html">UsefulJS.Query</a></li>
+                            <li><a href="storage.html">UsefulJS.Storage</a></li>
+                            <li><a href="string.html">UsefulJS.String</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="browser.html">UsefulJS.Browser</a></li>
+                            <li><a href="currency.html">UsefulJS.Currency</a></li>
+                            <li><a href="dnd.html">UsefulJS.DnD</a></li>
+                            <li><a href="skin.html">UsefulJS.Skin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container">
+            <h1>UsefulJS.Locale</h1>
+            <p>The Locale module provides support for number and date formatting. A large
+            number of languages and locales are supported out of the box and the locale
+            framework is extensible.</p>
+            <h2>Extending supported locales</h2>
+            <p>Extending the supported locales is a (relatively) simple matter of defining
+            an Object with the relevant properties. Although there are a large number of
+            properties, the locale system has a simple inheritance mechanism so that you
+            only have to fill in the properties that differ from the <code>base</code>
+            locale.<p>
+            <p>The templates directory has a file called locale_template.js that you can 
+            adapt for your own purposes. The example is a self-executing function but if you
+            don't need to define aliases or compute anything as part of the locale definition,
+            this can be a simple list of properties.</p>
+            <h2>Locale identification</h2>
+            <p>Locales should be identified using BCP 47 tags which take the form</p>
+            <pre>&lt;LANGUAGE&gt;-&lt;SCRIPT&gt;-&lt;COUNTRY&gt;</pre>
+            <p>Only the language tag is necessary for most locales; the other parts are
+            specializations for a particular country. For example, "sr" is the tag for 
+            Serbian in the default Cyrillic script. "sr-Latn" is the tag for Serbian using
+            the Latin alphabet while "sr-Latn-ME" is the tag for Serbian using the Latin
+            alphabet in Montenegro. See <a href="http://tools.ietf.org/html/rfc5646" target="_blank">RFC 5646</a>
+            for more details on language tags and <a 
+            href="http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry" target="_blank">
+            the relevant IANA documentation</a> for the correct language codes.</p> 
+            <h2>Inheritance</h2>
+            <p>The UsefulJS core defines a default locale ("def") that is the base of all 
+            other locales. If your locale derives from the default locale (via its base 
+            property) then you only have to define properties that differ from the default
+            locale. If the <code>base</code> is something other than "def", then you only need to
+            define properties that differ from the base locale AND the def locale. Inheritance
+            can be any number of levels deep. For example, the ar-TZ (Tunisia) locale has
+            the following inheritance:</p>
+            <pre>ar-TZ -&gt; ar-DZ (Algeria) -&gt; ar-MA (Morocco) -&gt; ar-AE (United Arab Emirates) -&gt; ar (Arabic) -&gt; def (Default)</pre>
+            <h2>Locale properties</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Type</th>
+                        <th width="15%">Meaning</th>
+                        <th>Purpose</th><th width="35%">Notes</th>
+                        <th>Default</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>n</td>
+                        <td>String</td>
+                        <td>Name</td>
+                        <td>Displayable, localized name</td>
+                        <td>-</td>
+                        <td>English</td>
+                    </tr>
+                    <tr>
+                        <td>base</td>
+                        <td>String</td>
+                        <td>Parent locale</td>
+                        <td>The base locale for inheritance purposes</td>
+                        <td>-</td>
+                        <td>null</td>
+                    </tr>
+                    <tr>
+                        <td>ndigits</td>
+                        <td>String</td>
+                        <td>Numeric digits</td>
+                        <td>The default digits used for representing numbers</td>
+                        <td>See <a href="numeric.html">UsefulJS.Number</a></td>
+                        <td>latn</td>
+                    </tr>
+                    <tr>
+                        <td>ds</td>
+                        <td>String</td>
+                        <td>Decimal separator</td>
+                        <td>The character that separates the integer component of a number
+                        from the decimal part</td>
+                        <td>-</td>
+                        <td>.</td>
+                    </tr>
+                    <tr>
+                        <td>gs</td>
+                        <td>String</td>
+                        <td>Numeric group separator</td>
+                        <td>The character that separates groups when a number is formatted
+                        for readability</td>
+                        <td>-</td>
+                        <td>,</td>
+                    </tr>
+                    <tr>
+                        <td>gc</td>
+                        <td>Array</td>
+                        <td>Group counts</td>
+                        <td>How many digits are in each group of the number.</td>
+                        <td>Most locales use a count of 3 as in 10,000,000; in Indian locales 
+                        this would be 1,00,00,000 which makes the gc value [3,2]</td>
+                        <td>[3]</td>
+                    </tr>
+                    <tr>
+                        <td>nn</td>
+                        <td>String</td>
+                        <td>Negative number pattern</td>
+                        <td>The template used for rendering negative numbers</td>
+                        <td>"%1" is replaced with the formatted absolute value</td>
+                        <td>-%1</td>
+                    </tr>
+                    <tr>
+                        <td>cc</td>
+                        <td>String</td>
+                        <td>Currency code</td>
+                        <td>The ISO 4217 currency code</td>
+                        <td>This is a locale-neutral currency representation; codes are listed 
+                        <a href="http://www.currency-iso.org/dam/downloads/table_a1.xml"
+                        target="_blank">here</a>.</td>
+                        <td>EUR</td>
+                    </tr>
+                    <tr>
+                        <td>cu</td>
+                        <td>Object</td>
+                        <td>Currency units</td>
+                        <td>Localized currency symbols</td>
+                        <td>This maps three-letter currency codes to currency symbols; for example,
+                        <code>{ USD : "US$", AUD : "$" }</code>.
+                        <td>-</td>
+                    <tr>
+                        <td>cf</td>
+                        <td>Array</td>
+                        <td>Currency formats</td>
+                        <td>The templates used for rendering positive and negative 
+                        currency values</td>
+                        <td>'$' is replaced with the currency code or symbol; "%1" is 
+                        replaced with the formatted absolute value</td>
+                        <td><nobr>["$%1", "-$%1"]</nobr></td>
+                    </tr>
+                    <tr>
+                        <td>pc</td>
+                        <td>Array</td>
+                        <td>Percentage codes</td>
+                        <td>The templates used for rendering positive and negative 
+                        percent values</td>
+                        <td>"%1" is replaced with the formatted absolute value</td>
+                        <td><nobr>["%1%", "-%1%"]</nobr></td>
+                    </tr>
+                    <tr>
+                        <td>ddigits</td>
+                        <td>String</td>
+                        <td>Date digits</td>
+                        <td>The default digits used for representing dates</td>
+                        <td>See <a href="date.html">UsefulJS.Date</a></td>
+                        <td>latn</td>
+                    </tr>
+                    <tr>
+                        <td>mc</td>
+                        <td>Array</td>
+                        <td>Compact months</td>
+                        <td>Short forms of month names</td>
+                        <td>Some locales do not have a compact form for month names; use 
+                        <code>null</code>.</td>
+                        <td>["Jan", ... "Dec"]</td>
+                    </tr>
+                    <tr>
+                        <td>mf</td>
+                        <td>Array</td>
+                        <td>Full months</td>
+                        <td>Long forms of month names</td>
+                        <td>-</td>
+                        <td>["January", ... "December"]</td>
+                    </tr>
+                    <tr>
+                        <td>mn</td>
+                        <td>Array</td>
+                        <td>Nominative month names</td>
+                        <td>Month names in the nominative case</td>
+                        <td>Some languages distinguish between, e.g. "18 September" and
+                        "September 2015", using genitive case for the former and nominative
+                        for the latter. When this is the case use the genitive forms in mf 
+                        and the nominative forms in mn.</td>
+                        <td>null</td>
+                    </tr>
+                    <tr>
+                        <td>da</td>
+                        <td>Array</td>
+                        <td>Abbreviated day names</td>
+                        <td>Shortest forms of day names</td>
+                        <td>These are the day codes that are returned by the UsefulJS.Date
+                        <code>cal</code> function. If this not meaningful in the locale, 
+                        use <code>null</code>.</td>
+                        <td>["Su", ... "Sa"]</td>
+                    </tr>
+                    <tr>
+                        <td>dc</td>
+                        <td>Array</td>
+                        <td>Compact day names</td>
+                        <td>Short forms of day names</td>
+                        <td>Some locales do not have a compact form for day names; use 
+                        <code>null</code>.</td>
+                        <td>["Sun", ... "Sat"]</td>
+                    </tr>
+                    <tr>
+                        <td>df</td>
+                        <td>Array</td>
+                        <td>Full day names</td>
+                        <td>Long forms of day names</td>
+                        <td>Values should always start at the equivalent of Sunday</td>
+                        <td>["Sunday", ... "Saturday"]</td>
+                    </tr>
+                    <tr>
+                        <td>um</td>
+                        <td>Array</td>
+                        <td>Uppercase meridiem names</td>
+                        <td>Local equivalent of AM/PM</td>
+                        <td>12 hour clock is not meaningful in all locales</td>
+                        <td>["AM", "PM"]</td>
+                    </tr>
+                    <tr>
+                        <td>lm</td>
+                        <td>Array</td>
+                        <td>Lowercase meridiem names</td>
+                        <td>Local equivalent of am/pm</td>
+                        <td>-</td>
+                        <td>["am", "pm"]</td>
+                    </tr>
+                    <tr>
+                        <td>hd</td>
+                        <td>Array</td>
+                        <td>Hour divisions</td>
+                        <td>The starting hours of each division of the day</td>
+                        <td>Some locales may divide the hours of the day into more than
+                        two divisions</td>
+                        <td>[0, 12]</td>
+                    </tr>
+                    <tr>
+                        <td>hour12</td>
+                        <td>Boolean</td>
+                        <td>12 hour clock flag</td>
+                        <td>Default value of the hour12 format property when using the Intl API</td>
+                        <td>Set to true if the locale uses 12 hour clock by default</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>sc</td>
+                        <td>Object</td>
+                        <td>Strftime codes</td>
+                        <td>Macros for strftime</td>
+                        <td>Some strftime codes (such as %c) are expanded to a sequence of 
+                        other strftime codes. Macros that may need to be defined are: %c 
+                        (date and time), %x (date), %X (time) and %r (time with am/pm).</td>
+                        <td>{ "%c" : "%a %d %b %Y %X", %x" : "%d/%m/%Y", "%X" : "%T", "%r" : "%I:%M:%S %p" }</td>
+                    </tr>
+                    <tr>
+                        <td>dfmt</td>
+                        <td>Object</td>
+                        <td>Date format strings</td>
+                        <td>strftime sequences for formatting dates using the Intl API</td>
+                        <td>See below.</td>
+                        <td>See below</td>
+                    </tr>
+                    <tr>
+                        <td>tfmt</td>
+                        <td>Object</td>
+                        <td>Time format strings</td>
+                        <td>strftime sequences for formatting times using the Intl API</td>
+                        <td>See below.</td>
+                        <td>See below</td>
+                    </tr>
+                    <tr>
+                        <td>datetime</td>
+                        <td>String</td>
+                        <td>Date and time template</td>
+                        <td>The template used to combine the format strings used for rendering
+                        the date and the time</td>
+                        <td>"{d}" is replaced with the date format string while "{t}" is
+                        replaced with the time format string.</td>
+                        <td>{d} {t}</td>
+                    </tr>
+                    <tr>
+                        <td>dateera</td>
+                        <td>String</td>
+                        <td>Date and era template</td>
+                        <td>The template used to combine the format string used for rendering
+                        the date and the era</td>
+                        <td>"{d}" is replaced with the date format string.</td>
+                        <td>{d} %!</td>
+                    </tr>
+                    <tr>
+                        <td>time12</td>
+                        <td>String</td>
+                        <td>Twelve hour clock template</td>
+                        <td>The template used to combine the format string used for rendering
+                        the time and am/pm</td>
+                        <td>"{t}" is replaced with the time format string.</td>
+                        <td>{t} %p</td>
+                    </tr>
+                    <tr>
+                        <td>timetz</td>
+                        <td>String</td>
+                        <td>Time + timezone template</td>
+                        <td>The template used to combine the format string used for rendering
+                        the time and the timezone</td>
+                        <td>"{t}" is replaced with the time format string.</td>
+                        <td>{t} GMT%z</td>
+                    </tr>
+                    <tr>
+                        <td>fd</td>
+                        <td>Number</td>
+                        <td>First day of the week</td>
+                        <td>0-based value of the first day of the week where 0 corresponds 
+                        to Sunday and 6 corresponds to Saturday</td>
+                        <td>-</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>calendar</td>
+                        <td>String</td>
+                        <td>Default calendar</td>
+                        <td>The name of the default calendar for the locale. </td>
+                        <td>See <a href="date.html">UsefulJS.Date</a></td>
+                        <td>gregory</td>
+                    </tr>
+                    <tr>
+                        <td>&lt;CALENDAR NAME&gt;</td>
+                        <td>Object</td>
+                        <td>Calendar property overrides</td>
+                        <td>Allow overriding of selected calendar properties</td>
+                        <td>For example, to override the strings used for AD and BC, add a <code>gregory</code>
+                        property whose value is { era : ["&lt;AD equivalent&gt;", "&lt;BC equivalent&gt;"] }</td>
+                        <td>null</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2>Date and time formats</h2>
+            <p>When using the Intl-compatible API to format dates, rather than specifying a
+            format string, you specify the properties that you'd like the output to have.
+            Sensible property combinations result in sensible output via the format strings
+            in the <code>dfmt</code> and <code>tfmt</code> Objects in the Locale definition.
+            The keys use the characters 't', 'n' and '-' where 't' represents a text field,
+            'n' represents a numeric field and '-' represents an absent field. Rather than 
+            having to specify all possible combinations, you only need to specify a sensible
+            subset and only when they differ from the base locale. dfmt keys are four characters
+            representing weekday, year, month and day while tfmt keys are three characters
+            representing hours, minutes and seconds. The following table lists the sensible
+            combinations, together with their values in the def locale and example output.</p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Meaning</th>
+                        <th>Format String</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4"><b>dfmt</b></td>
+                    </tr>
+                    <tr>
+                        <td>tntn</td>
+                        <td>Weekday, year, month, day</td>
+                        <td>%A, %e %B %Y</td>
+                        <td>Saturday, 19 September 2015</td>
+                    </tr>
+                    <tr>
+                        <td>tnnn</td>
+                        <td>Weekday, year, month, day</td>
+                        <td>%A, %e/%N/%Y</td>
+                        <td>Saturday, 19/9/2015</td>
+                    </tr>
+                    <tr>
+                        <td>-ntn</td>
+                        <td>Year, month, day</td>
+                        <td>%e %B %Y</td>
+                        <td>19 September 2015</td>
+                    </tr>
+                    <tr>
+                        <td>-nnn</td>
+                        <td>Year, month, day</td>
+                        <td>%e/%N/%Y</td>
+                        <td>19/9/2015</td>
+                    </tr>
+                    <tr>
+                        <td>-nt-</td>
+                        <td>Year, month</td>
+                        <td>%B %Y</td>
+                        <td>September 2015</td>
+                    </tr>
+                    <tr>
+                        <td>-nn-</td>
+                        <td>Year, month</td>
+                        <td>%N/%Y</td>
+                        <td>9/2015</td>
+                    </tr>
+                    <tr>
+                        <td>--tn</td>
+                        <td>Month, day</td>
+                        <td>%e %B</td>
+                        <td>19 September</td>
+                    </tr>
+                    <tr>
+                        <td>--nn</td>
+                        <td>Month, day</td>
+                        <td>%e/%N</td>
+                        <td>19/9</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"><b>tfmt</b></td>
+                    </tr>
+                    <tr>
+                        <td>nnn</td>
+                        <td>Hours, minutes, seconds</td>
+                        <td>%k:%M:%S</td>
+                        <td>2:05:24</td>
+                    </tr>
+                    <tr>
+                        <td>nn-</td>
+                        <td>Hours, minutes</td>
+                        <td>%k:%M</td>
+                        <td>13:27</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2>Static properties</h2>
+            <h4 class="api-doc">UsefulJS.Locale.current</h4>
+            <p>This read/write value is the fallback locale when no locales are specified
+            when constructing a format object. It is initialized with information obtained
+            from the browser which, depending on the browser, may or may not reflect a
+            user's preference. To illustrate, assuming that the library sets "en" (US English)
+            as the current locale:
+            <pre>(new UsefulJS.Date.Format()).format(new Date()); // 9/19/2015
+UsefulJS.Locale.current = "fr";
+(new UsefulJS.Date.Format()).format(new Date()); // 19/9/2015</pre>
+            <p>If the browser supports <code>Object.defineProperty</code>, the <code>current</code>
+            property is accessed through a getter and setter which will raise a TypeError if you attempt
+            to set a silly value. If you set an unsupported locale, a sensible fallback will be
+            used. To illustrate:</p>
+            <pre>UsefulJS.current = null; // throws TypeError
+UsefulJS.current = "zz";
+UsefulJS.current         // "en"
+UsefulJS.current = "zh-Hant-CN";
+UsefulJS.current         // "zh"</pre>
+            <p>If the browser does not support <code>Object.defineProperty</code>, you can 
+            set silly values which will make bad things happen. So don't!</p>
+            <h2>Static methods</h2>
+            <p>The UsefulJS.Locale functions are called by the numeric and date formatting
+            code but they are public functions that your own applications may call.</p>
+            <h4 class="api-doc">alias</h4>
+            <p>Sets aliases for a defined locale (two or more arguments) or resolves an alias
+            (single argument).</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Locale.alias(loc[, alias1, alias2 ...])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>loc</code> <b>String</b><br>
+                The locale to alias (multiargument) or resolve (single argument).</li>
+                <li><code>alias1, alias2, ...</code> <b>String</b><br>
+                Aliases for the locale.</li>
+            </ul>
+            <p>Returns: <b>String</b>. The resolved locale (single-argument only)</p>
+            <h5>Description</h5>
+            <p>Aliasing is required when the lookup algorithm would give the wrong answer.
+            For example, the locale ID for Taiwan is "zh-Hant-TW" meaning Chinese, written
+            in Han traditional script as used in Taiwan. If we were to lookup "zh-TW" (Chinese
+            as used in Taiwan), the lookup algorithm would resolve "zh" which is mainland
+            Chinese. If, however, we record "zh-TW" as an <em>alias</em> for "zh-Hant-TW",
+            the lookup for "zh-TW" gives the correct answer.</p>
+            <h5>Usage</h5>
+            <pre>// Set an alias
+UsefulJS.Locale.alias("zh-Hant-TW", "zh-TW");
+// Resolve an alias
+var resolved = UsefulJS.Locale.alias("zh-TW");  // zh-Hant-TW</pre>
+            <h4 class="api-doc">lookup</h4>
+            <p>Obtains best match for the requested locales from the supported locales.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Locale.lookup(locales)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>locales</code> <b>Array</b><br>
+                The list of locale codes to select a match from.</li>
+            </ul>
+            <p>Returns: <b>Array</b>. Two items, the best match locale and any unicode
+            extension requested for that locale.</p>
+            <h5>Description</h5>
+            <p>For ease of processing the selected code is split into the BCP 47 part and
+            any unicode extension requested. The algorithm returns the first "acceptable"
+            result, falling back to the default locale if no acceptable results can be
+            obtained. Unassisted, the algorithm may not select the <em>best</em> match,
+            however. For example, if the input is <code>["en-MY", "en-GB", "en-US"]</code>,
+            the returned locale will be "en", since "en-MY" is not a supported locale. 
+            However, for a Malaysian audience, "en-GB" would produce better output. The solution
+            is to alias "en-GB" to "en-MY".</p>
+            <h5>Usage</h5>
+            <pre>UsefulJS.Locale.lookup(["ja-JP-u-nu-fullwidth", "zh-Hant"]); // ["ja", "u-nu-fullwidth"]
+UsefulJS.Locale.alias("en-GB", "en-MY");
+UsefulJS.Locale.lookup(["en-MY", "en-GB", "en"]);            // ["en-GB", ""]</pre>
+            <h4 class="api-doc">options</h4>
+            <p>Gets the locale options for the named locale.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Locale.options(loc)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>loc</code> <b>String</b><br>
+                The locale to get options for.</li>
+            </ul>
+            <p>Returns: <b>Object</b>. The resolved locale options</p>
+            <h5>Description</h5>
+            <p>Although the locale Objects are properties of UsefulJS.Locale accessing
+            them directly is unlikely to return the right thing because of the inheritance
+            system which means that a whole bunch of properties are likely to be missing. 
+            Getting the Objects through the <code>options</code> method both resolves the
+            input locale and the inherited properties. This method is primarily designed
+            to be called to do the initial property resolution for the <code>dateOptions</code>
+            and <code>numericOptions</code> methods so the returned value is not 100% useful.</p>
+            <h4 class="api-doc">dateOptions</h4>
+            <p>Gets the fully resolved locale options required for date formatting.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Locale.dateOptions(loc[, fmtOptions])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>loc</code> <b>String</b><br>
+                The locale to get options for.</li>
+                <li><code>fmtOptions</code> <b>Object</b><br>
+                The format options hash supplied to the format object constructor; see 
+                <a href="date.html">UsefulJS.Date.Format</a> for more details.</li>
+            </ul>
+            <p>Returns: <b>Object</b>. The resolved locale options</p>
+            <h5>Description</h5>
+            <p>Unlike the <code>options</code> method, this call does return an Object with
+            everything resolved that needs to be resolved, taking into account the requested
+            numbering and calendar.</p>
+            <h4 class="api-doc">numericOptions</h4>
+            <p>Gets the fully resolved locale options required for number formatting.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Locale.numericOptions(loc[, fmtOptions])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>loc</code> <b>String</b><br>
+                The locale to get options for.</li>
+                <li><code>fmtOptions</code> <b>Object</b><br>
+                The format options hash supplied to the format object constructor; see 
+                <a href="numeric.html">UsefulJS.Number.Format</a> for more details.</li>
+            </ul>
+            <p>Returns: <b>Object</b>. The resolved locale options</p>
+            <h5>Description</h5>
+            <p>Unlike the <code>options</code> method, this call does return an Object with
+            everything resolved that needs to be resolved, taking into account the requested
+            numbering.</p>
+            <h4 class="api-doc">supportedLocalesOf</h4>
+            <p>Returns items from an input array that are supported in the sense that they
+            do not force a fallback to the <code>current</code> locale.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Locale.supportedLocalesOf(locales)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>locales</code> <b>Array</b><br>
+                The list of locale codes to query support for.</li>
+            </ul>
+            <p>Returns: <b>Array</b>. Filtered items from the input array.</p>
+            <h4 class="api-doc">getSupported</h4>
+            <p>Returns the list of locales that are actually supported.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Locale.getSupported()</pre>
+            <p>Returns: <b>Array</b>. Directly supported locale codes.</p>
+            <h4 class="api-doc">numberSystems</h4>
+            <p>Returns the supported numbering systems.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Locale.numberSystems()</pre>
+            <p>Returns: <b>Array</b>. Supported numbering system names.</p>
+            <h5>Description</h5>
+            <p>These values go into the <code>-nu-</code> part of the unicode extension.</p>
+            <h4 class="api-doc">calendars</h4>
+            <p>Returns the supported calendars.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Locale.calendars()</pre>
+            <p>Returns: <b>Array</b>. Supported calendar names.</p>
+            <h5>Description</h5>
+            <p>These values go into the <code>-ca-</code> part of the unicode extension.</p>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

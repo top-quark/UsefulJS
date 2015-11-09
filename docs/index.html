@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Overview</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body data-spy="scroll" data-target="#sidebar">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="core.html">UsefulJS.Core</a></li>
+                            <li><a href="array.html">UsefulJS.Array</a></li>
+                            <li><a href="classlist.html">UsefulJS.ClassList</a></li>
+                            <li><a href="date.html">UsefulJS.Date</a></li>
+                            <li><a href="event.html">UsefulJS.Event</a></li>
+                            <li><a href="math.html">UsefulJS.Math</a></li>
+                            <li><a href="numeric.html">UsefulJS.Number</a></li>
+                            <li><a href="query.html">UsefulJS.Query</a></li>
+                            <li><a href="storage.html">UsefulJS.Storage</a></li>
+                            <li><a href="string.html">UsefulJS.String</a></li>
+                            <li><a href="locale.html">UsefulJS.Locale</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="browser.html">UsefulJS.Browser</a></li>
+                            <li><a href="currency.html">UsefulJS.Currency</a></li>
+                            <li><a href="dnd.html">UsefulJS.DnD</a></li>
+                            <li><a href="skin.html">UsefulJS.Skin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container" style="margin-bottom:30px;">
+            <h1>UsefulJS</h1>
+            <p>
+                UsefulJS is a JavaScript library whose purpose is twofold:
+            </p>
+            <ul>
+                <li>Make the basic JavaScript programming environment identical 
+                across all browsers</li>
+                <li>Add <em>useful</em> functionality lacking in the standard implementations.</li>
+            </ul>
+            <h2>The UsefulJS philosophy</h2>
+            <p>Every JavaScript programmer has probably written a function to pad
+            strings to a fixed width, a function to determine whether this year is
+            a leap year, functions to manipulate class names of document elements,
+            functions to do something better with Date objects than call
+            toString on them, functions to work around the
+            inadequacies of Number.toFixed and so on.
+            </p>
+            <p>The major browser vendors have recognized that JavaScript programmers
+            routinely and repeatedly solve the same problems, so we now have support for things like:
+            <ul>
+                <li>String utility functions, such as <em>startsWith</em>,
+                    <em>endsWith</em>, <em>contains</em>, etc.
+                </li>
+                <li>Common functions to find items in an Array - <em>indexOf</em>,
+                    <em>lastIndexOf</em> - and to iterate over Array objects - 
+                    <em>forEach</em>, <em>every</em>, <em>some</em>, etc.
+                </li>
+                <li>A standardized API to manipulate Element.className to add and
+                    remove CSS classes via the <em>DOMTokenList</em> interface.
+                </li>
+            </ul>
+            <p>However, if we use them, our code is liable to break. Therefore, we're stuck with
+            stuff like this:</p>
+            <pre>var arrayIndexOf = function(arr, item) {
+    for (var i = 0; i &lt; arr.length; i++) {
+        if (arr[i] === item) {
+            return i;
+        }
+    }
+    return -1;
+};</pre>
+            <p>Or, if we're aware that <code>indexOf</code> is now an Array.prototype
+            method in many browsers, we might write:</p>
+            <pre>var arrayIndexOf = function(arr, item) {
+    if ("indexOf" in arr) {
+        return arr.indexOf(item);
+    }
+    for (var i = 0; i &lt; arr.length; i++) {
+        if (arr[i] === item) {
+            return i;
+        }
+    }
+    return -1;
+};</pre>
+            <p>Worse, we may have filled in the perceived inadequacy in Array
+            by blindly patching in the missing functionality with something that doesn't
+            <em>quite</em> work according to spec:</p>
+            <pre>Array.prototype.indexOf = function(item) {
+    for (var i = 0; i &lt; this.length; i++) {
+        if (this[i] === item) {
+            return i;
+        }
+    }
+    return -1;
+};</pre>
+            <p>The basic problem in all cases is the same: <em>we can't rely on the
+            JavaScript programming environment that our code is running in.</em>
+            </p>
+            <p>
+            With UsefulJS that isn't true. We can optimistically write:
+            </p>
+            <pre>// Basic stuff
+[1, 2, 3, 4].indexOf(2);
+"Three score years".startsWith("Three");
+var startTime = Date.now();
+document.body.classList.add("myClass");
+// Bleeding-edge
+var fmtObj = new Intl.DateTimeFormat("zh-TW-u-nu-fullwide-ca-roc"),
+    dateStr = fmtObj.format(new Date()),  // "民國１０２年１１月１３日"
+    uLiterals = Array.from(dateStr, function(c, idx) {
+        return '\\u' + c.charCodeAt(idx).toString(16).padLeft(4, '0');
+    });</pre>
+            <p>and expect everything to just <em>work</em>.</p>
+            <div class="alert alert-info">
+                See the documentation for individual modules for details of the
+                standard JavaScript API functionality that they provide.
+            </div>
+            <h2>Standard library enhancements</h2>
+            <p>Besides providing missing JavaScript functionality, UsefulJS
+            provides a wide range of additional functionality, including:</p>
+            <ul>
+                <li>Enhanced runtime type identification</li>
+                <li>Object copying and iteration</li>
+                <li>Flexible, locale-aware number formatting and parsing</li>
+                <li>Flexible, locale-aware date formatting and parsing</li>
+                <li>Context-aware string escaping</li>
+                <li>Conversion to and from UTF-8</li>
+                <li>Conversion between radians and degrees (and minutes and
+                seconds)</li>
+                <li>Simple, cross-browser event handling</li>
+            </ul>
+            <p>In a nutshell, this is what UsefulJS does:</p>
+            <div class="alert alert-success"><p class="lead">
+                Makes the runtime environment sane then makes it better</p></div>
+            <h1>Building UsefulJS</h1>
+            <p>If you downloaded the dev bundle, you'll need a version of <code>make</code>. Windows users can
+            get one by installing Cygwin. Start off by unpacking the dev bundle to your 
+            working directory then edit <code>minjs.mk</code> which defines the function
+            for minifying JavaScript files. I use <a href="https://developers.google.com/closure/compiler/"
+            target="_blank">Google Closure Compiler</a>. Even if you use this, you probably 
+            don't have it installed in the same place as me. If you don't have any minification
+            tool, you can change the definition to this:</p>
+            <pre>define minjs
+	cp $1 $2
+endef</pre>
+            <p>With that done, you just need to type:</p>
+            <pre>$ make all</pre>
+            <p>For a clean build, type:</p>
+            <pre>$ make clean all</pre> 
+            <h1>Using UsefulJS</h1>
+            <p>Include UsefulJS somwhere in your list of JavaScript includes:</p>
+            <pre>...
+&lt;script src="UsefulJS-min-latest.js"&gt;&lt;/script&gt;
+...</pre>
+            <p>If you want the extensions, use this:</p>
+            <pre>...
+&lt;script src="UsefulJS-min-full-latest.js"&gt;&lt;/script&gt;
+...</pre>
+            <p>UsefulJS has no dependencies on any other libraries so load order
+            is irrelevant.</p>
+            <p>If you are using the development libraries, load order <em>is</em>
+            important: you need to load the core module first. All other modules
+            are independent and can be loaded in any order:</p>
+            <pre>...
+&lt;script src="src/core.js"&gt;&lt;/script&gt;
+&lt;script src="src/string.js"&gt;&lt;/script&gt;
+&lt;script src="src/locale_en.js"&gt;&lt;/script&gt;
+&lt;script src="etc."&gt;&lt;/script&gt;
+...</pre>
+            <p>Any required extensions should be loaded after the core modules</p>
+            <h2>Fixing the environment</h2>
+            <p>Having loaded the library, you have a number of more-or-less useful
+            functions under a number of different namespaces. To realize the full
+            potential, call the <code>fix</code> method:</p>
+            <pre>window.onload = function() {
+    var fixed = UsefulJS.fix();
+    ...
+};</pre>
+            <p>Or, if you're loading the library in the head:</p>
+            <pre>&lt;script type="text/javascript"&gt;
+    var g_fixed = UsefulJS.fix();
+&lt;/script&gt;</pre>
+            <div class="alert alert-info">
+                The <code>fix</code> method takes an optional <code>opts</code>
+                paramter that controls which fixes are applied. Some
+                fixes have to be explicitly disabled while others have to be
+                explicitly enabled. See the <a href="core.html" class="alert-link">core module
+                documentation</a> and documentation for individual modules for
+                more information.
+            </div>
+            <h1>UsefulJS modules</h1>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <h4><a href="core.html">Core</a></h4>
+                    <p>The core provides basic properties and functions used by
+                    the rest of the library, and provides the framework for
+                    internationalization and localization.</p>
+                </li>
+                <li class="list-group-item">
+                    <h4><a href="array.html">Array</a></h4>
+                    <p>The Array module adds missing methods to the Array class where
+                    they are not implemented natively.</p>
+                </li>
+                <li class="list-group-item">
+                    <h4><a href="classlist.html">ClassList</a></h4>
+                    <p>The ClassList module provides a DOMTokenList
+                    interface to an element's className that works in all browsers.
+                    Where possible it makes classList a property on elements in
+                    legacy browsers that do not natively support it.</p>
+                </li>
+                <li class="list-group-item">
+                    <h4><a href="date.html">Date</a></h4>
+                    <p>The Date module provides powerful, locale-aware date formatting
+                    and parsing functionality using strftime format strings. It provides a
+                    complete implementation of the Intl.DateTimeFormat API.</p>
+                </li>
+                <li class="list-group-item">
+                    <h4><a href="event.html">Event</a></h4>
+                    <p>The Event module provides a simple, cross-browser interface to
+                    DOM events. It also provides functionality for dispatching and
+                    catching custom events.</p>
+                </li>
+                <li class="list-group-item">
+                    <h4><a href="locale.html">Locale</a></h4>
+                    <p>Basic locale support is hosted in the UsefulJS core. A number of additional
+                    modules provide support for date and number formatting targeting a large number of
+                    languages and locales.</p>
+                </li>
+                <li class="list-group-item">
+                    <h4><a href="math.html">Math</a></h4>
+                    <p>The Math module provides useful functionality missing from the standard Math
+                    library: logarithms to any base, conversion between radians and degrees, minutes
+                    and seconds and floating point error correction.</p>
+                </li>
+                <li class="list-group-item">
+                    <h4><a href="numeric.html">Number</a></h4>
+                    <p>The Number module provides powerful, locale-aware number formatting
+                    and parsing functionality, including currency, percentage and scientific
+                    notation. It provides a complete implementation of the Intl.NumberFormat API.</p>
+                </li>
+                <li class="list-group-item">
+                    <h4><a href="query.html">Query</a></h4>
+                    <p>The Query module provides support for parsing and building query strings.
+                    It can parse location.search and make the parsed values available to
+                    your web application.</p>
+                </li>
+                <li class="list-group-item">
+                    <h4><a href="storage.html">Storage</a></h4>
+                    <p>The Storage module provides a DOMStorage interface to
+                    document.cookie. It also provides localStorage and 
+                    sessionStorage implementations for browsers that lack them.</p>
+                </li>
+                <li class="list-group-item">
+                    <h4><a href="string.html">String</a></h4>
+                    <p>The String module provides a variety of methods for formatting,
+                    escaping and converting strings along with implementations of String
+                    methods that may not have been implemented natively.</p>
+                </li>
+            </ul>
+            <h1>UsefulJS extensions</h1>
+            <p>Extensions are not part of the core library. They offer specialist functionality
+            that will only be useful in certain applications. Be aware that they are not
+            independent modules; for example, the UsefulJS.DnD extension needs UsefulJS.Event.</p>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <h4><a href="browser.html">Browser</a></h4>
+                    <p>The Browser extension determines browser and engine versions
+                    from the navigator.userAgent string. It can
+                    make the engine version available through classes added to the
+                    &lt;html&gt; element, allowing you to fix browser display
+                    issues through CSS.</p>
+                </li>
+                <li class="list-group-item">
+                    <h4><a href="currency.html">Currency</a></h4>
+                    <p>The Currency extension provides a simple conversion API.</p>
+                </li>
+                <li class="list-group-item">
+                    <h4><a href="dnd.html">DnD</a></h4>
+                    <p>The DnD extension provides a simple framework to support dragging
+                    and dropping elements.</p>
+                </li>
+                <li class="list-group-item">
+                    <h4><a href="dnd.html">Skin</a></h4>
+                    <p>The Skin extension provides a simple interface to using alternate
+                    stylesheets for skinning applications.</p>
+                </li>
+            </ul>
+            <h1>Browser Support</h1>
+            <p>UsefulJS has been tested on the following browsers:</p>
+            <table class="table">
+                <thead>
+                    <tr><th width="15%">Browser</th><th>Versions</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mozilla Firefox</td><td>24+</td>
+                    </tr>
+                    <tr>
+                        <td>Google Chrome</td><td>25, 30+</td>
+                    </tr>
+                    <tr>
+                        <td>Internet Explorer</td><td>7, 8, 9, 10</td>
+                    </tr>
+                    <tr>
+                        <td>Safari</td><td>6.0+</td>
+                    </tr>
+                    <tr>
+                        <td>Mobile Safari</td><td>9.0+</td>
+                    </tr>
+                    <tr>
+                        <td>Opera</td><td>11.0, 17.0+</td>
+                    </tr>
+                    <tr>
+                        <td>Konqueror</td><td>4.6</td>
+                    </tr>
+                    <tr>
+                        <td>Maxthon</td><td>4.1</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h1>Licence</h1>
+            <p>UsefulJS is released under <a href="http://www.apache.org/licenses/LICENSE-2.0"
+                target="_blank">the Apache 2.0 License</a> and is copyright 2013-2015 Christopher Williams.</p>
+            <p>The licence terms basically boil down to: use, modify and redistribute freely, but acknowledge use and
+            respect my copyright. Oh, and let me know if you find it useful - contact details below.</p>
+            <h1>Acknowledgements</h1>
+            <p>This site uses <a href="http://getbootstrap.com/" target="_blanK">Twitter Bootstrap</a></p>
+            <p><a href="http://www.microsoft.com/Language/en-US/StyleGuides.aspx" target="_blank">Microsoft's
+                excellent style guides</a> were used as the primary sources for localization information.</p>
+            <p><a href="https://github.com/jquery/globalize/" target="_blank">The JQuery Globalize project</a>
+            was used as a secondary source.</p>
+            <h1>Contacts</h1>
+            <p><a id="mailto" href="">Contact me</a> with any questions, suggestions or bugs</p>
+            <p>For bug reports, please start the subject with "BUG". For localization issues, please
+            start the subject with "L10N"</p>
+        </div>
+        <script type="text/javascript">
+            document.getElementById("mailto").href = "mailto:" + 
+                ["strange.quark.67", "gmail.com"].join("@");
+        </script>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

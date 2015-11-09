@@ -1,0 +1,32 @@
+BODY {
+    padding: 70px 0;
+}
+
+H4.api-doc {
+    margin-top: 1.5em;
+}
+
+EM.ujs-logo {
+    /*font-family: monospace;*/
+    margin-right: 0.3em;
+    color: white;
+}
+
+.scientific {
+    font-family: monospace!important;
+    font-size: 110%;
+}
+
+.scrollable-menu {
+    height: auto;
+    max-height: 240px;
+    overflow-x: hidden;
+}
+
+.blurb {
+    display: none;
+}
+        
+
+        
+

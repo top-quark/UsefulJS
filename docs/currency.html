@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>UsefulJS.Currency</title>
+        <meta name="author" content="Christopher Williams">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body data-spy="scroll" data-target="#sidebar">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="core.html">UsefulJS.Core</a></li>
+                            <li><a href="array.html">UsefulJS.Array</a></li>
+                            <li><a href="classlist.html">UsefulJS.ClassList</a></li>
+                            <li><a href="date.html">UsefulJS.Date</a></li>
+                            <li><a href="event.html">UsefulJS.Event</a></li>
+                            <li><a href="math.html">UsefulJS.Math</a></li>
+                            <li><a href="numeric.html">UsefulJS.Number</a></li>
+                            <li><a href="query.html">UsefulJS.Query</a></li>
+                            <li><a href="storage.html">UsefulJS.Storage</a></li>
+                            <li><a href="string.html">UsefulJS.String</a></li>
+                            <li><a href="locale.html">UsefulJS.Locale</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="browser.html">UsefulJS.Browser</a></li>
+                            <li><a href="dnd.html">UsefulJS.DnD</a></li>
+                            <li><a href="skin.html">UsefulJS.Skin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container">
+            <h1>UsefulJS.Currency</h1>
+            <p>The Currency extension provides a simple API for currency conversion.</p>
+            <h2>Conversion API</h2>
+            <p>The conversion API can be accessed procedurally or as chained method calls.
+            To convert from EUR to GBP, you might do this:
+            <pre>UsefulJS.Currency.load("EUR", { "GBP" : 0.72, ... });
+var pounds = UsefulJS.Currency.convert(1000, null, "GBP"); // 720</pre>
+            <p>Alternatively, you can do this:</p>
+            <pre>var pounds = UsefulJS.Currency.load("EUR", { "GBP" : 0.72, ... }).cnv(1000).to("GBP");</pre>
+            <div class="alert alert-warning">The rates passed to load are against a base, for
+            example USD. Assuming data is available for GBP and EUR, you can use these rates 
+            to go from USD to EUR or GBP to USD. You can also use them to go from EUR to
+            GBP and vice-versa but this is likely to be inaccurate since GBP has its own
+            exchange rate against the EUR that will not be the same as going via USD.</div>
+            <p>The API can be used to convert any units of the same dimension:</p>
+            <pre>var myHeightInCm = UsefulJS.Currency.load("m", { feet : 3.28, cm : 100 }).cnv(6).from("feet").to("cm");</pre>
+            <h3>API reference</h3>
+            <h4 class="api-doc">load</h4>
+            <p>Loads exchange rate information</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Currency.load(base, rates)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>base</code> <b>String</b><br>
+                The unit against which the rates are measured.</li>
+                <li><code>rates</code> <b>Object</b><br>
+                Scales relative to <code>base</code>.</li>
+            </ul>
+            <p>Returns <b>Object</b>: a bound instance of UsefulJS.Currency, used for chaining.</p>
+            <h5>Description</h5>
+            <p>Exchange rates are supplied to the <code>load</code> function in Open
+            Exchange Rates format, a JSON Object giving the base and the rates
+            as follows:</p>
+            <pre>{
+    "base":"EUR",
+    "rates":{
+        "GBP:0.72,
+        "USD":1.11,
+        ...
+    }
+}</pre>
+            <h4 class="api-doc">convert</h4>
+            <p>Converts a value from one unit to another</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Currency.convert(value[, from[, to]])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>value</code> <b>Number</b><br>
+                The value to convert.</li>
+                <li><code>from</code> <b>String</b> (optional)<br>
+                The unit to convert <em>from</em>; defaults to <code>base</code>.</li>
+                <li><code>to</code> <b>String</b> (optional)<br>
+                The unit to convert <em>to</em>; defaults to <code>base</code>.</li>
+            </ul>
+            <p>Returns <b>Number</b>: the converted value</p>
+            <p>Throws <b>TypeError</b>: <code>value</code> is not a finite number;
+            <b>RangeError</b>: no rate information is available for <code>from</code> or 
+            <code>to</code>.
+            <h4 class="api-doc">cnv</h4>
+            <p>Loads a value for conversion.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Currency.cnv(value)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>value</code> <b>Number</b><br>
+                The value to convert.</li>
+            </ul>
+            <p>Returns <b>Object</b>: a bound instance of UsefulJS.Currency, used for chaining.</p>
+            <h5>Description</h5>
+            <p>The value passed in is stored for future method calls.</p>
+            <h5>Usage</h5>
+            <pre>UsefulJS.Currency.load("EUR", ...).cnv(1000);
+var dollarValue = UsefulJS.Currency.to("USD"),
+    poundValue = UsefulJS.Currency.to("GBP");</pre>
+            <h4 class="api-doc">from</h4>
+            <p>Loads a unit for conversion.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Currency.from([unit])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>unit</code> <b>String</b> (optional)<br>
+                The unit to convert <em>from</em>; defaults to <code>base</code>.</li>
+            </ul>
+            <p>Returns <b>Object</b>: a bound instance of UsefulJS.Currency, used for chaining.</p>
+            <h5>Description</h5>
+            <p>The value passed in is stored for future method calls.</p>
+            <h5>Usage</h5>
+            <pre>UsefulJS.Currency.load("EUR", ...).from("GBP");
+var thousandPoundsInEuros = UsefulJS.Currency.cnv(1000).to(),
+    millionPoundsInEuros = UsefulJS.Currency.cnv(1000000).to();</pre>
+            <h4 class="api-doc">to</h4>
+            <p>Performs the conversion.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Currency.to([unit])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>unit</code> <b>String</b> (optional)<br>
+                The unit to convert <em>to</em>; defaults to <code>base</code>.</li>
+            </ul>
+            <p>Returns <b>Number</b>: the converted value</p>
+            <p>Throws <b>TypeError</b>: the value passed to <code>cnv</code> was not a finite number;
+            <b>RangeError</b>: no rate information is available for units passed to the
+            <code>from</code> and <code>to</code> methods.
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

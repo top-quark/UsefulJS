@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>UsefulJS.ClassList</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body data-spy="scroll" data-target="#sidebar">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="core.html">UsefulJS.Core</a></li>
+                            <li><a href="array.html">UsefulJS.Array</a></li>
+                            <li><a href="date.html">UsefulJS.Date</a></li>
+                            <li><a href="event.html">UsefulJS.Event</a></li>
+                            <li><a href="math.html">UsefulJS.Math</a></li>
+                            <li><a href="numeric.html">UsefulJS.Number</a></li>
+                            <li><a href="query.html">UsefulJS.Query</a></li>
+                            <li><a href="storage.html">UsefulJS.Storage</a></li>
+                            <li><a href="string.html">UsefulJS.String</a></li>
+                            <li><a href="locale.html">UsefulJS.Locale</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="browser.html">UsefulJS.Browser</a></li>
+                            <li><a href="currency.html">UsefulJS.Currency</a></li>
+                            <li><a href="dnd.html">UsefulJS.DnD</a></li>
+                            <li><a href="skin.html">UsefulJS.Skin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container">
+            <h1>UsefulJS.ClassList</h1>
+            <p>Manipulating element classes is the very bread-and-butter of DHTML. Almost every JavaScript developer
+            will have written library functions to do this and class manipulation functions are core parts of every
+            JavaScript framework. HTML5 has brought a standardized interface for this, <code>DOMTokenList</code>, and
+            the <code>classList</code> property on element objects that implements it.</p>
+            <p>UsefulJS.ClassList provides a portable, complete implementation of the <code>DOMTokenList</code>
+            interface for manipulating class lists. On browsers that lack a native implementation,
+            but which have the necessary <code>Object.defineProperty</code> support (in particular Internet Explorer
+            versions 8 and 9), the module fix will add a <code>classList</code> property to elements that you can
+            use to manipulate the underlying className. On legacy browsers that lack both a native implementation
+            and <code>Object.defineProperty</code>, the module provides a static method, <code>get</code>, that will
+            return a <code>DOMTokenList</code> for the element.</p>
+            <p>On browsers that fully support <code>Object.defineProperty</code>, UsefulJS.ClassList also implements the
+            <code>DOMSettableTokenInterface</code> where the underlying className can be accessed via a
+            <code>value</code> property.</p>
+            <h5>Syntax</h5>
+            <pre>new UsefulJS.ClassList(obj[, propertyName[, separator]])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>obj</code> <b>Object</b><br>
+                The element object whose token list property is to be managed</li>
+                <li><code>propertyName</code> <b>String</b><br>
+                The name of the property to be managed. Defaults to "className"</li>
+                <li><code>separator</code> <b>String</b><br>
+                The value used to separate items in the underlying list. Defaults to " "
+                (a space character)</li>
+            </ul>
+            <p>Throws: <b>TypeError</b> if <code>obj</code> is null or undefined.</p>
+            <div class="alert alert-info">UsefulJS.ClassList instances are not limited to managing element class names. 
+                They can manage any property on any object whose value is a delimiter-separated token list.</div>
+            <h2>Static properties</h2>
+            <h4 class="api-doc">UsefulJS.featureSupport.classList</h4>
+            <p>Adds a classList entry to UsefulJS.featureSupport that allows for testing <code>classList</code> support. 
+            Exposes three properties:</p>
+            <ul>
+                <li><b>supported</b><br>
+                <p>Whether the <code>classList</code> property is available on elements.</p></li>
+                <li><b>nativeSupport</b><br>
+                <p>Whether the <code>classList</code> property is natively implemented. When classList support
+                has been added via the fix, <code>supported</code> will be true, but
+                <code>nativeSupport</code> will be false.</p></li>
+                <li><b>settable</b><br>
+                <p>Whether the classList implementation supports the <code>DOMSettableTokenList</code> interface.</p></li>
+            </ul>
+            <h4 class="api-doc">settable</h4>
+            <p><b>true</b> when instances of UsefulJS.ClassList have a <code>value</code> property that can be
+            used to access the underlying className. It will be <b>undefined</b> otherwise (because it won't exist!).</p>
+            <h2>Static methods</h2>
+            <h4 class="api-doc">get</h4>
+            <p>Returns a classList object for an element.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.ClassList.get(elem)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>elem</code> <b>Element</b> or <b>String</b><br>
+                The element whose classList is to be returned. May be an element ID or an actual element.</li>
+            </ul>
+            <p>Returns: <b>DOMTokenList</b> (or <b>null</b> if <code>elem</code> is null or an ID that can't
+            be resolved).</p>
+            <h5>Description</h5>
+            <p>Returns the classList of the element, if present. Otherwise an instance of UsefulJS.ClassList
+            is returned.</p>
+            <h5>Usage</h5>
+<pre>var elem = document.documentElement,
+    classList = UsefulJS.ClassList.get(elem);</pre>
+            <h2>DOMTokenList interface</h2>
+            <h3>Instance properties</h3>
+            <h4 class="api-doc">length</h4>
+            <p>Read-only property that reflects the number of classes in the underlying classname.</p>
+            <div class="alert alert-info">This property is read-only in browsers that support
+                <code>Object.defineProperty</code>. Otherwise it can be written to. Assigning a value to
+                it doesn't change the underlying className.
+            </div>
+            <h4 class="api-doc">[0]...[<em>n</em>]</h4>
+            <p>classList objects are array-like and may be addressed through [] indexing. Native classList objects
+            cannot have values assigned to their numeric properties. Instances of UsefulJS.ClassList <em>can</em>;
+            doing so doesn't change anything, but the values obtained will no longer be truthful. So don't!</p>
+            <h3>Instance methods</h3>
+            <h4 class="api-doc">add</h4>
+            <p>Adds one or more class names to the element's className</p>
+            <h5>Syntax</h5>
+            <pre>classList.add(cl1[, cl2...])</pre>
+            <h4 class="api-doc">contains</h4>
+            <p>Returns <b>true</b> if the element's className contains the specified token</p>
+            <h5>Syntax</h5>
+            <pre>classList.contains(cl)</pre>
+            <h4 class="api-doc">item</h4>
+            <p>Returns the value of the token in the element's className at the specified position. Returns
+            <b>null</b> if the position is out of range. I can't quite see the point of this when you have []
+            indexing.</p>
+            <h5>Syntax</h5>
+            <pre>classList.item(pos)</pre>
+            <h4 class="api-doc">remove</h4>
+            <p>Removes one or more class names from the element's className</p>
+            <h5>Syntax</h5>
+            <pre>classList.remove(cl1[, cl2...])</pre>
+            <h4 class="api-doc">toggle</h4>
+            <p>Adds a class name and returns <b>true</b> if not present; removes a class name and returns 
+            <b>false</b> if present.</p>
+            <h5>Syntax</h5>
+            <pre>classList.toggle(cl[, force])</pre>
+            <h5>Description</h5>
+            <p>The optional force parameter changes the semantics. If its value is <b>true</b>, the function
+            will add a class but not remove it. It will then return <b>true</b> if the token is present. If its
+            value is <b>false</b>, the function will remove a class but not add it. This allows for test-and-set logic:</p>
+<pre>if (classList.toggle("myClass", true)) {
+    // Do something
+    ...
+}</pre>
+            <p>The behaviour is different from <code>add</code>, which also leaves the value unmodified if the
+            class is set, because <code>add</code> doesn't return a value.</p>
+            <h4 class="api-doc">toString</h4>
+            <p>Stringifies to the underlying className</p>
+            <h5>Syntax</h5>
+            <pre>classList.toString()</pre>
+            <h2>DOMSettableTokenList interface</h2>
+            <h3>Instance properties</h3>
+            <h4 class="api-doc">value</h4>
+            <p>Read-write property that allows direct access to the underlying className. Since you have the
+            className, I can't quite see the point of this, but I implemented the interface for completeness.</p>
+            <h3>Implementation notes</h3>
+            <p>UsefulJS.ClassList needs to do a fair amount of housekeeping since the underlying className may
+            be modified at any time during the lifetime of the object. It checks the className value
+            against the expected value on each method call. If they differ, it re-initializes itself. This will
+            really hurt performance so don't modify the className directly if you're also modifying it through a classList
+            object.</p>
+            <p>The need to present an array-like interface to the world means that numeric properties need
+            to be recalculated on each modification. This means that it is never going to be as performant as
+            a native implementation. That said, unless you're modifying hundreds of classes on hundreds of elements.
+            the overhead shouldn't be noticeable.</p>
+            <p>The specification requires that certain error types be raised if a class name passed to a method is null
+            or contains spaces. Since these errors cannot be constructed on legacy browsers (where you're likely to
+            be using this), I decided simply to ignore bad class names.</p>
+            <h3>Portability notes</h3>
+            <p>With native implementations, don't depend on being able to pass multiple arguments to <code>add</code>
+            and <code>remove</code>. Don't depend either on being able to use the <code>force</code> parameter
+            with <code>toggle</code>. No native implementation as far as I can tell implements the
+            <code>DOMSettableTokenList</code> interface which is no big loss. If you need to support legacy
+            browsers, you can reliably use <code>UsefulJS.ClassList.get</code>.</p>
+            <h2>Fixes</h2>
+            <p>The fixes for the ClassList module are defined in the _classList namespace of the fix options.</p>
+            <h4 class="api-doc">classList</h4>
+            <p>Adds a <code>classList</code> property to elements when possible. This fix is applied by default. The
+            descriptor for the added property has <code>enumerable</code> set to <b>false</b> and <code>configurable</code>
+            set to <b>true</b>. This is the magic combination that works on Internet Explorer 8.</p>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

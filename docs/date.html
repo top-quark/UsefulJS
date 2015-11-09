@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>UsefulJS.Date</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body data-spy="scroll" data-target="#sidebar">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="core.html">UsefulJS.Core</a></li>
+                            <li><a href="array.html">UsefulJS.Array</a></li>
+                            <li><a href="classlist.html">UsefulJS.ClassList</a></li>
+                            <li><a href="event.html">UsefulJS.Event</a></li>
+                            <li><a href="math.html">UsefulJS.Math</a></li>
+                            <li><a href="numeric.html">UsefulJS.Number</a></li>
+                            <li><a href="query.html">UsefulJS.Query</a></li>
+                            <li><a href="storage.html">UsefulJS.Storage</a></li>
+                            <li><a href="string.html">UsefulJS.String</a></li>
+                            <li><a href="locale.html">UsefulJS.Locale</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="browser.html">UsefulJS.Browser</a></li>
+                            <li><a href="currency.html">UsefulJS.Currency</a></li>
+                            <li><a href="dnd.html">UsefulJS.DnD</a></li>
+                            <li><a href="skin.html">UsefulJS.Skin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container">
+            <h1>UsefulJS.Date</h1>
+            <p>The Date module provides a <code>Format</code> class for date and time formatting and parsing that
+            uses an identical API to <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/DateTimeFormat"
+                target="_blank">Intl.DateTimeFormat</a>:</p>
+<pre>var d = new Date(),
+    opts = {weekday: "long", year: "numeric", month: "long", day: "numeric"},
+    fmt = new UsefulJS.Date.Format("fr", opts),
+    dateStr = fmt.format(d);                // "dimanche 3 novembre 2013"</pre>
+            <p>The values provided by Intl.DateTimeFormat are strictly one way: there is no way to read
+            them back. UsefulJS.Date.Format objects can read back strings that they produce and turn them
+            back into Date objects:</p>
+            <pre>fmt.parse("dimanche 3 novembre 2013"); // Sun Nov 03 2013 00:00:00 GMT+0000 (GMT)</pre>
+            <h3>UsefulJS.Date.Format</h3>
+            <p>Constructor for the class.</p>
+            <h5>Syntax</h5>
+            <pre>new UsefulJS.Date.Format([requestedLocales[, options]])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>requestedLocales</code> <b>String or Array</b><br>
+                See "Locales" below.</li>
+                <li><code>options</code> <b>Object</b><br>
+                Options to control how dates are formatted. See "Options" below.</li>
+            </ul>
+            <h3>Locales</h3>
+            <p>The <code>requestedLocales</code> parameter is specified either as a single BCP-47 locale tag ("en" or
+            "en-GB") or an array of such values indicating the preferred locale and one or more fallbacks. For example,
+            ["quz-PE", "es-PE", "es"] would result in the "es-PE" locale being selected for date and time formatting
+            since Quechua is not a supported language whereas Spanish is and there is a locale object for 
+            Spanish (Peru).</p>
+            <div class="alert alert-info">The <code>requestedLocales</code> parameter is optional. You can set 
+                <code>UsefulJS.Locale.current</code> to control the default locale.</div>
+            <h4>Unicode extensions</h4>
+            <p>Together with selecting the locale itself, you may specifiy Unicode extensions to control the
+            numbering system used and the calendar used to measure dates. "-u-" is used to specify an extension and then
+            "nu-&lt;N&gt;" for the numbering system and "ca-&lt;C&gt;" for the calendar. For example, to do date
+            formatting in Hindi using Devangaric digits and the Indian national calendar, you would specify
+            "hi-u-nu-deva-ca-indian". Latin ("latn") digits are the default for most locales together with the
+            Gregorian ("gregory") calendar.</p>
+            <h4>Numbering systems</h4>
+            <p>You may specify the following values for the numbering system: "arab", "arabext", "bali", "beng", "deva", 
+            "fullwide", "gujr", "guru", "hanidec", "khmr", "knda", "laoo", "latn", "limb", "mlym", "mong", "mymr", "orya", 
+            "tamldec", "telu", "thai" and "tibt". Of these "arab" is the default numbering system used in dates for
+            most Arabic locales apart from Tunisia, Algeria and Morocco, "arabext" is the default for "fa" (Iran) and
+            "beng" is the default for "bn-BD" (Bangladesh). "deva" would be valid for "hi" (Hindi), "thai" for "th" 
+            (Thailand) and "hanidec"/"fullwide" for Chinese and Japanese locales.</p>
+            <h4>Calendars</h4>
+            <p>The internationalization API allows for fourteen calendars: "buddhist", "chinese", "coptic", "ethioaa", 
+            "ethiopic", "gregory", "hebrew", "indian", "islamic", "islamicc", "iso8601", "japanese", "persian" and "roc".
+            Of these, the following calendars are supported by UsefulJS:</p>
+            <h5>buddhist</h5>
+            <p>The Buddhist calendar is measured from 543 BCE. Year 0 is formatted as "0" and years before the era
+            are formatted as negative values. Otherwise it is the same as the Gregorian calendar (i.e. the year
+            begins on January 1st and leap years are the same). It is the default calendar for the "th" (Thai)
+            locale. The era name ("BE") is only localized for Thai.</p>
+            <h5>gregory</h5>
+            <p>The Gregorian calendar introduced in 1582 CE corrected the excess leap years of the Julian calendar which 
+            by that time was eleven days out of step with the equinoxes. Years are measured from 1 CE, Years prior 
+            to this are formatted as abs(n) + 1, so that 0 becomes "1 BCE". This is the default calendar for most locales
+            and the months and era names, "CE" and "BCE", are localized for all locales.</p>
+            <h5>indian</h5>
+            <p>The Indian national calendar has had official status in India since 1957 CE (or 1879 Saka Era). The year
+            starts on March 22nd relative to the Gregorian (21st in leap years). The first month has thirty days (thirty
+            one in leap years) and is followed by five months of thirty one days and six of thirty. Years are 
+            measured from 78 CE which is formatted as "0 Saka Era". Years prior to this are negative values.
+            Leap years are synchronized with Gregorian leap years. The month names and era name are only localized for
+            Hindi.</p>
+            <h5>iso8601</h5>
+            <p>ISO 8601 is a standard for formatting dates and times to make them more amenable to machine processing:
+            lexicographical order is the same as chronological order and fixed width fields and invariant field
+            separators means that the date value can be read unambiguously from its textual representation. Selection of
+            this calendar imposes a number of restrictions: the date separator is always '-', ignoring the value for the
+            locale, and the time separator is always ':'. Field values are padded with zeroes to make them the correct
+            width, overriding values specified in the options hash. Likewise the numbering system is always "latn" no
+            matter the default for the locale or the system requested through the "-u-" extension. 1 BCE is formatted as
+            "+0000" and years prior to this are negative values. Era names are not used. Time is always in 24-hour
+            format and the first day of the week is Monday.</p>
+            <h5>japanese</h5>
+            <p>The Japanese calendar reckons years according to the reign of the Emperor with the era named after him.
+            An era ends when an emperor dies and a new one begins. This means that a single year can span two eras:
+            7th Jan 1989 was in the year 64 Shōwa while the next day was 1 Heisei. Eras are as follows:
+            <table class="table">
+                <tr>
+                    <th>Name</th><th>Kanji</th><th>Start</th><th>End</th>
+                </tr>
+                <tr>
+                    <td>Meiji</td><td>明治</td><td>8 Sep 1868</td><td>30 Jul 1912</td>
+                </tr>
+                <tr>
+                    <td>Taishō</td><td>大正</td><td>31 Jul 1912</td><td>25 Dec 1926</td>
+                </tr>
+                <tr>
+                    <td>Shōwa</td><td>昭和</td><td>26 Dec 1926</td><td>7 Jan 1989</td>
+                </tr>
+                <tr>
+                    <td>Heisei</td><td>平成</td><td>8 Jan 1989</td><td>-</td>
+                </tr>
+            </table>
+            <p>This calendar was only established in its modern form during the Meiji era, so this implementation
+            does not use eras prior to that. Dates in 1868 prior 8 Sep are formatted as "-1 Meiji". Years prior to
+            1868 become "-2 Meiji" and so on. This is not correct usage so use the Gregorian calendar for dates before
+            1868. When formatting dates using this calendar, the era name is always included. Besides the year
+            numbering this calendar is identical to the Gregorian.</p>
+            <h4>persian</h4>
+            <p>The Persian or Solar Hijri calendar is the official calendar of Iran. Years are measured from 622 CE
+            which is formatted as "0 AP".
+            It is an observational calendar with the year beginning on the day on which the vernal equinox occurs at or after
+            solar noon at the longitude of Tehran. The year consists of six months of thirty one days, five of thirty
+            and one of twenty nine (thirty in leap years). Since the calendar is observational, it is completely
+            accurate: a leap year occurs when the period between equinoxes is 366 days. It is the default calendar in
+            the "fa" (Iran) locale </p>
+            <div class="alert alert-warning"><span class="glyphicon glyphicon-warning-sign"></span>
+                The Persian new year falls approximately on 21st March relative to the
+                Gregorian calendar. However, since leap years are not synchronized with Gregorian leap years this shifts
+                from year to year. I've not been able to figure out the algorithm for this so the calendar
+                implementation uses lookup tables for the years 1900 - 2100 inclusive. Dates outside this period are
+                liable to be one or two days out.</div>
+            <h4>roc</h4>
+            <p>The Republic of China (R.O.C.) calendar measures years from the foundation of the republic, 1911 CE. The
+            era name is always included in date strings. Otherwise, it behaves identically to the Gregorian calendar,
+            including the fomatting of years &lt;= 0. The era names are only localized for the "zh-Hant-TW" (Taiwan)
+            locale. Use of this calendar in the mainland Chinese locale might be something of a faux pas!</p>
+            <h3>Options</h3>
+            <p>The options hash passed to the constructor may contain combinations of various named values that control
+            the formatting of date and time values. The options and their permissible values are detailed below:</p>
+            <table class="table">
+                <tr>
+                    <th>Option name</th>
+                    <th>Values</th>
+                    <th>Notes</th>
+                </tr>
+                <tr>
+                    <td>weekday</td>
+                    <td>long, short, narrow</td>
+                    <td>"narrow" is treated the same as "short". Use the <code>cal</code> method if you need abbreviated
+                        weekday names for a calendar widget.</td>
+                </tr>
+                <tr>
+                    <td>year</td>
+                    <td>numeric, 2-digit</td>
+                    <td>"numeric" results in an unpadded value unless you are using the "iso8601" calendar which pads year
+                        values to four digits.</td>
+                </tr>
+                <tr>
+                    <td>month</td>
+                    <td>long, short, narrow, numeric, 2-digit</td>
+                    <td>"narrow" is treated the same as "short".</td>
+                </tr>
+                <tr>
+                    <td>day</td>
+                    <td>numeric, 2-digit</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>hour</td>
+                    <td>numeric, 2-digit</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>minute</td>
+                    <td>numeric, 2-digit</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>second</td>
+                    <td>numeric, 2-digit</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>era</td>
+                    <td>long, short, narrow</td>
+                    <td>All values are treated as "short". This results in values of the form "AD". Era names in date
+                        strings are always output when using the "roc" and "japanese" calendars.</td>
+                </tr>
+                <tr>
+                    <td>timeZoneName</td>
+                    <td>long, short</td>
+                    <td>Both values are treated as "long", which looks like "GMT+XXXX". When parsing a string, the
+                        resulting Date object will be in UTC.</td>
+                </tr>
+                <tr>
+                    <td>timeZone</td>
+                    <td>"UTC", any</td>
+                    <td>The "UTC" timezone results in strings being formatted using UTC values rather than local time values. 
+                    Parsed dates will be in UTC as well. Other values are ignored.</td>
+                </tr>
+                <tr>
+                    <td>hour12</td>
+                    <td>true, false</td>
+                    <td>Whether time values are output in 12-hour (AM/PM) format.</td>
+                </tr>
+            </table>
+            <p>Any values outside the permissible range will result in RangeError exceptions as per-spec.
+            The options parameter to the constructor is optional; if not supplied the effect will be the same as
+            <code>{ year : "numeric", month : "numeric", day : "numeric" }</code>.</p>
+            <p>The internationalization API allows for an additional two parameters: localeMatcher and formatMatcher.
+            These are ignored - the algorithms used are "lookup" and "best fit" respectively.</p>
+            <p>Every locale has a defined value for the hour12 option. For example, 12-hour time is the
+            default in the "en" (US) locale, but not in the "ru" (Russia) one. Before overriding the locale default,
+            note that 12-hour time is not applicable in many locales and the values for "AM" and "PM" are not localized.
+            Setting hour12 to <b>false</b> may be more appropriate as 24-hour time is comprehensible everywhere.</p>
+            <p>Any option combination will result in <em>something</em> but that something will only be sensible when
+            the combination is sensible. The following date combinations are sensible:</p>
+            <ul>
+                <li>weekday, year, month, day</li>
+                <li>year, month, day</li>
+                <li>year, month</li>
+                <li>month, day</li>
+            </ul>
+            <p>As are the following time combinations:</p>
+            <ul>
+                <li>hour, minute, second</li>
+                <li>hour, minute</li>
+            </ul>
+            <p>A sensible date combination may be combined with a sensible time combination to format dates and times
+            together. The timeZoneName option is only used when outputting times and the era option is only used when
+            outputting dates. They are orthogonal to the other options: the era code is added to the date format string
+            after the format string has been determined using a locale-aware pattern. The format code for the timezone
+            is added to the time format string in a similar manner.</p>
+            <h3>Format codes</h3>
+            <p>The options hash is resolved internally into a format string and you can pass format strings diectly to the 
+            <code>format</code> and <code>parse</code> methods to avoid the hassle of constructing new Format objects. 
+            These format strings use familiar strftime format codes with three additions. See <a 
+                href="http://man7.org/linux/man-pages/man3/strftime.3.html" target="_blank">strftime</a> for more
+            information.</p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Code</th><th>Purpose</th><th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>%a</td>
+                        <td>Abbreviated weekday name</td>
+                        <td>Thu</td>
+                    </tr>
+                    <tr>
+                        <td>%A</td>
+                        <td>Full weekday name</td>
+                        <td>Thursday</td>
+                    </tr>
+                    <tr>
+                        <td>%b</td>
+                        <td>Abbreviated month name</td>
+                        <td>Aug</td>
+                    </tr>
+                    <tr>
+                        <td>%B</td>
+                        <td>Full month name</td>
+                        <td>August</td>
+                    </tr>
+                    <tr>
+                        <td>%c</td>
+                        <td>"Preferred" date and time representation for the locale; tends to be quite Unix-y</td>
+                        <td>Thu Aug 23 14:55:02 2001</td>
+                    </tr>
+                    <tr>
+                        <td>%C</td>
+                        <td>The century number: full year / 100</td>
+                        <td>20</td>
+                    </tr>
+                    <tr>
+                        <td>%d</td>
+                        <td>The day of the month, 0-padded</td>
+                        <td>03 or 23</td>
+                    </tr>
+                    <tr>
+                        <td>%D</td>
+                        <td>Fixed date; equivalent to "%m/%d/%y"; waste of a code</td>
+                        <td>08/23/01</td>
+                    </tr>
+                    <tr>
+                        <td>%e</td>
+                        <td>The day of the month, unpadded</td>
+                        <td>3 or 23</td>
+                    </tr>
+                    <tr>
+                        <td>%E</td>
+                        <td>Used to create an alternate representation for certain codes. This does nothing - specify a
+                        calendar extension in the locale value instead.</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>%F</td>
+                        <td>ISO-8601 date format; equivalent to %Y-%m-%d</td>
+                        <td>2001-08-23</td>
+                    </tr>
+                    <tr>
+                        <td>%g</td>
+                        <td>Same as %y, except: if %V would evaluate to week 53 of the previous year, the previous year
+                        is output. So not at all confusing</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>%G</td>
+                        <td>As %g except a four-digit year is emitted</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>%h</td>
+                        <td>Exactly the same as %b; another waste of a code</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>%H</td>
+                        <td>The hour using the 24-hour clock, 0-padded</td>
+                        <td>00 or 23</td>
+                    </tr>
+                    <tr>
+                        <td>%I</td>
+                        <td>The hour using the 12-hour clock, 0-padded</td>
+                        <td>01 or 12</td>
+                    </tr>
+                    <tr>
+                        <td>%j</td>
+                        <td>The day of the year (0 - 366)</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>%k</td>
+                        <td>The hour using the 24-hour clock, unpadded</td>
+                        <td>0 or 23</td>
+                    </tr>
+                    <tr>
+                        <td>%l</td>
+                        <td>The hour using the 12-hour clock, unpadded</td>
+                        <td>1 or 12</td>
+                    </tr>
+                    <tr>
+                        <td>%m</td>
+                        <td>The month as a decimal number with a leading zero</td>
+                        <td>08 or 12</td>
+                    </tr>
+                    <tr>
+                        <td>%M</td>
+                        <td>Minutes as a two-digit number</td>
+                        <td>55</td>
+                    </tr>
+                    <tr>
+                        <td>%n</td>
+                        <td>Newline character, \n</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>%N</td>
+                        <td>The month as an unpadded decimal number; UsefulJS extension</td>
+                        <td>8 or 12</td>
+                    </tr>
+                    <tr>
+                        <td>%O</td>
+                        <td>Used as a modifier on numeric fields, values are output in locale digits rather than 0-9.
+                            This modifier will be applied to numeric fields automatically if the numbering system is something
+                            other than "latn".</td>
+                        <td>%OY: ٢٠١٣</td>
+                    </tr>
+                    <tr>
+                        <td>%p</td>
+                        <td>The meridiem code in uppercase; irrelevant in many locales while others have more than two
+                            possible values</td>
+                        <td>AM or PM</td>
+                    </tr>
+                    <tr>
+                        <td>%P</td>
+                        <td>The meridiem code in lowercase; why %p and %P aren't the other way round is beyond me</td>
+                        <td>am or pm</td>
+                    </tr>
+                    <tr>
+                        <td>%r</td>
+                        <td>Time in am/pm notation, formatted for the locale; identical to %X in locales that do not use
+                        the 12-hour clock</td>
+                        <td>01:30:45 PM</td>
+                    </tr>
+                    <tr>
+                        <td>%R</td>
+                        <td>Equivalent to %H:%M; not adjusted for the locale</td>
+                        <td>14:55</td>
+                    </tr>
+                    <tr>
+                        <td>%s</td>
+                        <td>The number of seconds since the epoch</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>%S</td>
+                        <td>Seconds as a two-digit number</td>
+                        <td>02</td>
+                    </tr>
+                    <tr>
+                        <td>%t</td>
+                        <td>Tab character, \t</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>%T</td>
+                        <td>Equivalent to %H:%M:%S; not adjusted for the locale</td>
+                        <td>14:55:02</td>
+                    </tr>
+                    <tr>
+                        <td>%u</td>
+                        <td>The day of the week with Monday as 1 and Sunday as 7</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>%U</td>
+                        <td>The week number of the year (00-53), where the first Sunday of January is the 
+                            first day of week 1; days prior to this are in week 0</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>%V</td>
+                        <td>The ISO 8601 week number of the year (01-53), where week 1 is the first week that 
+                            has four days in the year; dates before this are considered to lie in week 53 of 
+                            the PREVIOUS year</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>%w</td>
+                        <td>The day of the week with Sunday as 0 and Saturday as 6</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>%W</td>
+                        <td>The week number of the year (00-53), where the first Monday of January is the 
+                            first day of week 1; days prior to this are in week 0</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>%x</td>
+                        <td>The "preferred" date representation for the locale; usually has leading zero on 
+                        the date value which makes it suitable for fixed layouts</td>
+                        <td>23/08/2001</td>
+                    </tr>
+                    <tr>
+                        <td>%X</td>
+                        <td>The "preferred" time representation for the locale; usually 24-hour clock with
+                        leading zero on the hour value which makes it suitable for fixed layouts</td>
+                        <td>14:55:02</td>
+                    </tr>
+                    <tr>
+                        <td>%y</td>
+                        <td>Two-digit year</td>
+                        <td>01</td>
+                    </tr>
+                    <tr>
+                        <td>%Y</td>
+                        <td>Four-digit year</td>
+                        <td>2001</td>
+                    </tr>
+                    <tr>
+                        <td>%z</td>
+                        <td>The hour and minute offset from UTC</td>
+                        <td>+0100</td>
+                    </tr>
+                    <tr>
+                        <td>%Z</td>
+                        <td>The timezone code; not available on every system and even then it needs to be extracted
+                        from the toString representation; not recommended</td>
+                        <td>BST</td>
+                    </tr>
+                    <tr>
+                        <td>%%</td>
+                        <td>A literal '%' character</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>%/</td>
+                        <td>Fractional seconds (ms) from 000-999; UsefulJS extension</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>%!</td>
+                        <td>The era name. UsefulJS extension.</td>
+                        <td>AD</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Codes that produce unpadded values - %e, %k and %l - are space-padded according to the POSIX spec.
+            However, space-padding is not terribly useful when outputting values for the web. The "numeric" month
+            option requires the month value to be unpadded; the %N code has been added to make this possible.</p>
+            <p>The %Z code will not result in any output on some systems and this, depending on the format string, may cause
+            the date string to be unparseable. Therefore, its use is not recommended. If
+            you are formatting dates in UTC, the timezone code is always set to "UTC".</p>
+            <p>The %U, %W and %V codes produce week number values relative to Jan 1st which is incorrect for the indian
+            and persian calendars. The %g, %G or %V codes are intended for ISO-8601 date strings.</p>
+            <h3>UsefulJS.Date.Format instance methods</h3>
+            <h4 class="api-doc">format</h4>
+            <p>Formats a Date object using either the internal format string or a specified format string.</p>
+            <h5>Syntax</h5>
+            <pre>format(date[, fmtStr])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>date</code> <b>Date</b><br>
+                The Date object to format.</li>
+                <li><code>fmtStr</code> <b>String</b><br>
+                A format string overriding the default.</li>
+            </ul>
+            <p>Returns: <b>String</b>. The formatted date string</p>
+            <p>Throws: <b>TypeError</b>: input is not a Date object; <b>Error</b>: unrecognized format code.</p>
+            <h5>Description</h5>
+            <p>Many of the available format codes are never present in the internally generated format string, but you
+            can use them by supplying your own format string. Any character data in the format string that isn't a format code appears in the 
+            output string; this allows you to insert punctuation and sensible whitespace (and anything else you want for 
+            that matter).</p>
+            <h5>Usage</h5>
+            <pre>// Create a format object for the default locale that uses the default format string
+var fmt1 = new UsefulJS.Date.Format();
+// An object for outputting ISO-8601 strings
+var fmt_iso = new UsefulJS.Date.Format("en-u-ca-iso8601");
+// An object for outputting dates in Japanese imperial format
+var fnt_jp = new UsefulJS.Date.Format("ja-u-nu-fullwide-ca-japanese",
+    { year : "numeric", month : "short", day : "numeric" });
+// Output some strings
+var d = new Date();
+var dateStr_us = fmt1.format(d);                // 11/17/2013, assuming "en" is the current locale
+var isoDateStr = fmt_iso.format(d);             // 2013-11-17
+// Our application needs ISO week values
+var isoWeekStr = fmt_iso.format(d, "%G-%V-%u"); // 2013-46-7
+// ...And, for some reason, Japanese values
+var impDateStr = fmt_jp.format(d);              // 平成２５年１１月１７日
+</pre>
+            <h4 class="api-doc">parse</h4>
+            <p>Parses a string produced by <code>format</code> back into a Date object.</p>
+            <h5>Syntax</h5>
+            <pre>parse(dateStr[, fmtStr])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>dateStr</code> <b>String</b><br>
+                The value to parse.</li>
+                <li><code>fmtStr</code> <b>String</b><br>
+                A format string overriding the default.</li>
+            </ul>
+            <p>Returns: <b>Date</b>. The parsed Date object.</p>
+            <p>Throws: <b>TypeError</b> if given something that isn't a non-empty string to parse; <b>Error</b> if an
+            unrecognized format code is encountered; <b>Error</b> if the date string contains values that cannot be
+            matched against the format string (such as non-numeric data for a numeric field); <b>RangeError</b> if any
+            values are outside the valid range (such as "%j" having a value greater than 366); <b>Error</b> if the
+            format string is not entirely processed (on the assumption that the input is lacking required information);
+            it is not an error if the input string is not entirely consumed.</p>
+            <h5>Description</h5>
+            <p>The parse method follows strptime rules: case is ignored, whitespace is insignificant (but not other
+            character data), and field widths, if applicable, are ignored. Two digit years are disambiguated by the
+            following rule: if, after calendar correction, the value is &lt; 30, the year is 20xx, otherwise it is
+            19xx.</p>
+            <h5>Usage</h5>
+            <pre>// Assuming the same objects as above, all will produce 17 Nov, 2013
+var d1 = fmt1.parse("11/17/2013"),
+    d2 = fmt_iso.parse("2013-11-17"),
+    d3 = fmt_iso.parse("2013-46-7", "%G-%V-%u"),
+    d4 = fmt_jp.parse("平成２５年１１月１７日");</pre>
+            <div class="alert alert-warning"><span class="glyphicon glyphicon-warning-sign"></span>
+                Entirely numeric date strings will be unparseable when using most calendars. For example, the format
+                string "%Y%N%e" will result in a date string that cannot be interpreted correctly. ISO-8601 defines
+                fixed widths and allows for all-numeric strings. Using the iso8601 calendar, "2013321" can be parsed 
+                unambiguously with the format strings "%G%V%u" and "%Y%j".</div>
+            <div class="alert alert-info">As per-spec, the <code>format</code> and <code>parse</code> methods are bound to
+                their instances. What this means is that you can use a method pointer where a function pointer is expected
+                (e.g., setTimeout or Array iteration methods) and everything just works.</div>
+            <h4 class="api-doc">cal</h4>
+            <p>Creates a calendar for the given month and year</p>
+            <h5>Syntax</h5>
+            <pre>cal([dLocal[, firstDay]])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>dLocal</code> <b>Object</b> (optional)<br>
+                The year and month to generate calendar data for. Object is broken-down time with yy and mm properties
+                for the year and month. May also have an "en" (era-number) properties if, for some reason, you need to
+                generate calendar data for years BCE (in which case era number will be 1). If not supplied, calendar
+                data for the current year and month is generated.</li>
+                <li><code>firstDay</code> <b>Number</b> (optional)<br>
+                The first day of the week, 0 for Sunday to 6 for Saturday. Defaults to the first day of the week for the
+                locale of the Format object.</li>
+            </ul>
+            <p>Returns: <b>Array</b>. Calendar data for the month.</p>
+            <h5>Description</h5>
+            <p>Returns a two dimensional array suitable for use in a calendar widget or similar. Format of the data is
+            similar to the Unix `cal` command: the first row contains seven abbreviated day names followed by four to
+            six rows of month days. Empty entries are represented by non-breaking spaces, <code>\u00a0</code>.</p>
+            <h5>Usage</h5>
+            <pre>// Generate calendar data for a year for the current locale
+var fmt = new UsefulJS.Date.Format(null, { year : "numeric", month : "long" }),
+    cal = fmt.getCalendar(),
+    // This year in calendar time
+    y = cal.today().yy;
+cal.months().forEach(function(n, idx) {
+    // Calendar time to internal time
+    var dLocal = { yy : y, mm : idx, dd : 1 },
+        dInternal = UsefulJS.clone(dLocal);
+    cal.fromCalendarDate(dInternal);
+    // Generate a calendar header
+    var d = new Date(dInternal.yy, dInternal.mm, dInternal.dd),
+        headerStr = fmt.format(d),
+        // Month data
+        monthData = fmt.cal(dLocal);
+    // Populate the calendar widget
+    ...
+});
+</pre>
+            <h4 class="api-doc">getCalendar</h4>
+            <p>Gets the calendar object used for formatting and parsing dates.</p>
+            <h5>Syntax</h5>
+            <pre>getCalendar()</pre>
+            <h5>Description</h5>
+            <p>See above for possible usage. See below for methods of calendar objects.</p>
+            <h4 class="api-doc">resolvedOptions</h4>
+            <p>Gets an Object showing what the requested options resolved to. The <code>locale</code> property is useful
+            in that it gives the actual locale being used (unlike <code>supportedLocalesOf</code>). See the
+            Intl.DateTimeFormat documentation for more information.</p>
+            <h5>Syntax</h5>
+            <pre>resolvedOptions()</pre>
+            <h4 class="api-doc">supportedLocalesOf</h4>
+            <p>Part of the internationalization API and not terribly useful. Takes an array of locale codes and returns
+            the locales that are "supported" in the sense that they do not resolve to the default locale. For example,
+            "ru-UK" (Ukrainian Russian) would return as "supported", even though the locale that is actually supported
+            is "ru", i.e. Russian Russian. See the Intl documentation for more information.</p>
+            <h5>Syntax</h5>
+            <pre>supportedLocalesOf(locales[, options])</pre>
+            <h3>Methods of the calendar object</h3>
+            <p>The <code>getCalendar</code> method of the Format object returns an object that exposes the following
+            methods:</p>
+            <h4 class="api-doc">isLeapYear</h4>
+            <p>Returns <b>true</b> when a given year in a given era is a leap year.</p>
+            <h5>Syntax</h5>
+            <pre>isLeapYear(year, eraNo)</pre>
+            <h5>Description</h5>
+            <p>The gregory calendar has two eras, numbered 0 and 1, signifying CE and BCE respectively. The roc calendar
+            is similar. The japanese calendar has (so far) four eras. The other calendars have just the one.</p>
+            <h4 class="api-doc">isLeapDay</h4>
+            <p>Returns <b>true</b> when a given date in a given month is the extra day in a leap year.</p>
+            <h5>Syntax</h5>
+            <pre>isLeapDay(month, date)</pre>
+            <h5>Description</h5>
+            <p>For the gregory calendar and others similar to it, the combination 1,29 will return true. For the indian
+            calendar, this will be 0,31 while the persian calendar uses 11,30.</p>
+            <h4 class="api-doc">months</h4>
+            <p>Returns an array of the day counts for the months in the year.</p>
+            <h5>Syntax</h5>
+            <pre>months(year, eraNo)</pre>
+            <h5>Description</h5>
+            <p>See above for the significance of the era number. If the year is a leap year, the return value will have
+            the correct number of days in the relevant month.</p>
+            <h4 class="api-doc">dateToCalendarDate</h4>
+            <p>Turns a Date object into broken-down time representing the date in the calendar (which may well be quite
+            unlike the internal date).</p>
+            <h5>Syntax</h5>
+            <pre>dateToCalendarDate(date, utc)</pre>
+            <h5>Description</h5>
+            <p>Returns an Object containing the calendar representation of the date in broken down time. Properties are:
+            yy (year), mm (month), dd (date), wd (week day), en (era number), utc (whether the date is UTC) and dateObj
+            (the input Date object). This method is used to pre-process dates for formatting. The utc parameter
+            determines whether UTC methods (such as getUTCFullYear) are used in preference to non-UTC methods (such as
+            getFullYear).</p>
+            <h4 class="api-doc">fromCalendarDate</h4>
+            <p>Turns the broken-down calendar date into values in internal date representation.</p>
+            <h5>Syntax</h5>
+            <pre>fromCalendarDate(dLocal)</pre>
+            <h5>Description</h5>
+            <p>The input object has the same properties as above. The method does not return a value but instead
+            modifies its argument in-place. It is used to post-process parsed date strings.</p>
+            <h3>Interoperability with Intl.DateTimeFormat</h3>
+            <p>The UsefulJS.Date.Format API is 100% compatible with Intl.DateTimeFormat (and one of the module fixes can
+            add Intl.DateTimeFormat to the global namespace), but it does not follow that the date strings will be
+            identical which means that there is no guarantee that you can take a date string created using a native Intl
+            implementation and parse it using UsefulJS.Date.Format. The reason for this is twofold. The generation of
+            the format string is algorithmic and I am not privy to the algorithm used by, say, Chrome and that algorithm
+            will not be the same as that used by Internet Explorer 11. The other is that even given the same format
+            string (assuming other implementations use strftime internally), we <em>still</em> may not produce the same
+            date string. What constitutes the "correct" format for a given locale is a question without a definitive
+            answer. I honestly have no idea how to correctly format date and time values in, say, Vietnamese so rely on
+            another source for this information, assuming that they have 1) employed a local expert and 2) done their
+            homework (in the case of the Microsoft style guides I used both are reasonable assumptions). A different
+            implementation may have used a different source giving different guidance, resulting in different month
+            abbreviations or commas where I have none or no comma where I add a comma, etc. The <code>parse</code>
+            method is downright persnickety as to what it will accept - the input has to match the format string
+            <em>exactly</em>. So here is my suggestion: if your application needs to parse date and time values, use the
+            UsefulJS namespace. Otherwise use the Intl one (the module fix will ensure that this works in all
+            browsers).</p>
+            <h3>What about Date.prototype.toLocaleFormat?</h3>
+            <p>The Date implementation in Firefox has a method, <code>toLocaleFormat</code>, not present in other
+            implementations. I'm guessing that this is a remnant of a proposed standard that never quite got off the
+            ground. It accepts a strftime format string and gives you back the date and time formatted accordingly.
+            While it gives you some control over the output, unlike <code>toLocaleString</code>, it has the same problem
+            as other toLocale* methods: the locale is baked in at compile time so that you cannot use it to generate
+            localized date strings, unless the baked-in locale coincides with that of your application. In addition,
+            there is no facility to obtain sensible format strings for different locales. Therefore its use, even when
+            available, is not recommended.</p>
+            <h2>Julian day conversion</h2>
+            <p>The Julian day value is a time measurement used by astronomers and is the
+            number of days (including fractional part) since the beginning of the Julian
+            Period (fixed at noon, 1st January 4713 BCE according to the Julian calendar).
+            Note that the day begins at noon, not midnight. The Julian day value for the
+            Unix epoch is 2,440,587.5.</p>
+            <h4 class="api-doc">toJulianDay</h4>
+            <p>Converts a Date object to Julian day value</p>
+            <h5>Syntax</h5>
+            <pre>toJulianDay(d)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>d</code> <b>Date</b><br>
+                The Date object to be converted.</li>
+            </ul>
+            <p>Returns <b>Number</b>: the Julian day value.</p>
+            <p>Throws <b>TypeError</b>: if <code>d</code> is not a Date object.</p>
+            <h5>Usage</h5>
+            <pre>var gEpoch = Date.parse("1582-10-15T00:00:00Z"),      // Start of the Gregorian calendar
+    jd = UsefulJS.Date.toJulianDay(new Date(gEpoch)); // 2299160.5</pre>
+            <h4 class="api-doc">fromJulianDay</h4>
+            <p>Converts a Julian day value to a Date object.</p>
+            <h5>Syntax</h5>
+            <pre>fromJulianDay(jd)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>jd</code> <b>Number</b><br>
+                The value to be converted.</li>
+            </ul>
+            <p>Returns <b>Date</b>: a native Date object.</p>
+            <p>Throws <b>TypeError</b>: if <code>jd</code> is not a finite number.</p>
+            <h5>Usage</h5>
+            <pre>var jd = 2299160.5,
+    gEpoch = UsefulJS.Date.fromJulianDay(jd); // "Fri Oct 15 1582 01:00:00 GMT+0100 (BST)"</pre>
+            <h2>Additional UsefulJS.Date properties and methods</h2>
+            <p>Besides the Format class, UsefulJS.Date has a number of additional properties and methods.</p>
+            <h4 class="api-doc">UsefulJS.featureSupport.date</h4>
+            <p>Adds a date entry to UsefulJS.featureSupport:</p>
+            <ul>
+                <li><b>timezone</b><br>
+                <p>Whether a timezone code can be extracted from a Date object's toString representation.</p></li>
+                <li><b>tzCode</b><br>
+                <p>The timezone code extracted from a Date object's toString representation.</p></li>
+            </ul>
+            <h4 class="api-doc">formats</h4>
+            <p>Format strings for standardized date and time formats: iso8601 (ISO date-time string),
+            iso8601_ext (ISO date-time string plus milliseconds), isoweek (year number, week number and day-of-the-week
+            number), isoordinal (year and day-of-the-year) and rfc2822 (as used in the Date header in emails).</p>
+            <h4 class="api-doc">getFormatString</h4>
+            <p>Turns format options into a format string</p>
+            <h5>Syntax</h5>
+            <pre>getFormatString(opts, resolved)</pre>
+            <h5>Description</h5>
+            <p>This is actually the internal function used to generate a default format string when constructing a
+            Format object. It is exposed as a public method on the assumption that you might want to play with the
+            format strings rather than having the process remain completely opaque. As such, the API is not the most
+            intuitive - it is designed to be useful to me rather than to you! See the usage for details on how to call
+            this.</p>
+            <h5>Usage</h5>
+            <pre>// Get an internal format string
+var fmtOpts = { weekday : "long", year : "numeric", month : "long", day : "numeric", era : "short", 
+    hour : "numeric", minute : "2-digit", second : "2-digit", timeZoneName : "long", hour12 : true };
+// What will this produce in the Finnish locale?
+var dateOpts = UsefulJS.Locale.dateOptions("fi", fmtOpts);
+// Get the format string, ignore resolved options
+vat fmtStr = UsefulJS.Date.getFormatString(dateOpts, {});    // "%Ana %e. %Bta %Y %! %l.%M.%S %p UTC%z"
+</pre>
+            <h4 class="api-doc">UTC</h4>
+            <p>Given broken-down time, returns milliseconds since the epoch, UTC.</p>
+            <h5>Syntax</h5>
+            <pre>Date.UTC(year,month[,date[,hrs[,min[,sec[,ms]]]]])</pre>
+            <h5>Description</h5>
+            <p>This static method <em>should</em> be identical to <code>Date.UTC</code>. However, at least one
+            implementation (Konqueror) has a bug where the local time difference is not taken into account so that the
+            value returned is milliseconds since the epoch, <b>local</b> time, not UTC. The Date module detects this bug
+            and creates an alternate UTC method that subtracts the local time difference from the value returned by
+            <code>Date.UTC</code>. This is necessary to parse date strings correctly in UTC. However, if this bug is
+            present other Date UTC methods (such as getUTCHours) must be considered untrustworthy:</p>
+            <pre>if (UsefulJS.Date.UTC !== Date.UTC) {
+    // UTC is broken
+}</pre>
+            <h2>Fixes</h2>
+            <p>The fixes for the Date module are in the _date namespace of the fix options.</p>
+            <h4 class="api-doc">now</h4>
+            <p>Adds a <code>now</code> static method to the Date class when <code>Date.now</code> is not implemented
+            natively. This fix is applied by default.</p>
+            <h4 class="api-doc">toISOString</h4>
+            <p>Adds a <code>toISOString</code> method to Date.prototype when this is not implemented natively. The
+            locale option is "en-u-ca-iso8601" and the format string used is <code>formats.iso8601_ext</code>. This fix
+            is applied by default.</p>
+            <h4 class="api-doc">toRFC822String</h4>
+            <p>Adds a <code>toRFC822String</code> method to Date.prototype. The locale option is "en" and the format
+            string used is <code>formats.rfc2822</code>. More accurately, the resulting date-and-time string is RFC2822
+            compliant since RFC822 mandated a 2-digit year. As a library extension, this fix must be explicitly
+            enabled.</p>
+            <div class="alert alert-info">The string values produced by <code>toISOString</code> and
+                <code>toRFC822String</code> should be parseable by <code>Date.parse</code>.</div>
+            <h4 class="api-doc">intl_DateTimeFormat</h4>
+            <p>Makes the UsefulJS.Date.Format class available through the Intl.DateTimeFormat namespace. This allows for
+            completely portable, locale-aware date and time formatting that runs in pretty much any browser, using the
+            native object when available. This fix is applied by default.</p>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

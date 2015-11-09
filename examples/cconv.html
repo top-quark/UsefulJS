@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Currency Converter</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=0.75">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+        <style type="text/css">
+        #content {
+            width: 32em;
+            margin: 0 auto;
+        }
+        
+        .alert {
+            margin-bottom: 10px;
+        }
+        
+        #update-info, INPUT {
+            text-align: right;
+        }
+        
+        BUTTON {
+            width: 5em;
+        }
+        
+        </style>
+    </head>
+    <body>
+        <p class="blurb">This is handy utility that can convert between a wide range
+        of currencies. It showcases the UsefulJS Currency extension and makes heavy use
+        of the Number module for locale-aware formatting and parsing.</p>
+        <nav id="main-nav" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Currency Converter<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="1010.html">1010</a></li>
+                            <li><a href="calendar.html">Five Year Calendar</a></li>
+                            <li><a href="ctable.html">Programmer's Character Reference</a></li>
+                            <li><a href="awords.html">Angry Words</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><nobr>Locale: <span id="selected-locale"></span><b class="caret"></b></nobr></a>
+                        <ul class="dropdown-menu scrollable-menu" id="locale-choice" role="menu">
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="panel panel-primary" id="content">
+                <div class="panel-heading"><h3 class="panel-title">Currency converter</h3></div>
+                <div class="panel-body">
+                    <form id="conv">
+                        <div class="form-group" id="convert-from-grp">
+                            <!--div class="alert alert-info">Enter values using the form <b id="curr-example"></b></div-->
+                            <label for="convert-from" class="control-label">Convert from</label>
+                            <div class="input-group">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default dropdown-toggle" 
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
+                                        id="selected-from"></span> <span class="caret"></span></button>
+                                    <ul class="dropdown-menu scrollable-menu" id="from-choice"></ul>
+                                </div>
+                                <input id="convert-from" type="text" class="form-control" 
+                                    aria-label="Convert from" aria-describedby="from-help" value="0">
+                            </div>
+                            <span class="help-block" id="from-help">Enter values using the form <b id="curr-example"></b></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="convert-to" class="control-label">Convert to</label>
+                            <div class="input-group">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-default dropdown-toggle" 
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span
+                                        id="selected-to"></span> <span class="caret"></span></button>
+                                    <ul class="dropdown-menu scrollable-menu" id="to-choice"></ul>
+                                </div>
+                                <input id="convert-to" type="text" class="form-control" 
+                                    aria-label="Convert to" readonly value="0">
+                            </div>
+                            <div class="alert alert-info" style="display:none;">Enter a value using the form <b id="curr-example"></b></div>
+                        </div>
+                        <div id="update-info">Exchange rates from <a href="https://developer.yahoo.com/yql" 
+                            target="_blank">Yahoo</a>; updated <span id="updated-on"></span></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+        <script src="../built/UsefulJS-min-full-latest.js"></script>
+        <script type="text/javascript">
+        
+// Currency information
+var fxData = {
+    // For parsing update information
+    parser : new UsefulJS.Date.Format("en", 
+        { year : "numeric", month : "numeric", day : "numeric", hour : "numeric", minute : "numeric" }),
+    rates : {
+        USD : {}, GBP : {}, EUR : {}, AUD : {}, BGN : {}, BRL : {}, CAD : {},
+        CHF : {}, CNY : {}, CZK : {}, DKK : {}, HKD : {}, HRK : {},
+        HUF : {}, IDR : {}, ILS : {}, INR : {}, ISK : {}, JPY : {},
+        KRW : {}, MXN : {}, MYR : {}, NOK : {}, NZD : {}, OMR : {},
+        PHP : {}, PLN : {}, QAR : {}, RON : {}, RUB : {}, SAR : {},
+        SEK : {}, SGD : {}, THB : {}, TRY : {}, TWD : {}, ZAR : {}
+        
+    },
+    queried : {
+    
+    },
+    updated : {
+    
+    }
+};
+
+// Callback for YQL response
+// Response looks like
+/*
+{
+  "query": {
+    "count": 1,
+    "created": "2015-10-24T15:10:53Z",
+    "lang": "en-GB",
+    "results": {
+      "rate": {
+        "id": "INREUR",
+        "Name": "INR/EUR",
+        "Rate": "0.0140",
+        "Date": "10/24/2015",
+        "Time": "12:55pm",
+        "Ask": "0.0140",
+        "Bid": "0.0139"
+      }
+    }
+  }
+}
+*/
+window.yqlCallback = function(cData) {
+    "use strict";
+    if ("error" in cData) {
+        alert(cData.error.description);
+        return;
+    }
+    var r = cData.query.results.rate, t = Date.parse(cData.query.created), 
+        k1 = r.id, from = k1.substring(0, 3), to = k1.substring(3, k1.length),
+        u = fxData.parser.parse(r.Date + " " + r.Time),
+        k2 = to + from, _u = UsefulJS;
+    // Update timestamps
+    fxData.queried[k1] = fxData.queried[k2] = t;
+    fxData.updated[k1] = fxData.updated[k2] = u;
+    // Update rates
+    fxData.rates[from][to] = _u.Currency.rates[to] = r.Rate;
+    fxData.rates[to][from] = 1 / r.Rate;
+    // Remove the script element we created
+    document.body.removeChild(document.getElementById(k1));
+    // Trigger the update
+    _u.Event.fire("cconvert", window, { from : from, to : to });
+};
+
+window.onload = function() {
+    "use strict";    
+    var _u = UsefulJS, _cu = _u.Currency, _nOpts = { style : "currency" },
+        _fixed = _u.fix({ _string : "all" }), _loc = _u.Locale,
+        _nFormat = _u.Number.Format, _evt = _u.Event, _cList = _u.ClassList,
+        _dFormat = _u.Date.Format, _qr = _u.Query,
+        _ele = function(item) {
+            if ("string" === _typeof(item)) {
+                return document.getElementById(item);
+            }
+            return item;
+        },
+        _setText = function(e, txt) {
+            e = _ele(e);
+            e.innerHTML = "";
+            e.appendChild(document.createTextNode(txt));
+        };
+        
+    var currLocale = null;    
+    if (_u.featureSupport.storage.local || _fixed._storage.localStorage) {
+        currLocale = localStorage.getItem("cconv-locale");
+    }
+    if (currLocale) {
+        _loc.current = currLocale;
+    }
+    else {
+        currLocale = _loc.current;
+    }
+        
+    // Load all the locales that use currency codes for which we have exchange data
+    var menu, cMap = {},
+        allLocales = _loc.getSupported().filter(function(loc) {
+            var lOpts = _loc.options(loc), cCode = lOpts.cc;
+            if (fxData.rates.hasOwnProperty(cCode)) {
+                cMap[loc] = { n : lOpts.n, cc : cCode };
+                return true;
+            }
+        });
+    
+    allLocales.sort();
+    
+    // If the current locale is not one we're going to use, switch to "en"
+    if (!currLocale in cMap) {
+        currLocale = _loc.current = "en";
+    }
+    _setText("selected-locale", cMap[currLocale].n);
+    
+    var makeExampleFormatter = function(loc) {
+        return new _nFormat(currLocale, { minimumFractionDigits : 2, maximumFractionDigits : 2}); 
+    };
+    
+    // Formatter / parser for the from the field
+    var fromFormatter = makeExampleFormatter(currLocale);
+    _setText("curr-example", fromFormatter.format(9999.5));
+    
+    // Formatter for update information
+    var dfOpts = { year : "numeric", month : "numeric", day : "numeric", hour : "numeric", minute : "numeric" }, 
+        dFormatter = new _dFormat(currLocale, dfOpts);
+    
+    // Get the currencies
+    var allCurrencies = _u.keys(fxData.rates);
+    allCurrencies.sort();
+
+    // Current convert from
+    var _convertFrom = cMap[currLocale].cc;
+    _setText("selected-from", _convertFrom);
+    _cu.load(_convertFrom, fxData.rates[_convertFrom]);
+    
+    var _convertTo = "EUR";
+    if (_convertFrom === _convertTo) {
+        _convertTo = "USD";
+    } 
+    _setText("selected-to", _convertTo);
+    
+    // Parses the value to be converted
+    var parseFrom = function() {
+        var fld = _ele("convert-from"), cl = _cList.get("convert-from-grp"), 
+            ret = fromFormatter.parse(fld.value);
+        if (isNaN(ret)) {
+            ret = null;
+            cl.add("has-error");            
+        }
+        else {
+            cl.remove("has-error");            
+        }
+        return ret;
+    };
+    
+    // Focus handler for the from field
+    _evt.register("convert-from", "focus", function(evt, eType, eSrc, eReg) {
+        var cl = _cList.get("convert-from-grp");
+        cl.remove("has-error"); 
+        if (eReg.value === "0") {
+            eReg.value = "";
+        }
+    });
+    
+    // Formats a query for Yahoo Finance
+    var conversionQuery = function() {
+        var k1 = _convertFrom + _convertTo, qParams = {
+            q : "select * from yahoo.finance.xchange where pair in (\"" + k1 + "\")",
+            format : "json",
+            env : "store://datatables.org/alltableswithkeys",
+            callback : "window.yqlCallback"
+        };
+        var url = "http://query.yahooapis.com/v1/public/yql?" + _qr.build(qParams);
+        var script = document.createElement("script");
+        script.id = k1;
+        document.body.appendChild(script);
+        script.src = url;
+    };
+    
+    // Does the conversion
+    var kpTimeout = null;
+    var convertValue = function() {
+        kpTimeout = null;
+        // Check the timestamp of the information that we have
+        var tsKey = _convertFrom + _convertTo;
+        // Allow six hours
+        if (tsKey in fxData.queried && fxData.queried[tsKey] > Date.now() - 21600000) {
+            // Fire a custom event 
+            _evt.fire("cconvert", window, { from : _convertFrom, to : _convertTo });
+        }
+        else {
+            // Fetch the info we need
+            conversionQuery();
+        }
+    };
+    
+    // Custom event handler for data conversions
+    var doConversion = function(evt) {
+        var toConvert = parseFrom();
+        if (null === toConvert) {
+            return;
+        }
+        var fC = evt.detail.from, tC = evt.detail.to, uKey = fC + tC;
+        var outputFmt = new _nFormat(currLocale, { style : "currency", currency : tC }),
+            converted = _cu.cnv(toConvert).from(fC).to(tC);
+        _ele("convert-to").value = outputFmt.format(converted);
+        
+        _setText("updated-on", dFormatter.format(fxData.updated[uKey]));
+    };
+    _evt.register(window, "cconvert", doConversion);
+    
+    // Keypress handler - convert when the user stops typing
+    _evt.register("convert-from", ["keyup", "paste"], function() {
+        if (kpTimeout) {
+            clearTimeout(kpTimeout);
+        }
+        kpTimeout = setTimeout(convertValue, 300);
+    });
+    
+    menu = _ele("from-choice");
+    allCurrencies.forEach(function(cc) {
+        var li = document.createElement("li"), 
+            link = document.createElement("a");
+        link.href = "#";
+        link.appendChild(document.createTextNode(cc));
+        li.id = "from-" + cc;
+        if (cc === _convertFrom) {
+            li.className = "active";
+        }
+        li.appendChild(link);
+        _evt.register(li, "click", function(evt, eType, eSrc, eReg) {
+            var menu = _ele("from-choice");
+            _cList.get("from-" + _convertFrom).remove("active");
+            _cList.get("from-" + cc).add("active");
+            _setText("selected-from", cc);
+            _convertFrom = cc;
+            _cList.get(menu.parentNode).remove("open");
+            // Load the new set of conversion data
+            _cu.load(_convertFrom, fxData.rates[_convertFrom]);
+            convertValue();
+            return false;
+        });
+        menu.appendChild(li);  
+    });
+    
+    menu = _ele("to-choice");
+    allCurrencies.forEach(function(cc) {
+        var li = document.createElement("li"), 
+            link = document.createElement("a");
+        link.href = "#";
+        link.appendChild(document.createTextNode(cc));
+        li.id = "to-" + cc;
+        if (cc === _convertTo) {
+            li.className = "active";
+        }
+        li.appendChild(link);
+        _evt.register(li, "click", function(evt, eType, eSrc, eReg) {
+            var menu = _ele("to-choice");
+            _cList.get("to-" + _convertTo).remove("active");
+            _cList.get("to-" + cc).add("active");
+            _setText("selected-to", cc);
+            _convertTo = cc;
+            _cList.get(menu.parentNode).remove("open");
+            convertValue();
+            return false;
+        });
+        menu.appendChild(li);  
+    });
+    
+    menu = _ele("locale-choice");
+    allLocales.forEach(function(loc) {
+        var localeName = cMap[loc].n, li = document.createElement("li"), 
+            link = document.createElement("a");
+        link.href = "#";
+        link.appendChild(document.createTextNode(localeName));
+        li.id = "loc-" + loc;
+        if (loc === currLocale) {
+            li.className = "active";
+        }
+        li.appendChild(link);
+        _evt.register(li, "click", function(evt, eType, eSrc, eReg) {
+            var menu = _ele("locale-choice");
+            _cList.get("loc-" + currLocale).remove("active");
+            if (_u.featureSupport.storage.local || _fixed._storage.localStorage) {
+                localStorage.setItem("cconv-locale", loc);
+            }
+            _cList.get("loc-" + loc).add("active");
+            _setText("selected-locale", localeName);
+            currLocale = loc;
+            _cList.get(menu.parentNode).remove("open");
+            _loc.current = currLocale;
+            
+            // We'll rewrite the value in the from control
+            var fromValue = parseFrom();
+            
+            fromFormatter = makeExampleFormatter(loc);
+            _setText("curr-example", fromFormatter.format(9999.5));
+            
+            if (null !== fromValue) {
+                _ele("convert-from").value = fromFormatter.format(fromValue);
+            }
+            
+            dFormatter = new _dFormat(currLocale, dfOpts);
+            
+            convertValue();
+            
+            return false;
+        });
+        menu.appendChild(li);        
+    });
+    // Get the first bit of exchange info
+    conversionQuery();
+};
+        </script>
+    </body>
+</html>

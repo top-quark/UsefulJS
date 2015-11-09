@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>UsefulJS.Storage</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body data-spy="scroll" data-target="#sidebar">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="core.html">UsefulJS.Core</a></li>
+                            <li><a href="array.html">UsefulJS.Array</a></li>
+                            <li><a href="classlist.html">UsefulJS.ClassList</a></li>
+                            <li><a href="date.html">UsefulJS.Date</a></li>
+                            <li><a href="event.html">UsefulJS.Event</a></li>
+                            <li><a href="math.html">UsefulJS.Math</a></li>
+                            <li><a href="numeric.html">UsefulJS.Number</a></li>
+                            <li><a href="query.html">UsefulJS.Query</a></li>
+                            <li><a href="string.html">UsefulJS.String</a></li>
+                            <li><a href="locale.html">UsefulJS.Locale</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="browser.html">UsefulJS.Browser</a></li>
+                            <li><a href="currency.html">UsefulJS.Currency</a></li>
+                            <li><a href="dnd.html">UsefulJS.DnD</a></li>
+                            <li><a href="skin.html">UsefulJS.Skin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container">
+            <h1>UsefulJS.Storage</h1>
+            <p>The ability to access cookies has been a feature of JavaScript since, well, forever.
+            Cookies are now obsolete for client-side storage (unless you need to support 
+            <em>really</em> old browser versions) but they can still be a useful mechanism for
+            exchanging non-critical data between the server and client. Unfortunately, 
+            accessing cookies via <code>document.cookie</code> is simply horrible. 
+            UsefulJS.Storage presents a DOM storage-compatible interface to <code>document.cookie</code>
+            that allows you to treat cookies as named key-value data stores. If you're unlucky enough
+            to have to support a browser that does not offer storage, it can provide a fix to
+            emulate both local storage and session storage using cookies.</p>
+            <div class="alert alert-warning">
+                <span class="glyphicon glyphicon-warning-sign"></span>
+                If you are using cookies to provide client-side storage, note that the amount
+                of data you can store in a cookie is several orders of magnitude less than
+                in localstorage: ~1 KB compared to ~5 MB.
+            </div>
+            <h5>Syntax</h5>
+            <pre>new UsefulJS.Storage(name[, props])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>name</code> <b>String</b><br>
+                The name of the data store.</li>
+                <li><code>props</code> <b>Object</b><br>
+                Cookie properties to control expiry and suchlike.</li>
+            </ul>
+            <p>Throws: <b>TypeError</b> if <code>name</code> is anything other than a non-empty string.</p>
+            <h5>Description</h5>
+            <p>The optional <code>props</code> parameter can have the following properties:</p>
+            <ul>
+                <li>lifetime: how long (in days) the cookie is valid for; defaults to 365; if no
+                explicit lifetime is set, the expiry time will be updated when the store is
+                updated. If a lifetime of 0 is set, a session cookie will be created</li>
+                <li>domain: the domain (such as example.com) that the cookie should be served
+                to; defaults to null.</li>
+                <li>path: expressed as an absolute path; cookies will be only be served to URLs 
+                when the cookie path is a prefix of the URL path; defaults to "/"</li>
+                <li>secure: if true, the cookie will only be served over secure HTTPS
+                connections; defaults to false.</li>
+            </ul>
+            <h2>Static properties</h2>
+            <h4 class="api-doc">UsefulJS.featureSupport.storage</h4>
+            <p>Adds a storage entry to UsefulJS.featureSupport that allows for testing 
+            <code>localStorage</code> / <code>sessionStorage</code> support. 
+            Exposes the following properties:</p>
+            <ul>
+                <li><b>cookies</b><br>
+                <p>Whether cookies are enabled.</p></li>
+                <li><b>local</b><br>
+                <p>Whether <code>localStorage</code> is supported and enabled.</p></li>
+                <li><b>session</b><br>
+                <p><code>sessionStorage</code> is supported and enabled.</p></li>
+            </ul>
+            <h2>DOMStorage interface</h2>
+            <p>See <a href="http://www.w3.org/TR/webstorage/#the-storage-interface"
+            target="_blank">the W3C documentation</a> for more information.</p>
+            <h3>Instance properties</h3>
+            <h4 class="api-doc">length</h4>
+            <p>Read-only property that reflects the number of items in the datastore.</p>
+            <div class="alert alert-info">This property is read-only in browsers that support
+                <code>Object.defineProperty</code>. Otherwise it can be written to. Assigning a value to
+                it doesn't change the underlying data.
+            </div>
+            <h3>Instance methods</h3>
+            <h4 class="api-doc">clear</h4>
+            <p>Clears the store; the underlying cookie is removed</p>
+            <h5>Syntax</h5>
+            <pre>storage.clear()</pre>
+            <h4 class="api-doc">getItem</h4>
+            <p>Retrieves an item from the data store</p>
+            <h5>Syntax</h5>
+            <pre>storage.getItem(key)</pre>
+            <p>Returns <code>String</code> if the key exists in the store, otherwise returns
+            <code>null</code>.</p>
+            <h4 class="api-doc">key</h4>
+            <p>Retrieves a key name from the store at a given numeric index</p>
+            <h5>Syntax</h5>
+            <pre>storage.key(index)</pre>
+            <p>Returns <code>String</code> if there is a key at the given index, otherwise returns
+            <code>null</code>.</p>
+            <h4 class="api-doc">removeItem</h4>
+            <p>Removes an item from the data store</p>
+            <h5>Syntax</h5>
+            <pre>storage.removeItem(key)</pre>
+            <h4 class="api-doc">setItem</h4>
+            <p>Stores an item in the data store; the value stored is coerced to a String if
+            it is not a String</p>
+            <h5>Syntax</h5>
+            <pre>storage.setItem(key, value)</pre>
+            <h4 class="api-doc">toString</h4>
+            <p>Stringifies the cookie data</p>
+            <h5>Syntax</h5>
+            <pre>storage.toString()</pre>
+            <p>Returns <code>String</code></p>
+            <h5>Description</h5>
+            <p>The returned string takes the form <code>name=&lt;ENCODED_VALUE&gt;</code>
+            where "name" is the name of the data store and "&lt;ENCODED_VALUE&gt;" is the
+            store data with URI-encoding applied. When the value is URI-decoded, it takes
+            the same form as a query string: <code>key1=value1&key2=value2...</code>. Each
+            key and value is individually URI-encoded.</p>
+            <h3>Example</h3>
+            <pre>// Load the user's high score
+var score = 0, store = new UsefulJS.Storage("my.game.data"), 
+    hiScore = Number(store.getItem("hs"));
+    
+...
+
+// If there's a new high score, persist it
+if (score > hiScore) {
+    store.setItem("hs", score);
+}
+</pre>
+            <h3>Implementation notes</h3>
+            <p>The storage specification says that an event should be issued to all open 
+            tabs that might be interested in the modified data. Well, that ain't going to
+            happen.</p>
+            <p>Cookies may trivially be disabled by the browser user. If that is the case,
+            values may be stored but they won't be persisted.</p>
+            <p>In Chrome (at least), cookies are not allowed with file:// URLs, which is 
+            handy when you're developing stuff locally. Can't quite see what security issue
+            this restriction solves myself since native storage works just fine.</p>
+            <h2>Fixes</h2>
+            <p>The fixes for the Storage module are defined in the _storage namespace of the fix options.</p>
+            <h4 class="api-doc">localStorage</h4>
+            <p>If, by some chance, your code is running in a browser that doesn't offer a
+            native storage implementation, this fix will emulate <code>window.localStorage</code>
+            using a cookie called UsefulJSLocalStorage. This fix will not be applied if storage
+            has been disabled in browser settings. If <code>UsefulJS.featureSupport.storage.local</code> 
+            is false and so is <code>_storage.localStorage</code> in the return Object from
+            <code>UsefulJS.fix</code>, storage has probably been disabled either explicitly
+            or as a side effect of private browsing.</p>
+            <h4 class="api-doc">sessionStorage</h4>
+            <p>If required, this fix emulates <code>window.sessionStorage</code> with a
+            session cookie called UsefulJSSessionStorage.</p>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

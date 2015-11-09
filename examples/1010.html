@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>1010</title>
+        <meta name="viewport" content="width=device-width, initial-scale=0.75">
+        <meta name="author" content="Christopher Williams">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+        <link rel="stylesheet" href="light.css" title="Light">
+        <link rel="alternate stylesheet" href="dark.css" title="Dark">
+        <style type="text/css">
+        .container {
+            -webkit-user-select: none;
+        }
+        
+        #gameContainer {
+            border-radius: 0.8em;
+            border-width: 2px;
+            border-style: solid;
+            width: 26em;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        #boardContainer {
+            padding: 0;
+            text-align: center;
+        }
+        
+        #modalLayer {
+            position: absolute;
+            top: 0,
+            left: 0;
+            background-color: #222;
+            z-index: 2;
+            opacity : 0.4;
+            border-radius: 0.8em;
+            border: 3px solid black;
+            width: 26em;
+            margin: 0 auto;
+            height: 8em;
+        }
+        
+        #startGame {
+            width: 20em;
+            height: 10em;
+            border-radius: 0.8em;
+            position: absolute;
+            left: 2.9em;
+            top: 12.8em;
+            z-index: 3;
+        }
+        
+        #startMsg {
+            color: white;
+            text-align: center;
+            margin-top: 5px;
+            font-size: 1.2em;
+        }
+        
+        #startControl {
+            position: absolute;
+            font-size: 70px;
+            color: white;
+            width: 100%;
+            text-align: center;
+            top: 0.42em;
+        }
+        
+        #startButton {
+            cursor: pointer;
+        }
+        
+        DIV.bigSquares, DIV.smSquares {
+            display: inline-block;
+        }
+        
+        DIV.bigSquares BR, DIV.smSquares BR {
+            clear: both;
+        }
+        
+        .bigSquares DIV.square {
+            border-style: solid;
+            border-width: 0 3px 3px 0;
+            height: 35px;
+            width: 35px;
+            float: left;
+        }
+        
+        .bigSquares DIV.firstRow {
+            border-top-width: 3px;
+            height: 38px;
+        }
+        
+        .bigSquares DIV.firstCol {
+            border-left-width: 3px;
+            width: 38px;
+        }
+                
+        #scoreArea TD {
+            padding: 5px 5px 2px;
+            font-size: 2em;
+            font-weight: bold;
+            line-height: 1;
+        }
+        
+        #scoreDivider {
+            text-align: center;
+            width: 20%;
+        }
+        
+        #currentScore {
+            text-align: right;
+            width: 40%;
+        }
+        
+        #highScore {
+            width: 40%;
+        }
+        
+        .shapeArea {
+            text-align: center;
+            vertical-align: middle;
+            height: 8.3em;
+            width: 8.3em;
+            padding: 0.2em;
+        }
+        
+        .smSquares DIV.square {
+            border-style: solid;
+            border-width: 0 2px 2px 0;
+            height: 21px;
+            width: 21px;
+            float: left;
+        }
+        
+        .smSquares DIV.firstRow {
+            border-top-width: 2px;
+            height: 23px;
+        }
+        
+        .smSquares DIV.firstCol {
+            border-left-width: 2px;
+            width: 23px;
+        }
+        
+        DIV.blank1111 {
+            border-color: transparent;
+        }
+        
+        .dot {
+            background-color: #DB94FF;
+        }
+        
+        .twoBar {
+            background-color: #FFFF75;
+        }
+        
+        .threeBar {
+            background-color: #FFAD5C;
+        }
+        
+        .fourBar {
+            background-color: #C02424;
+        }
+        
+        .fiveBar {
+            background-color: #720C0C;
+        }
+        
+        .twoEl {
+            background-color: #75FF75;
+        }
+        
+        .twoSquare {
+            background-color: #0C724D;
+        }
+        
+        .threeEl {
+            background-color: #0E8EAE;
+        }
+        
+        .threeSquare {
+            background-color: #0C3F94;
+        }
+        </style>
+    </head>
+    <body>
+        <p class="blurb">This is a pure-JavaScript implementation of the popular 1010 
+        from Gram Games. It uses the UsefulJS Event module along with the DnD and Skin
+        extensions. It works with both mouse / trackpad and touchscreen.</p>
+        <nav id="main-nav" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">1010<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="ctable.html">Programmer's Character Reference</a></li>
+                            <li><a href="calendar.html">Five Year Calendar</a></li>
+                            <li><a href="cconv.html">Currency Converter</a></li>
+                            <li><a href="awords.html">Angry Words</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="selected-skin"></span><b class="caret"></b></a>
+                        <ul class="dropdown-menu" id="skin-choice"></ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="container" id="ctr">
+            <div id="modalLayer" style="display:none;"></div>
+            <div id="gameContainer">
+                <div id="startGame" style="display:none;">
+                    <div id="startMsg" style="display:none;">No moves remaining</div>
+                    <div id="startControl">
+                        <span id="startButton" class="glyphicon glyphicon-play"></span>
+                    </div>
+                </div>
+                <table id="playArea" width="100%">
+                    <tr id="scoreArea">
+                        <td id="currentScore">0</td>
+                        <td id="scoreDivider"><span class="glyphicon glyphicon-star"><span></td>
+                        <td id="highScore">0</td>
+                    </tr>
+                    <tr>
+                        <td id="boardContainer" colspan="3"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <table>
+                                <tr>
+                                    <td class="shapeArea" id="shape0"></td>
+                                    <td class="shapeArea" id="shape1"></td>
+                                    <td class="shapeArea" id="shape2"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+        <script src="../built/UsefulJS-min-full-latest.js"></script>
+        <script type="text/javascript">
+        
+window.onload = function() {
+    "use strict";
+    var _u = UsefulJS, _fixed = _u.fix({ _string : "all" }), 
+        _evt = UsefulJS.Event, _cList = UsefulJS.ClassList,
+        _ele = function(item) {
+            if ("string" === _typeof(item)) {
+                return document.getElementById(item);
+            }
+            return item;
+        },
+        _setText = function(e, txt) {
+            e = _ele(e);
+            e.innerHTML = "";
+            e.appendChild(document.createTextNode(txt));
+        };
+        
+    var _gameCtr = _ele("gameContainer"), _modalLayer = _ele("modalLayer"), 
+        _starter = _ele("startGame"), touchEnabled = false;
+    
+    var modalize = function(e) {
+        _modalLayer.style.display = "";
+        e.style.display = "";
+    },
+    demodalize = function(e) {
+        _modalLayer.style.display = "none";
+        e.style.display = "none";
+    };
+    
+    // Get saved values
+    var skin = null, _sk = _ele("selected-skin"), 
+        hScore = null, score, _hsc = _ele("highScore"), _sc = _ele("currentScore");
+    if (_u.featureSupport.storage.local || _fixed._storage.localStorage) {
+        hScore = localStorage.getItem("1010hs");
+        skin = localStorage.getItem("1010skin");
+    }
+    if (null === hScore) {
+        hScore = 0;
+    }
+    var skins = _u.Skin.load(skin);
+    if (!skin) {
+        skin = skins[0];
+    }
+    var nFmt = new Intl.NumberFormat();
+    _setText(_hsc, nFmt.format(hScore));
+    _setText(_sk, skin);
+    
+    // Initialize the skin selection
+    var menu = _ele("skin-choice");
+    skins.forEach(function(_skin) {
+        var li = document.createElement("li"), link = document.createElement("a");
+        link.href = "#";
+        link.appendChild(document.createTextNode(_skin));
+        li.id = "skin-" + _skin;
+        if (_skin === skin) {
+            li.className = "active";
+        }
+        li.appendChild(link);
+        _evt.register(li, "click", function(evt, eType, eSrc, eReg) {
+            _cList.get("skin-" + skin).remove("active");
+            _u.Skin.choose(_skin);
+            if (_u.featureSupport.storage.local || _fixed._storage.localStorage) {
+                localStorage.setItem("1010skin", _skin);
+            }
+            _cList.get("skin-" + _skin).add("active");
+            _setText(_sk, _skin);
+            skin = _skin;
+            _cList.get(menu.parentNode).remove("open");
+            return false;
+        });
+        menu.appendChild(li);     
+    });
+    
+    // Initializes the board    
+    var initGame = function() {
+        // Build up the table
+        var i = 0, j = 0, size = 10, bCtr = _ele("boardContainer"), 
+            board = document.createElement("div"), sq;
+        board.className = "bigSquares";
+        for (; i < size; i++) {
+            if (i) {
+                board.appendChild(document.createElement("br"));
+            }
+            for (j = 0; j < size; j++) {
+                sq = document.createElement("div");
+                sq.className = "square empty";
+                if (!i) {
+                    sq.className += " firstRow";
+                }
+                if (!j) {
+                    sq.className += " firstCol";
+                }
+                sq.id = "square_" + i + "_" + j;
+                board.appendChild(sq);
+            }
+        }
+        bCtr.appendChild(board);
+        _modalLayer.style.height = _gameCtr.offsetHeight + "px";
+        _modalLayer.style.left = _gameCtr.offsetLeft + "px";
+        modalize(_starter);
+    };
+    
+    // These are all the shape varieties that may be given the user
+    // 0 signifies that the shape class should be applied to the square
+    // "xxxx" signifies "blank" + "xxxx" class should be applied
+    var shapes = [
+        { layout : [[0]], className : "dot" },
+        { layout : [[0, 0]], className : "twoBar" },
+        { layout : [[0], [0]], className : "twoBar" },
+        { layout : [[0, 0, 0]], className : "threeBar" },
+        { layout : [[0], [0], [0]], className : "threeBar" },
+        { layout : [[0, 0, 0, 0]], className : "fourBar" },
+        { layout : [[0], [0], [0], [0]], className : "fourBar" },
+        { layout : [[0, 0, 0, 0, 0]], className : "fiveBar" },
+        { layout : [[0], [0], [0], [0], [0]], className : "fiveBar" },
+        { layout : [[0, 0], [0, "1001"]], className : "twoEl" },
+        { layout : [[0, 0], ["1100", 0]], className : "twoEl" },
+        { layout : [["0110", 0], [0, 0]], className : "twoEl" },
+        { layout : [[0, "0011"], [0, 0]], className : "twoEl" },
+        { layout : [[0, 0], [0, 0]], className : "twoSquare" },
+        { layout : [[0, 0, 0], [0, "1001", "1000"], [0, "0001", "1111"]], className : "threeEl" },
+        { layout : [[0, 0, 0], ["1000", "1100", 0], ["1111", "0100", 0]], className : "threeEl" },
+        { layout : [["1111", "0100", 0], ["0010", "0110", 0], [0, 0, 0]], className : "threeEl" },
+        { layout : [[0, "0001", "1111"], [0, "0011", "0010"], [0, 0, 0]], className : "threeEl" },
+        { layout : [[0, 0, 0], [0, 0, 0], [0, 0, 0]], className : "threeSquare" }
+    
+    ];
+
+    var activeShapes = [], activeShape = null;
+    
+    // Drag start callback
+    var dragStart = function(evt, eSrc, eReg) {
+        var eId = eReg.id, cl, shapeClass, activeIdx;
+        if (/^shape\d/.test(eId)) {
+            // Touched the containing cell rather than the shape itself; this is only
+            // allowed for touch events and there must be a shape present
+            if (!"touches" in evt) {
+                return null;
+            }
+            eReg = eReg.firstChild;
+            if (!eReg) {
+                return null;
+            }
+            eId = eReg.id;
+        }
+        // Get the class for the shape
+        activeShapes.some(function(shp, idx) {
+            if (shp.id === eId) {
+                // Found the one we want
+                shapeClass = shp.className;
+                activeIdx = idx;
+                return true;
+            }
+            return false;
+        });
+        // When using touch, we need to allow imprecision; otherwise check that
+        // a blank square has not been selected
+        if (!(touchEnabled || eSrc === eReg)) {
+            cl = _cList.get(eSrc);
+            if (!cl.contains(shapeClass)) {
+                // Nope
+                return null;
+            }
+        }
+        
+        activeShape = activeShapes[activeIdx];
+        activeShapes.splice(activeIdx, 1);
+        
+        // Remove the shape from its parent, append it to document.body and change
+        // class so that the squares are rendered the same size as the playing field
+        var xy = _u.DnD.elementOffset(eReg), eX = xy[0], eY = xy[1];
+        if (touchEnabled) {
+            // If we have the shape appearing under our fingers, it's invisible so
+            // shift it upwards
+            xy = _u.DnD.elementOffset(eReg.parentNode);
+            eY = xy[1];
+        }
+        eReg.parentNode.removeChild(eReg);
+        eReg.style.position = "absolute";
+        eReg.style.left = eX + "px";
+        eReg.style.top = eY + "px";
+        cl = _cList.get(eReg);
+        cl.remove("smSquares");
+        cl.add("bigSquares");
+        document.body.appendChild(eReg);
+        return eReg;
+    };
+
+    // Clears squares
+    var clearBoard = function(h1, h2, v1, v2) {
+        var i, j, sq, cl;
+        for (i = h1; i < h2; i++) {
+            for (j = v1; j < v2; j++) {
+                sq = _ele("square_" + i + "_" + j);
+                cl = i ? "" : "firstRow ";
+                if (!j) {
+                    cl += "firstCol ";
+                }
+                sq.className = cl + "empty square";                
+            }
+        }
+    };
+    
+    // For testing drop targets
+    var dropRe = /square_(\d)_(\d)/;
+
+    // See whether a shape fits in a given slot on the board
+    var canGo = function(shp, targetId) {
+        var matchInfo = dropRe.exec(targetId);
+        if (!matchInfo) {
+            // Not a square on the playing field
+            return null;
+        }
+        var rowNo = matchInfo[1] - 0, colNo = matchInfo[2] - 0, ly = shp.layout,
+            wS = ly[0].length, hS = ly.length, i, j, sqId, cl;
+        if (colNo + wS > 10 || rowNo + hS > 10) {
+            // Won't fit horizontally or vertically or both
+            return null;
+        }
+
+        // Check the squares under the shape
+        for (i = 0; i < hS; i++) {
+            for (j = 0; j < wS; j++) {
+                if (0 === ly[i][j]) {
+                    // See what the playing field square is at this point
+                    sqId = "square_" + (i + rowNo) + "_" + (j + colNo);
+                    cl = _cList.get(sqId);
+                    if (!cl.contains("empty")) {
+                        // One of our target squares is already occupied
+                        return null;
+                    } 
+                }
+            }
+        }
+        
+        return [rowNo, colNo];
+    };
+    
+    // Checks columns and rows for completion; clears them if cleared; returns the
+    // total number of rows and columns cleared
+    var checkBoard = function() {
+        var rowsToClear = [], colsToClear = [], i, j, count, cl;
+        // Check rows
+        for (i = 0; i < 10; i++) {
+            count = 0;
+            for (j = 0; j < 10; j++) {
+                cl = _cList.get("square_" + i + "_" + j);
+                if (cl.contains("empty")) {
+                    // Not complete
+                    break;
+                }
+                ++count;
+            }
+            if (count === 10) {
+                rowsToClear.push(i);
+            }
+        }
+        // Check columns
+        for (j = 0; j < 10; j++) {
+            count = 0;
+            for (i = 0; i < 10; i++) {
+                cl = _cList.get("square_" + i + "_" + j);
+                if (cl.contains("empty")) {
+                    // Not complete
+                    break;
+                }
+                ++count;
+            }
+            if (count === 10) {
+                colsToClear.push(j);
+            }
+        }
+        var ret = 0;
+        rowsToClear.forEach(function(rowNo) {
+            clearBoard(rowNo, rowNo + 1, 0, 10);
+            ++ret;
+        });
+        colsToClear.forEach(function(colNo) {
+            clearBoard(0, 10, colNo, colNo + 1);
+            ++ret;
+        });
+        return ret;
+    };
+    
+    // Determines whether a game-over condition has been met; it's game over if none
+    // of the remaining shapes can be added to the board
+    var isGameOver = function() {
+        return activeShapes.every(function(shp) {
+            var i, j;
+            for (i = 0; i < 10; i++) {
+                for (j = 0; j < 10; j++) {
+                    if (canGo(shp, "square_" + i + "_" + j)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        });
+    };
+    
+    // Handles the game over condition
+    var gameOver = function() {
+        if (score > hScore) {
+            // Update high score
+            hScore = score;
+            _setText(_hsc, nFmt.format(hScore));
+            if (_u.featureSupport.storage.local || _fixed._storage.localStorage) {
+                localStorage.setItem("1010hs", hScore);
+            }
+        }
+        _ele("startMsg").style.display = "";
+        modalize(_starter);
+    };
+    
+    // Copies the shape onto the playing field; by this point we've already established
+    // that it will fit
+    var applyShape = function(shp, rowNo, colNo) {
+        var ly = shp.layout, clName = shp.className, wS = ly[0].length, hS = ly.length,
+            i, j, sqId, cl;
+        for (i = 0; i < hS; i++) {
+            for (j = 0; j < wS; j++) {
+                if (0 === ly[i][j]) {
+                    // See what the playing field square is at this point
+                    sqId = "square_" + (i + rowNo) + "_" + (j + colNo);
+                    cl = _cList.get(sqId);
+                    cl.remove("empty");
+                    cl.add(clName); 
+                }
+            }
+        }
+        // Clear complete / rows and columns and update the score
+        score += shp.score + 10 * checkBoard();
+        _setText(_sc, nFmt.format(score));
+    };
+    
+    var dragUpdate = function(evt, x, y, eReg, complete) {
+        if (!complete) {
+            return;
+        }
+        // Remove the element from document.body
+        document.body.removeChild(eReg);
+        // Fudge factor; add quarter a drop cell's width to the offsets to allow
+        // for some imprecision
+        var ff = (_ele("square_0_0").clientWidth / 4) >> 0,
+            dropTarget = document.elementFromPoint(x + ff, y + ff);
+        var coords = dropTarget ? canGo(activeShape, dropTarget.id) : null;
+        if (coords) {
+            applyShape(activeShape, coords[0], coords[1]);
+            
+            // We're done with it
+            _u.DnD.deregister(eReg);
+            activeShape = null;
+            
+            if (!activeShapes.length) {
+                addShapes();
+            }
+            if (isGameOver()) {
+                gameOver();
+            }
+            
+            return;
+        }
+    
+        var eId = eReg.id, shapeNo = eId.substring(eId.length - 1, eId.length);
+        // Remove the absolute positioning and put it back where it belongs        
+        eReg.style.position = "static";
+        var cl = _cList.get(eReg);
+        cl.remove("bigSquares");
+        cl.add("smSquares");
+        _ele("shape" + shapeNo).appendChild(eReg);
+        activeShapes.unshift(activeShape);
+        activeShape = null;
+    };
+    
+    // Gets three random shapes and sticks them in the shape area
+    var addShapes = function() {
+        var i, j, k;
+        for (i = 0; i < 3; ++i) {
+            var idx = Math.floor(Math.random() * shapes.length),
+                shp = { layout : shapes[idx].layout, className : shapes[idx].className, 
+                    id : "activeShape" + i, score : 0 },
+                wrapper = document.createElement("div");
+            wrapper.className = "smSquares";
+            wrapper.id = shp.id;
+            for (j = 0; j < shp.layout.length; j++) {
+                if (j) {
+                    wrapper.appendChild(document.createElement("br"));
+                }
+                for (k = 0; k < shp.layout[j].length; k++) {
+                    var sq = document.createElement("div"), cl = ["square"];
+                    if (!j) {
+                        cl.push("firstRow");
+                    }
+                    if (!k) {
+                        cl.push("firstCol");
+                    }
+                    if (0 === shp.layout[j][k]) {
+                        cl.push(shp.className);
+                        ++shp.score;
+                    }
+                    else {
+                        cl.push("blank" + shp.layout[j][k]);
+                    }
+                    sq.className = cl.join(" ");
+                    wrapper.appendChild(sq);
+                }
+            } 
+            _ele("shape" + i).appendChild(wrapper);
+            activeShapes.push(shp);
+            _u.DnD.register(wrapper, null, dragStart, dragUpdate);
+        }
+    };
+    
+    // Begins a game
+    var startGame = function(evt) {
+        if ("touches" in evt) {
+            touchEnabled = true;
+        }
+        demodalize(_starter);
+        score = 0;
+        _setText(_sc, nFmt.format(score));
+        clearBoard(0, 10, 0, 10);
+        // Clear anything left over from the previous game
+        activeShapes.forEach(function(shp) {
+            _u.DnD.deregister(shp.id);
+        });
+        activeShapes = [];
+        activeShape = null;
+        _ele("shape0").innerHTML = _ele("shape1").innerHTML = 
+            _ele("shape2").innerHTML = "";
+        addShapes();
+    };
+      
+    _evt.register("startButton", ["click", "touchstart"], startGame);
+    // Register the shape areas for drag-and-drop; this is to facilitate touch play
+    ["shape0", "shape1", "shape2"].forEach(function(id) {
+        _u.DnD.register(id, null, dragStart, dragUpdate);
+    });
+    initGame();
+    
+};
+
+        </script>
+    </body>
+</html>

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>UsefulJS.String</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body data-spy="scroll" data-target="#sidebar">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="core.html">UsefulJS.Core</a></li>
+                            <li><a href="array.html">UsefulJS.Array</a></li>
+                            <li><a href="classlist.html">UsefulJS.ClassList</a></li>
+                            <li><a href="date.html">UsefulJS.Date</a></li>
+                            <li><a href="event.html">UsefulJS.Event</a></li>
+                            <li><a href="math.html">UsefulJS.Math</a></li>
+                            <li><a href="numeric.html">UsefulJS.Number</a></li>
+                            <li><a href="query.html">UsefulJS.Query</a></li>
+                            <li><a href="storage.html">UsefulJS.Storage</a></li>
+                            <li><a href="locale.html">UsefulJS.Locale</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="browser.html">UsefulJS.Browser</a></li>
+                            <li><a href="currency.html">UsefulJS.Currency</a></li>
+                            <li><a href="dnd.html">UsefulJS.DnD</a></li>
+                            <li><a href="skin.html">UsefulJS.Skin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container">
+            <h1>UsefulJS.String</h1>
+            <p>The String module provides functionality for encoding, escaping and formatting strings.
+            It may also apply a number of fixes to the built-in <code>String</code> object.</p>
+            <h2>Static properties</h2>
+            <h4 class="api-doc">UsefulJS.featureSupport.string</h4>
+            <p>Adds entries to UsefulJS.featureSupport:</p>
+            <ul>
+                <li><b>codePointEscaping</b><br>
+                <p>Whether \u{...} escape sequences can be used.</p></li>
+            </ul>
+            <h2>Formatting strings</h2>
+            <h3>UsefulJS.String.sprintf</h3>
+            <p>Formats a string with placeholder fields replaced with argument values.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.String.sprintf(fmt[, field1[, field2 ...]])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>fmt</code> <b>String</b><br>
+                The string to format.</li>
+                <li><code>field1 ... field<em>n</em></code> <b>String|Number</b><br>
+                Ordered replacements for field placeholders in the format string.</li>
+            </ul>
+            <p>Returns: <b>String</b>. The formatted string</p>
+            <p>Throws: <b>TypeError</b>: unrecognized format code; unexpected argument type
+            for the field.</p>
+            <h5>Usage</h5>
+            <pre>var company = "Holding Holdings, Inc", year = (new Date()).getFullYear(),
+    copyright = UsefulJS.String.sprintf("Copyright (C) %04d %s. All rights reserved.", year, company);</pre>
+            <h3>Format field syntax</h3>
+            <p>The general syntax of a sprintf format field is:</p>
+            <pre>%[argno][flags][width][precision]type</pre>
+            <p>Items in square brackets are optional and for some type values they may be ignored.</p>
+            <div class="alert alert-info">What, no length field? If you have a C or Perl
+            background you may have used, for example, the <code>%ld</code> sequence for a <em>long int</em>
+            value. Let me put it like this: JAVASCRIPT IS NOT C! C is a strongly typed language
+            and the compiler cares very much about the distinction between an <em>int</em>
+            and <em>long int</em>. JavaScript is a weakly typed language; not only am I 
+            unable to make the distinction but I don't even care to.</div>
+            <h3>Field types</h3>
+            <table class="table">
+                <tr>
+                    <th>Field type</th>
+                    <th>Purpose</th>
+                    <th>Notes</th>
+                </tr>
+                <tr>
+                    <td>%d</td>
+                    <td>Signed integer</td>
+                    <td>Range is <span style="vertical-align: 0.25ex;">±</span>2<sup>53</sup> - 1. Locale-aware</td>
+                </tr>
+                <tr>
+                    <td>%i</td>
+                    <td>32-bit signed integer</td>
+                    <td>Range is -2<sup>31</sup> to 2<sup>31</sup> - 1. Not locale-aware</td>
+                </tr>
+                <tr>
+                    <td>%u</td>
+                    <td>32-bit unsigned integer</td>
+                    <td>Range is 0 to 2<sup>32</sup></td>
+                </tr>
+                <tr>
+                    <td>%x / %X</td>
+                    <td>Unsigned integer in hexadecimal notation</td>
+                    <td>Range is the same as %u. %X uses uppercase characters and '0X'
+                    with the # flag</td>
+                </tr>
+                <tr>
+                    <td>%o</td>
+                    <td>Unsigned integer in octal notation</td>
+                    <td>Range is the same as %u</td>
+                </tr>
+                <tr>
+                    <td>%b / %B</td>
+                    <td>Unsigned integer in binary notation</td>
+                    <td>Range is the same as %u. %B uses uppercase '0B' with # flag</td>
+                </tr>
+                <tr>
+                    <td>%f</td>
+                    <td>Floating point value in decimal format</td>
+                    <td>Locale-aware</td>
+                </tr>
+                <tr>
+                    <td>%e / %E</td>
+                    <td>Floating point value in exponential format</td>
+                    <td>%E uses an uppercase 'E' for the exponent part; exponent value is
+                    a minimum of two digits</td>
+                </tr>
+                <tr>
+                    <td>%c</td>
+                    <td>A single character or surrogate pair</td>
+                    <td>Codepoint in the range 0 to 0x10ffff</td>
+                </tr>
+                <tr>
+                    <td>%s</td>
+                    <td>A character string</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>%%</td>
+                    <td>A literal '%' character</td>
+                    <td>Note that <em>x</em>% is not a valid percentage format in certain
+                    locales</td>
+                </tr>
+            </table>
+            <div class="alert alert-info">A number of fields familiar to C programmers
+            are unimplemented. There is no way that I could implement the <code>%p</code>
+            and <code>%n</code> fields and I wouldn't even if I could since they're features
+            in search of a use case. In twenty five years I've never once used <code>%g</code>
+            which behaves like <code>%f</code> or <code>%e</code> depending on the magnitude
+            and has a funky interaction with the precision field. So that one's out too.</div>
+            <h3>Argno</h3>
+            <p>Generally, each field in the format string consumes the next argument. You
+            can change this behaviour by specifying the argument number in the first slot
+            in the format field. The syntax is <code><em>n</em>$</code> where <em>n</em>
+            is the argument number. it must be a minimum of 1 since argument 0 is the format
+            string itself. To illustrate:</p>
+            <pre>UsefulJS.String.sprintf("%1$3u %1$#04x %1$#010b", 23); // " 23 0x17 0b00010111"</pre>
+            <h3>Flags</h3>
+            <p>Flags control the appearance of the formatted value. You can use as many of them
+            as you like, though some may be ignored.</p>
+            <table class="table">
+                <tr>
+                    <th>Flag</th>
+                    <th>Purpose</th>
+                    <th>Notes</th>
+                </tr>
+                <tr>
+                    <td>-</td>
+                    <td>Left-align padded values</td>
+                    <td>Fixed width fields are right-aligned unless this flag is set;
+                    left aligned fields ignore the '0' flag</td>
+                </tr>
+                <tr>
+                    <td>+</td>
+                    <td>Prefix positive numbers with '+'</td>
+                    <td>Only used when the field indicates a signed value: %d, %i, %e %f</td>
+                </tr>
+                <tr>
+                    <td>&lt;SPACE&gt;</td>
+                    <td>Prefix positive numbers with 'NBSP' (non-breaking space)</td>
+                    <td>Only used when the field indicates a signed value</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>Pad numeric fields with '0' characters; otherwise NBSP characters
+                    are used</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td>#</td>
+                    <td>Prefixes binary, octal and hex values with a base identifier</td>
+                    <td>Hex values are prefixed with '0x', octal values with '0' and 
+                    binary values with '0b'. Affects the behaviour of the width field</td>
+                </tr>
+                <tr>
+                    <td>,</td>
+                    <td>Group the digits in the output value (e.g. "1,000" rather than "1000")</td>
+                    <td>Only used when the field is %d or %f</td>
+                </tr>
+            </table>
+            <h3>Width</h3>
+            <p>The width field follows the flags and is a number that specifies the minimum
+            width of the formatted field. Formatted values wider than this are not truncated.
+            Field width is applied after all other formatting is complete, so precision and
+            prefixes are taken into account when calculating how much padding is required:</p>
+            <pre>UsefulJS.String.sprintf("%+7.4f", 1.0);       //  "+1.0000"
+UsefulJS.String.sprintf("%+8.4f", 1.0);       // " +1.0000"</pre>
+            <p>A dynamic width can be specified with the '*' character. This consumes an
+            argument. To illustrate:</p>
+            <pre>UsefulJS.String.sprintf("%*d", 2, 1);         // " 1"</pre>
+            <p>The width field also controls the output width with the %s field type:</p>
+            <pre>UsefulJS.String.sprintf("%8s", "expand");  // "  expand"
+UsefulJS.String.sprintf("%-8s", "expand"); // "expand  "</pre>
+            <h3>Precision</h3>
+            <p>The precision field follows the width and is a number preceded by a '.'
+            character that specifies how many digits after the decimal point are to be
+            displayed when used with the %f and %e field types. The default value is 6. 
+            Trailing zeroes in the output are not suppressed:</p>
+            <pre>UsefulJS.String.sprintf("%f", 1);             // "1.000000"
+UsefulJS.String.sprintf("%.2f", 1);           // "1.00"</pre>
+            <p>As with the width, you can specify precision dynamically with the '*'
+            character:</p>
+            <pre>UsefulJS.String.sprintf("%.*f", 2, 1);        // "1.00"</pre>
+            <p>When used with the %s field type, the precision value controls the output
+            width, truncating if required:</p>
+            <pre>UsefulJS.String.sprintf("%.8s", "truncated"); // "truncate"</pre>
+            <h3>Localization</h3>
+            <p>The %d and %f fields are locale aware (that is, assuming that the 
+            <code>UsefulJS.Number</code> module is available). This means that the decimal
+            separator and digits for the current locale are observed:</p>
+            <pre>UsefulJS.Locale.current = "fr";
+UsefulJS.String.sprintf("%.*f", 2, 1);        // "1,00"
+UsefulJS.Locale.current = "hi";
+UsefulJS.String.sprintf("%.*f", 2, 1);        // "१.००"</pre>
+            <p>You can enable grouped output with the ',' (comma) flag to improve readability:<//p>
+            <pre>UsefulJS.Locale.current = "en-IN";
+UsefulJS.String.sprintf("%,d", 100000);       // "1,00,000"</pre>
+            <p>Beyond this, the formats used for numbers are fixed. If you have more complex
+            formatting requirements (e.g. currency or suppressing trailing zeroes), you 
+            should format the numbers as a separate step and use <code>%s</code> fields.</p>
+            <h3>Internationalization</h3>
+            <p>Here is a simple but functional internationalization framework:</p>
+            <pre>var I18N = {
+    strings : {
+        de : {
+            question : "Was ist das Ergebnis der Multiplikation %1$.1f von %2$.1f?",
+            ...
+        },
+        en : {
+            question : "What do you get when you multiply %1$.1f by %2$.1f?",
+            ...
+        },
+        ...
+    },
+    
+    resolve : function(key/*, arg1, arg2, ... */) {
+        var fmt = I18n.strings[UsefulJS.Locale.current][key];
+        if (!fmt) {
+            return key;
+        }
+        // Get the rest of the arguments
+        var args = Array.from(arguments);
+        // Put the format string on the front
+        args[0] = fmt;
+        return UsefulJS.String.sprintf.apply(null, args);
+    }       
+};
+
+UsefulJS.Locale.current = "de";
+I18n.resolve("question", 6, 9);  // "Was ist das Ergebnis der Multiplikation 6,0 von 9,0?"
+</pre>
+            <p>Note the use of positional parameters <code>%1$.1f</code> and <code>%2$.1f</code>.
+            This is particularly important for <code>%s</code> fields. When your stringtable
+            entries are translated, the word order can change very radically and there is
+            no way of distinguishing one %s from another when the argument order is fixed.
+            Specifying <em>which</em> arguments to use in the format string means that substitution
+            won't produce gobbledegook.</p>
+            <h2>String encoding</h2>
+            <p>The functions in the <cpde>UsefulJS.String.encode</code> namespace are used
+            for interchange with backend processes.</p>
+            <h4 class="api-doc">UsefulJS.String.encode.toUtf8</h4>
+            <p>Returns its input, UTF-8 encoded.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.String.encode.toUtf8(s)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>s</code> <b>String</b><br>
+                The string to encode</li>
+            </ul>
+            <p>Returns: <b>String</b></p>
+            <h5>Description</h5>
+            <p>UTF-8 is a character encoding that uses a variable number of 8-bit bytes to 
+            encode a single character. The bit pattern in the first byte of the sequence
+            says how many bytes are in an encoded sequence. UTF-8 has a number of intrinsic
+            advantages over other character encodings:</p>
+            <ul>
+                <li>Any of the 1.1 million or so codepoints defined by the Unicode standard 
+                can be represented unambiguously</li>
+                <li>Error recovery is a simple matter of scanning forward in the decode
+                stream to the next start byte</li>
+                <li>Being 8-bit, byte ordering is a non-issue</li>
+                <li>Backwards compatibility with ASCII means that any program which
+                uses an 8-bit <code>char</code> data type can handle UTF-8 data.
+                Important values like the null terminator retain their special meanings
+                so that UTF-8 encoded data can be used with, for example, <code>std::string</code>.</li>
+            </ul>
+            <p>No more than four bytes are required to represent any defined
+            character. Here are some examples:</p>
+            <pre>UsefulJS.String.escape.js(UsefulJS.String.encode.toUtf8("$"));  // "$"; unchanged
+UsefulJS.String.escape.js(UsefulJS.String.encode.toUtf8("£"));  // "\xc2\xa3"
+UsefulJS.String.escape.js(UsefulJS.String.encode.toUtf8("€"));  // "\xe2\x82\xac"
+UsefulJS.String.escape.js(UsefulJS.String.encode.toUtf8("💩")); // "\xf0\x9f\x92\xa9"</pre>
+            <p>Following the <a href="http://www.unicode.org/faq/private_use.html#nonchar7"
+            target="_blank">Noncharacter FAQ</a>, noncharacter codepoints are encoded like
+            any other. However, codepoints that represent isolated halves of a surrogate
+            pair are encoded as <code>"\xef\xbf\xbd"</code>, the UTF-8 encoding of U+FFFD, 
+            the replacement character. Note that no "BOM" (byte-order mark) is emitted - 
+            this is absolutely not needed for UTF-8. If, for some reason, the receiving 
+            program expects one, you can prefix the encoded string with with 
+            <code>"\xef\xbb\xbf"</code>.</p> 
+            <h4 class="api-doc">UsefulJS.String.encode.fromUtf8</h4>
+            <p>UTF-8 decodes its input, returning a regular String.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.String.encode.fromUtf8(s)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>s</code> <b>String</b><br>
+                The string to decode</li>
+            </ul>
+            <p>Returns: <b>String</b></p>
+            <h5>Description</h5>
+            <p>Valid UTF-8 sequences in the input are decoded to the corresponding codepoints.
+            This includes sequences that decode to noncharacters. Invalid sequences are 
+            decoded to U+FFFD, the replacement character. Invalid sequences are:</p>
+            <ul>
+                <li>Sequences that decode to a codepoint >0x10ffff</li>
+                <li>Truncated sequences where one or more continuation bytes are missing</li>
+                <li>Continuation bytes where a start byte is expected</li>
+                <li>Sequences that decode to one half of a surrogate pair (codepoints
+                between 0xd800 and 0xdfff)</li>
+                <li>Overlong sequences. Overlong sequences are ones where more bytes than
+                necessary have been used to encode the codepoint, for example, the NUL
+                character "\x00" being encoded as "\xC0\x00".</li>
+            </ul>
+            <h4 class="api-doc">UsefulJS.String.encode.lf</h4>
+            <p>Canonicalizes line-endings as "\n".</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.String.encode.lf(s)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>s</code> <b>String</b><br>
+                The string to encode</li>
+            </ul>
+            <p>Returns: <b>String</b></p>
+            <h5>Description</h5>
+            <p>Strips carriage returns out of its argument and returns the result.</p>
+            <h4 class="api-doc">UsefulJS.String.encode.crlf</h4>
+            <p>Canonicalizes line-endings as "\r\n".</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.String.encode.crlf(s)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>s</code> <b>String</b><br>
+                The string to encode</li>
+            </ul>
+            <p>Returns: <b>String</b></p>
+            <h5>Description</h5>
+            <p>Replaces all newlines in its argument with carriage return / newline
+            pairs. If called twice on the same string, carriage returns will not be
+            doubled-up.</p>
+            <h3>Implementation notes</h3>
+            <p>UTF-8 encoding and decoding may trivially be done using the deprecated
+            <code>escape</code> and <code>unescape</code> functions:</p>
+            <pre>var s = "...",
+    encoded = unescape(encodeURIComponent(s)),
+    decoded = decodeURIComponent(escape(encoded));</pre>
+            <p>This works because URLs must be UTF-8 encoded with individual octets
+            %-escaped. <code>escape/unescape</code> are completely unaware of this and treat the UTF-8
+            byte values as individual characters.</p>
+            <p>I chose to implement my own codec for a number of reasons. The primary reason
+            is the dependence on deprecated functions which may stop working at any time. The
+            other is control over error handling; <code>decodeURIComponent</code> throws on
+            invalid input (with, given the context, a slightly weird "Malformed URI" error) while
+            I prefer to replace bad sequences with a replacement character and carry on.</p>
+            <h2>String escaping</h2>
+            <p>Functions in the <code>UsefulJS.String.escape</code> namespace are used to
+            escape potentially problematic characters in strings before they're used in 
+            various contexts.</p>
+            <h4 class="api-doc">UsefulJS.String.escape.html</h4>
+            <p>Escapes a String for use in HTML</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.String.escape.html(s)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>s</code> <b>String</b><br>
+                The string to escape</li>
+            </ul>
+            <p>Returns: <b>String</b></p>
+            <h5>Description</h5>
+            <p>This is a basic escape function, only escaping &amp;&lt;&gt;'"/. It's intended
+            to prevent you from shooting yourself in the foot when using <code>innerHTML</code>.
+            The better approach is to <code>document.createTextNode</code> or <code>attribute.setValue</code>
+            which turn strings plain old data that will never be interpreted. The 
+            function does not emit character entities like <code>&amp;reg;</code> since
+            these have not been required for years - simply specify a UTF-8 charset in
+            a &lt;meta&gt; element.</p>
+            <h4 class="api-doc">UsefulJS.String.escape.js</h4>
+            <p>Escapes a String for use in JavaScript</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.String.escape.js(s)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>s</code> <b>String</b><br>
+                The string to escape</li>
+            </ul>
+            <p>Returns: <b>String</b></p>
+            <h5>Description</h5>
+            <p>This uses a fairly paranoid escape algorithm: only ASCII alphanumeric characters 
+            (A-Z, a-z and 0-9) are not escaped. Otherwise, codepoints below U+0100 are escaped
+            using the form <code>\xHH</code> where 'H' is a hexadecimal digit. The escaping
+            of other codepoints depends on the capabilities of the browser: if the <code>\u{H...H}</code>
+            escaping style is supported, this form will be used; if not the escape sequence
+            will use the <code>\uHHHH</code> style.</p>
+            <h4 class="api-doc">UsefulJS.String.escape.regex</h4>
+            <p>Escapes a String for use in in regular expressions</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.String.escape.regex(s)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>s</code> <b>String</b><br>
+                The string to escape</li>
+            </ul>
+            <p>Returns: <b>String</b></p>
+            <h5>Description</h5>
+            <p>String values passed to the <code>RegExp</code> constructor may need to be
+            escaped if you don't want certain characters to interpreted as part of the
+            regular expression syntax. This function backslash-escapes the following
+            characters: \.-[]{}()^$|+?*. Note that '/' does not need to be escaped unless
+            you're in the habit of constructing dynamic regexes with <code>eval</code>.</p>
+            <h2>Fixes</h2>
+            <p>The fixes for the String module implement a number of ES5/6 methods and
+            are defined in the _string namespace of the fix options.
+            Fixes are applied automatically apart from the padLeft and padRight options
+            which, as library extensions, must be explicitly enabled.</p>
+            <p>String prototype methods are implemented generically so that you can apply 
+            any value to them:</p>
+            <pre>String.prototype.includes.call([1,2,3,4], ",3,")</pre>
+            <p>As per spec, however, they will throw a TypeError if the first argument is 
+            null or undefined.</p>
+            <h4 class="api-doc">startsWith</h4>
+            <p>Adds a <code>startsWith</code> method to <code>String.prototype</code> if
+            it is not implemented natively.</p>
+            <h5>Syntax</h5>
+            <pre>string.startsWith(t)</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith"
+            target="_blank">MDN documentation</a> for details.</p>
+            <h4 class="api-doc">endsWith</h4>
+            <p>Adds an <code>endsWith</code> method to <code>String.prototype</code> if
+            it is not implemented natively.</p>
+            <h5>Syntax</h5>
+            <pre>string.endsWith(t)</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith"
+            target="_blank">MDN documentation</a> for details.</p>
+            <h4 class="api-doc">includes</h4>
+            <p>Adds an <code>includes</code> method to <code>String.prototype</code> if
+            it is not implemented natively.</p>
+            <h5>Syntax</h5>
+            <pre>string.includes(t[, pos])</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes"
+            target="_blank">MDN documentation</a> for details.</p>
+            <h4 class="api-doc">trim</h4>
+            <p>Adds a <code>trim</code> method to <code>String.prototype</code> if
+            it is not implemented natively.</p>
+            <h5>Syntax</h5>
+            <pre>string.trim()</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trim"
+            target="_blank">MDN documentation</a> for details. The pattern used for whitespace
+            is Unicode-aware.</p>
+            <h4 class="api-doc">trimLeft</h4>
+            <p>Adds a <code>trimLeft</code> method to <code>String.prototype</code> if
+            it is not implemented natively.</p>
+            <h5>Syntax</h5>
+            <pre>string.trimLeft()</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trimLeft"
+            target="_blank">MDN documentation</a> for details.</p>
+            <h4 class="api-doc">trimRight</h4>
+            <p>Adds a <code>trimRight</code> method to <code>String.prototype</code> if
+            it is not implemented natively.</p>
+            <h5>Syntax</h5>
+            <pre>string.trimRight()</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/trimRight"
+            target="_blank">MDN documentation</a> for details.</p>
+            <h4 class="api-doc">repeat</h4>
+            <p>Adds a <code>repeat</code> method to <code>String.prototype</code> if
+            it is not implemented natively.</p>
+            <h5>Syntax</h5>
+            <pre>string.repeat(count)</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/repeat"
+            target="_blank">MDN documentation</a> for details.</p>
+            <h4 class="api-doc">padLeft</h4>
+            <p>Adds a <code>padLeft</code> method to <code>String.prototype</code>.</p>
+            <h5>Syntax</h5>
+            <pre>string.padLeft(padTo, padWith)</pre>
+            <h5>Description</h5>
+            <p>Adds 0 or more copies of the character in <code>padWith</code> to the start of
+            <code>string</code> so that it is at least <code>padTo</code> characters long and returns 
+            the result. If <code>string</code> is already long enough, no padding is applied.</p>
+            <h4 class="api-doc">padRight</h4>
+            <p>Adds a <code>padRight</code> method to <code>String.prototype</code>.</p>
+            <h5>Syntax</h5>
+            <pre>string.padRight(padTo, padWith)</pre>
+            <h5>Description</h5>
+            <p>Adds 0 or more copies of the character in <code>padWith</code> to the end of
+            <code>string</code> so that it is at least <code>padTo</code> characters long and returns 
+            the result. If <code>string</code> is already long enough, no padding is applied.</p>
+            <h4 class="api-doc">fromCodePoint</h4>
+            <p>Adds a <code>fromCodePoint</code> factory method to <code>String</code> if
+            it is not implemented natively.</p>
+            <h5>Syntax</h5>
+            <pre>String.fromCodePoint(codePoint1[, codePoint2, ...])</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCodePoint"
+            target="_blank">MDN documentation</a> for details.</p>
+            <h4 class="api-doc">codePointAt</h4>
+            <p>Adds a <code>codePointAt</code> method to <code>String.prototype</code> if
+            it is not implemented natively.</p>
+            <h5>Syntax</h5>
+            <pre>string.codePointAt(pos)</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/codePointAt"
+            target="_blank">MDN documentation</a> for details.</p>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

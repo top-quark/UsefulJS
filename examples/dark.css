@@ -1,0 +1,67 @@
+/**
+ * "Dark" skin for 1010
+ */
+ 
+BODY {
+    background-color: #111;
+}
+
+DIV.square {
+    border-color: #111;
+}
+
+.empty {
+    background-color: #444;        
+}
+
+#gameContainer {
+    border-color: #8a2525;
+}
+
+#startGame {
+    background-color: #8a2525;
+}
+
+#scoreArea TD {
+    color: #8a2525;
+}
+
+/* Coloured square to the top */
+DIV.blank1000 {
+    border-color: #111 transparent transparent transparent;
+}
+
+/* Coloured square to the top and right */
+DIV.blank1100 {
+    border-color: #111 #111 transparent transparent;
+}
+
+/* Coloured square to the top and left */
+DIV.blank1001 {
+    border-color: #111 transparent transparent #111;
+}
+
+/* Coloured square to the right */
+DIV.blank0100 {
+    border-color: transparent #111 transparent transparent;
+}
+
+/* Coloured square to the left */
+DIV.blank0001 {
+    border-color: transparent transparent transparent #111;
+}
+
+/* Coloured square to the bottom */
+DIV.blank0010 {
+    border-color: transparent transparent #111 transparent;
+}
+
+/* Coloured square to the bottom and right */
+DIV.blank0110 {
+    border-color: transparent #111 #111 transparent;
+}
+
+/* Coloured square to the bottom and left */
+DIV.blank0011 {
+    border-color: transparent transparent #111 #111;
+}

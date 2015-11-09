@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>UsefulJS.Skin</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body data-spy="scroll" data-target="#sidebar">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="core.html">UsefulJS.Core</a></li>
+                            <li><a href="array.html">UsefulJS.Array</a></li>
+                            <li><a href="classlist.html">UsefulJS.ClassList</a></li>
+                            <li><a href="date.html">UsefulJS.Date</a></li>
+                            <li><a href="event.html">UsefulJS.Event</a></li>
+                            <li><a href="math.html">UsefulJS.Math</a></li>
+                            <li><a href="numeric.html">UsefulJS.Number</a></li>
+                            <li><a href="query.html">UsefulJS.Query</a></li>
+                            <li><a href="storage.html">UsefulJS.Storage</a></li>
+                            <li><a href="string.html">UsefulJS.String</a></li>
+                            <li><a href="locale.html">UsefulJS.Locale</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="browser.html">UsefulJS.Browser</a></li>
+                            <li><a href="currency.html">UsefulJS.Currency</a></li>
+                            <li><a href="dnd.html">UsefulJS.DnD</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container">
+            <h1>UsefulJS.Skin</h1>
+            <p>The Skin extension provides an easy API for switching between alternate
+            stylesheets to change your web application's look and feel.</p>
+            <h2>Alternate stylesheets</h2>
+            <p>Switchable stylesheets are indicated by a <code>title</code> attribute on
+            the <code>link</code> element. The <code>rel</code> attribute may also be specified
+            as "alternate stylesheet" to flag it as an alternative:</p>
+            <pre>&lt;link rel="stylesheet" href="primary.css" <em>title="Primary"</em>&gt;
+&lt;link rel="<em>alternate stylesheet</em>" href="secondary.css" <em>title="Secondary"</em>&gt;</pre>
+            <p>Some browsers (for example, Firefox and Opera) allow switching between
+            alternative stylesheets by diving into the View menu while others (such as
+            Chrome without a dedicated extension) do not. It is also possible to switch
+            between them programmatically (which is what this extension facilitates).</p>
+            <div class="alert alert-warning">It is also possible to add a <code>title</code>
+            attribute to inline <code>&lt;style&gt;</code> elements and switch between them.
+            However, this does not seem to work on all browsers unlike external stylesheets
+            which do. If you have simple requirements and don't want to litter your source
+            tree with external stylesheets, you can achieve the desired result with a data URI:
+            <pre>&lt;link rel="stylesheet" href="data:text/css,BODY%20{%20background-color:%20white;%20color:%20black;%20}" title="W+B"&gt;
+&lt;link rel="alternate stylesheet" href="data:text/css,BODY%20{%20background-color:%20black;%20color:%20white;%20}" title="B+W"&gt;</pre>
+            </div>
+            <h2>Static methods</h2>
+            <h4 class="api-doc">load</h4>
+            <p>Identifies the switchable <code>&lt;link&gt;</code> / <code>&lt;style&gt;</code>
+            elements in the document head and returns their names.</p>
+            <h5>Syntax</h5>
+            <pre>load([active])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>active</code> <b>String</b> (optional)<br>
+                The name of a stylesheet that you want to be activated initially; the
+                default is the first non-disabled item.</li>
+            </ul>
+            <p>Returns <b>Array</b>: the switchable stylesheets.</p>
+            <h5>Description</h5>
+            <p>The <code>active</code> parameter may be used to override the default
+            stylesheet. You might do this if, for example, you saved the user's preference
+            in a previous session. The strings in the return Array may be passed to
+            <code>UsefulJS.Skin.choose</code>.</p>
+            <div class="alert alert-info">You must call <code>load</code> before calling
+            <code>choose</code>. This is because <code>choose</code> only accepts values
+            that the library knows about. If you add a <code>&lt;link&gt;</code> element
+            programmatically, you must call <code>load</code> again before you can activate it.</div>
+            <div class="alert alert-warning"><code>load</code> only searches <code>document.head</code>
+            for stylesheets. Since this is where they belong anyway, I don't plan on searching
+            <code>document.body</code>.</div>
+            <h5>Usage</h5>
+            <pre>var skin = null, _fixed = UsefulJS.fix();
+if (UsefulJS.featureSupport.storage.local || _fixed._storage.localStorage) {
+    skin = localStorage.getItem("preferredStyle");
+}
+var skins = UsefulJS.Skin.load(skin);</pre>    
+            <h4 class="api-doc">choose</h4>
+            <p>Switches to a different stylesheet.</p>
+            <h5>Syntax</h5>
+            <pre>choose(active)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>active</code> <b>String</b><br>
+                The name of a stylesheet that you want to be activated.</li>
+            </ul>
+            <h5>Description</h5>
+            <p>Does nothing if <code>active</code> is the currently active stylesheet
+            or if <code>active</code> is not the name of a known stylesheet.</p>
+            <h5>Usage</h5>
+            <pre>// Build up a menu of selectable stylesheets
+var menu = ..., styleSheets = UsefulJS.Skin.load();
+styleSheets.forEach(function(sheetName) {
+    var menuItem = document.createElement(...);
+    menuItem.appendChild(document.createTextNode(sheetName));
+    UsefulJS.Event.register(menuItem, "click", function() {
+        UsefulJS.Skin.choose(sheetName);
+    });
+    menu.appendChild(menuItem);
+});</pre>
+            <h4 class="api-doc">active</h4>
+            <p>Gets the currently active stylesheet.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Skin.active()</pre>
+            <p>Returns <b>String</b>: the name of the currently active stylesheet.</p>
+            <h5>Usage</h5>
+            <pre>// Add a new stylesheet but do not change the selection
+var newSheet = document.createElement("link");
+newSheet.rel = "alternate stylesheet";
+newSheet.href = "tertiary.css";
+newSheet.title = "Tertiary";
+document.head.appendChild(newSheet);
+var allSheets = UsefulJS.Skin.load(UsefulJS.Skin.active());</pre>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

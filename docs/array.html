@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>UsefulJS.Array</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+    </head>
+    <body data-spy="scroll" data-target="#sidebar">
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Overview</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="core.html">UsefulJS.Core</a></li>
+                            <li><a href="classlist.html">UsefulJS.ClassList</a></li>
+                            <li><a href="date.html">UsefulJS.Date</a></li>
+                            <li><a href="event.html">UsefulJS.Event</a></li>
+                            <li><a href="math.html">UsefulJS.Math</a></li>
+                            <li><a href="numeric.html">UsefulJS.Number</a></li>
+                            <li><a href="query.html">UsefulJS.Query</a></li>
+                            <li><a href="storage.html">UsefulJS.Storage</a></li>
+                            <li><a href="string.html">UsefulJS.String</a></li>
+                            <li><a href="locale.html">UsefulJS.Locale</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="browser.html">UsefulJS.Browser</a></li>
+                            <li><a href="currency.html">UsefulJS.Currency</a></li>
+                            <li><a href="dnd.html">UsefulJS.DnD</a></li>
+                            <li><a href="skin.html">UsefulJS.Skin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+        <div class="container">
+            <h1>UsefulJS.Array</h1>
+            <h2>Methods</h2>
+            <p>The methods in the <code>UsefulJS.Array</code> namespace are not designed to be called by application
+            code. Rather, they are the implementations of the ECMAScript 5/6 Array methods and intended to be 
+            called via methods of <code>Array.prototype</code>. The methods are generic in the sense that
+            they will work with any array-like object.</p>
+            <h4 class="api-doc">fill</h4>
+            <p>Fills slots in an array between specified boundaries with a specified value.
+            This function modifies its input but won't grow it.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Array.fill(a, value[, start[, end]])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>a</code> <b>Array</b><br>
+                The array to fill</li>
+                <li><code>value</code> <b>Object</b><br>
+                The object used to fill the array</li>
+                <li><code>start</code> <b>Number</b><br>
+                The start index. May be negative (in which case the start index is
+                a.length + start). Defaults to 0</li>
+                <li><code>end</code> <b>Number</b><br>
+                The end index. May be negative (in which case the end index is
+                a.length + start). Defaults to a.length</li>
+            </ul>
+            <p>Returns: <b>Array</b> the mutated array</p>
+            <h4 class="api-doc">find</h4>
+            <p>Finds an item in an Array starting either from the head or the tail.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Array.find(a, item, idx, incr)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>a</code> <b>Array</b><br>
+                The array to search</li>
+                <li><code>item</code> <b>Object</b><br>
+                The item to search for</li>
+                <li><code>idx</code> <b>Number</b><br>
+                The array index to start at</li>
+                <li><code>incr</code> <b>Number</b><br>
+                +1 for forward search, -1 for backward search</li>
+            </ul>
+            <p>Returns: <b>Number</b> either the 0-based index of the item or -1</p>
+            <h4 class="api-doc">iterate</h4>
+            <p>Iterates over an array calling a function for each item in the array until either
+            the array is exhausted or (in some modes) the callback returns a certain value.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Array.iterate(a, callback, ctx, mode)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>a</code> <b>Array</b><br>
+                The array to iterate over</li>
+                <li><code>callback</code> <b>Function</b><br>
+                A callback for each item in the array; the callback signature is:<br>
+                <pre>f(item, index, array)</pre></li>
+                <li><code>ctx</code> <b>Object</b><br>
+                The <code>this</code> context for the callback</li>
+                <li><code>mode</code> <b>String</b><br>
+                One of "every", "some", "forEach", "filter", "map", "find" or "findIndex"</li>
+            </ul>
+            <p>Returns: varying, according to the mode:
+            <ul>
+                <li>every, some: <b>Boolean</b> the final return value of the callback function</li>
+                <li>filter: <b>Array</b> the filtered-out items from the input</li>
+                <li>map: <b>Array</b> the transformed items from the input</li>
+                <li>forEach: <b>undefined</b></li>
+                <li>find: <b>Object</b> the first item for which the callback function 
+                returns <code>true</code> or undefined</li>
+                <li>findIndex: <b>Number</b> the first index for which the callback function 
+                returns <code>true</code> or -1</li>
+            </ul>
+            <h4 class="api-doc">reduce</h4>
+            <p>Iterates over an array passing in an accumulated result and the current item in the array;
+            the final output is a single value.</p>
+            <h5>Syntax</h5>
+            <pre>UsefulJS.Array.reduce(a, callback, initialValue, incr)</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>a</code> <b>Array</b><br>
+                The array to iterate over</li>
+                <li><code>callback</code> <b>Function</b><br>
+                A callback for each item in the array; the callback signature is:<br>
+                <pre>f(accumulated, item, index, array)</pre></li>
+                <li><code>initialValue</code> <b>Object</b><br>
+                The seed value for the reduction; if defined this is passed to the callback on first iteration</li>
+                <li><code>incr</code> <b>Number</b><br>
+                +1 for forward iteration, -1 for backward iteration</li>
+            </ul>
+            <p>Returns: <b>Object</b> the final return value from the callback.</p>
+            <h2>Fixes - ES5/6 Array methods</h2>
+            <p>The fixes for the UsefulJS.Array module are defined in the _array namespace of the input and
+            output properties of the <code>fix</code> call. All are applied by default. The property names 
+            are the method names: "indexOf", "lastIndexOf", "from", etc.</p>
+            <h3>Static Array methods</h3>
+            <h4 class="api-doc">Array.isArray</h4>
+            <h5>Syntax</h5>
+            <pre>Array.isArray(obj)</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h3>Array.prototype methods</h3>
+            <h4 class="api-doc">Array.prototype.copyWithin</h4>
+            <h5>Syntax</h5>
+            <pre>array.copyWithin(targetIdx, startIdx[, endIdx])</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Array.prototype.every</h4>
+            <h5>Syntax</h5>
+            <pre>array.every(callback[, context])</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Array.prototype.fill</h4>
+            <h5>Syntax</h5>
+            <pre>array.fill(value[, start[, end]])</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Array.prototype.filter</h4>
+            <h5>Syntax</h5>
+            <pre>array.filter(callback[, context])</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Array.prototype.find</h4>
+            <h5>Syntax</h5>
+            <pre>array.find(callback[, context])</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Array.prototype.findIndex</h4>
+            <h5>Syntax</h5>
+            <pre>array.findIndex(callback[, context])</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Array.prototype.forEach</h4>
+            <h5>Syntax</h5>
+            <pre>array.forEach(callback[, context])</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Array.prototype.indexOf</h4>
+            <h5>Syntax</h5>
+            <pre>array.indexOf(item[, fromIndex])</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Array.prototype.lastIndexOf</h4>
+            <h5>Syntax</h5>
+            <pre>array.lastIndexOf(item[, fromIndex])</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Array.prototype.map</h4>
+            <h5>Syntax</h5>
+            <pre>array.map(callback[, context])</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Array.prototype.reduce</h4>
+            <h5>Syntax</h5>
+            <pre>array.reduce(callback[, initialValue])</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Array.prototype.reduceRight</h4>
+            <h5>Syntax</h5>
+            <pre>array.reduceRight(callback[, initialValue])</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/ReduceRight"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h4 class="api-doc">Array.prototype.some</h4>
+            <h5>Syntax</h5>
+            <pre>array.some(callback[, context])</pre>
+            <h5>Description</h5>
+            <p>See the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some"
+                target="_blank">the MDN documentation</a> for details</p>
+            <h3>Array factory methods</h3>
+            <p>Factory methods create Array objects from non-array objects. They are 
+            implemented as generic functions so that they can create instances of other
+            classes if you copy the methods to those classes. For example:
+            <pre>var MyArray = function(length) { ... };
+MyArray.of = Array.of;
+var arr = MyArray.of(1, 2, 3); // creates an instance of MyArray</pre> 
+            <h4 class="api-doc">Array.from</h4>
+            <p>Constructs an Array from an array-like object.</p>
+            <h5>Syntax</h5>
+            <pre>Array.from(obj[, mapFn[, mapCtx]])</pre>
+            <h5>Parameters</h5>
+            <ul>
+                <li><code>obj</code> <b>Object</b><br>
+                An array-like object</li>
+                <li><code>mapFn</code> <b>Function</b><br>
+                A function to convert each item in the output Array</li>
+                <li><code>mapCtx</code> <b>Object</b><br>
+                the value of <code>this</code> in the mapping function.</li>
+            </ul>
+            <p>Returns: <b>Array</b>
+            <h5>Description</h5>
+            <p>Array-like objects have a length property and can be accessed via square-bracket indexing but do not
+            otherwise have the methods of a real Array. Examples of array-like objects are strings (assuming square
+            bracket indexing is supported), <code>NodeList</code> objects and <code>Element.classList</code>.
+            Array.from will return a real Array that contains the same values as its input. See <a 
+            ref="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from"
+            target="_blank">the MDN documentation</a> for more information.</p>
+            <h4 class="api-doc">Array.of</h4>
+            <p>Constructs an Array from its arguments.</p>
+            <h5>Syntax</h5>
+            <pre>Array.of([item1 [, item2, ... ]])</pre>
+            <p>Returns: <b>Array</b>
+            <h5>Description</h5>
+            <p>Arguments can be any number of any objects. See <a 
+            ref="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/of"
+            target="_blank">the MDN documentation</a> for more information.</p>
+            <!--h2>Fixes - Array generics</h2>
+            <p>Certain Array methods can take array-like objects and produce sensible results if they're called
+            like this:</p>
+            <pre>Array.prototype.join.call("abc", "-");  // "a-b-c"</pre>
+            <p>Since this is a pain to type, generic methods may be implemented that achieve the same thing.
+            These are static Array methods that call the underlying implementation on their arguments:</p>
+            <pre>Array.join("abc", "-");</pre>
+            <p>UsefulJS will add generic methods to <code>Array</code> in browsers that lack native support
+            for them. The fixes are defined in the _array_generic namespace of the input and
+            output properties of the <code>fix</code> call. All are applied by default. The property names 
+            are the method names: "indexOf", "slice", etc.</p>
+
+            <h3>Implementation fixes</h3>
+            <h4 class="api-doc">fixSlice</h4>
+            <p>Array generics depend upon <code>Array.prototype.slice</code> being generic. On some legacy
+            browsers, this is not true and the following code will throw:</p>
+            <pre>Array.prototype.slice.call(document.getElementsByTagName("pre"), 0, 1);</pre>
+            <p>The ability to slice array-like objects is not standard <em>per-se</em> but it is
+            <em>de-facto</em> behaviour and works on all modern browsers. The inability to depend on this
+            behaviour limits developers to <code>for...</code> loops to work with, for example, the results
+            of <code>document.getElementsByTagName</code>. fixSlice patches <code>Array.prototype.slice</code> so
+            that it works with anything that has a length and that can be indexed via [] (and works around any 
+            inability to address strings via square-bracket indexing).</p>
+            <p>The optsOut property set is called "sliceFixed".</p>
+
+            <h3>Static Array methods</h3>
+            <h4 class="api-doc">Array.every</h4>
+            <p>Iterates over the array-like object until the callback returns <b>false</b>.</p>
+            <h5>Syntax</h5>
+            <pre>Array.every(obj, callback[, context])</pre>
+            <h4 class="api-doc">Array.filter</h4>
+            <p>Iterates over the array-like object returning an array of the items for which
+            the callback returned <b>true</b>.</p>
+            <h5>Syntax</h5>
+            <pre>Array.filter(obj, callback[, context])</pre>
+            <h4 class="api-doc">Array.forEach</h4>
+            <p>Iterates over the array-like object returning an array of the items transformed
+            by the callback.</p>
+            <h5>Syntax</h5>
+            <pre>Array.forEach(obj, callback[, context])</pre>
+            <h4 class="api-doc">Array.indexOf</h4>
+            <p>Finds an item in the array-like object using a forward search.</p>
+            <h5>Syntax</h5>
+            <pre>Array.indexOf(obj, item[, fromIndex])</pre>
+            <h4 class="api-doc">Array.join</h4>
+            <p>Returns a string containing the items in the array-like object joined with the
+            specified seaparator.</p>
+            <h5>Syntax</h5>
+            <pre>Array.join(obj[, separator])</pre>
+            <h4 class="api-doc">Array.map</h4>
+            <p>Iterates over the array-like object passing each item to the callback and returning
+            the transformed values.</p>
+            <h5>Syntax</h5>
+            <pre>Array.map(obj, callback[, context])</pre>
+            <h4 class="api-doc">Array.reduce</h4>
+            <p>Iterates forwards over the array-like object returning an accumulated value provided 
+            by the callback.</p>
+            <h5>Syntax</h5>
+            <pre>Array.reduce(obj, callback[, initialValue])</pre>
+            <h4 class="api-doc">Array.reduceRight</h4>
+            <p>Iterates backwards over the array-like object returning an accumulated value provided 
+            by the callback.</p>
+            <h5>Syntax</h5>
+            <pre>Array.reduceRight(obj, callback[, initialValue])</pre>
+            <h4 class="api-doc">Array.slice</h4>
+            <p>Returns an Array containing a range of items in an array-like object.</p>
+            <h5>Syntax</h5>
+            <pre>Array.slice(obj[, begin, end])</pre>
+            <h4 class="api-doc">Array.some</h4>
+            <p>Iterates over the array-like object until the callback returns <b>true</b>.</p>
+            <h5>Syntax</h5>
+            <pre>Array.some(obj, callback[, context])</pre>
+            <h3>Portability notes</h3>
+            <p>Array generics on older versions (&lt; 9) of Internet Explorer require the slice fix
+            (<code>Array.from</code> needs this too since it uses slice under the hood).</p>
+            <p>The above generic methods are the ones that work portably. <code>reverse</code>,
+                for example, appears to work but returns its argument unchanged.</p>
+            <p>Firefox exposes all Array methods as generics, but many of them - <code>push/pop</code>,
+            <code>shift/unshift</code>, <code>splice</code> - simply throw when passed something that
+            isn't an Array.</p>
+            <p>The following code:</p>
+            <pre>Array.lastIndexOf("abc", "b")</pre>
+            <p>returns 1 on Firefox but -1 on Chrome. <code>indexOf</code> works as expected. Go figure.</p>
+            <p>The <code>UsefulJS.Array</code> methods all work with array-like objects.</p-->
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

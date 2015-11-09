@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Calendar</title>
+        <meta name="author" content="Christopher Williams">
+        <meta name="viewport" content="width=device-width, initial-scale=0.75">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <!--link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css"-->
+        <link rel="stylesheet" href="../css/ujs.css">
+        <style type="text/css">
+        #yearView {
+            width: 100%;
+            maxwidth: 100%;
+        }
+        
+        #yearView TBODY>TR>TD {
+            padding: 8px;
+            vertical-align: top;        
+        }
+        
+        .cal {
+            border-top-width: 0;
+        }
+        .cal TH {
+            background-color: #222;
+            color: white;
+            width: 2.9em;
+            height : 1.4em;
+            font-weight: normal;
+            padding: 0.2em 0;
+            text-align: center;
+        }
+        .cal TH.chead {
+            border-bottom: 1px solid white;
+        }
+        .cal TD {
+            width: 2.5em;
+            height: 2.5em;
+            text-align: center;
+        }
+        .cal TD SPAN {
+            display: inline-block;
+            text-align: right;
+            min-width: 1.6em;
+        }
+        .cal TD.today, .cal>TBODY>TR:nth-child(odd)>TD.today {
+            background-color: #222;
+            color: white;
+        }
+        </style>
+    </head>
+    <body>
+        <p class="blurb">The Five Year Calendar is perpetual calendar with a five-year
+        sliding view using a number of different calendars, including the Gregorian, Buddhist,
+        Japanese Imperial, ROC, Indian and Persian Solar Hijri. It makes heavy use of the 
+        UsefulJS Date module and showcases the library's locale support for date formatting.</p>
+        <nav id="main-nav" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="../index.html" class="navbar-brand">UsefulJS</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Five Year Calendar<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="1010.html">1010</a></li>
+                            <li><a href="ctable.html">Programmer's Character Reference</a></li>
+                            <li><a href="cconv.html">Currency Converter</a></li>
+                            <li><a href="awords.html">Angry Words</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><nobr>Locale: <span id="selected-locale"></span><b class="caret"></b></nobr></a>
+                        <ul class="dropdown-menu scrollable-menu" id="locale-choice" role="menu">
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Year: <span id="selected-yr"></span><b class="caret"></b></a>
+                        <ul class="dropdown-menu scrollable-menu" id="yr-choice" role="menu">
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Numbers: <span id="selected-nu"></span><b class="caret"></b></a>
+                        <ul class="dropdown-menu scrollable-menu" id="nu-choice" role="menu">
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Calendar: <span id="selected-ca"></span><b class="caret"></b></a>
+                        <ul class="dropdown-menu scrollable-menu" id="ca-choice" role="menu">
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="table-responsive">
+                <table id="yearView">
+                    <tr>
+                        <td id="m0" width="33%"></td>
+                        <td id="m1" width="34%"></td>
+                        <td id="m2" width="33%"></td>
+                    </tr>
+                    <tr>
+                        <td id="m3"></td>
+                        <td id="m4"></td>
+                        <td id="m5"></td>
+                    </tr>
+                    <tr>
+                        <td id="m6"></td>
+                        <td id="m7"></td>
+                        <td id="m8"></td>
+                    </tr>
+                    <tr>
+                        <td id="m9"></td>
+                        <td id="m10"></td>
+                        <td id="m11"></td>
+                    </tr>
+               </table>
+            </div>
+        </div>
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+        <script src="../built/UsefulJS-min-latest.js"></script>
+        <script type="text/javascript">
+        
+window.onload = function onload() {
+    "use strict";
+    var _u = UsefulJS, _fixed = _u.fix({ _string : "all" }), 
+        _loc = _u.Locale, _evt = _u.Event, _cList = _u.ClassList,
+        _dfmt = _u.Date.Format,
+        _ele = function(item) {
+            if ("string" === _typeof(item)) {
+                return document.getElementById(item);
+            }
+            return item;
+        },
+        _setText = function(e, txt) {
+            e = _ele(e);
+            e.innerHTML = "";
+            e.appendChild(document.createTextNode(txt));
+        };
+    
+    var currLocale = null, nSystem = null, calendar = null;    
+    if (_u.featureSupport.storage.local || _fixed._storage.localStorage) {
+        currLocale = localStorage.getItem("calendar-locale");
+        nSystem = localStorage.getItem("calendar-nu") || "";
+        calendar = localStorage.getItem("calendar-ca") || "";
+    }
+    if (currLocale) {
+        _loc.current = currLocale;
+    }
+    else {
+        currLocale = _loc.current;
+    }
+    
+    // Lookup table for numbering systems
+    var nSysNames = {
+        "" : "Locale Default", latn : "Latin", arab : "Arabic",
+        arabext : "Eastern Arabic", bali : "Balinese", beng : "Bengali",
+        deva : "Devangaric", fullwide : "Full Width Latin", gujr : "Gujarati",
+        guru : "Gurmukhi", hanidec : "Han Decimal", khmr : "Khmer",
+        knda : "Kannada", laoo : "Lao", limb : "Limbu", 
+        mlym : "Malayalam", mong : "Mongolian", mymr : "Myanmar", 
+        orya : "Oriya", tamldec : "Tamil Decimal", telu : "Telugu",
+        thai : "Thai", tibt : "Tibetan" 
+    };
+    
+    // Lookup table for calendar names
+    var calNames = {
+        "" : "Locale Default", gregory : "Gregorian", iso8601 : "ISO 8601",
+        buddhist : "Buddhist", roc : "Republic of China (R.O.C.)",
+        japanese : "Imperial Japanese", indian : "Indian National",
+        persian : "Solar Hijri (Persian)", ethiopic : "Ethiopic"
+    };
+            
+    // Get the name of the selected locale
+    var localeName = _loc.options(currLocale).n, 
+        allLocales = _loc.getSupported(), menu,
+        allNumSys = _loc.numberSystems(),
+        allCalendars = _loc.calendars(),
+        defOptions = _loc.dateOptions(currLocale);
+    
+    // Gets the name of the numbering system in use
+    var getNumSysName = function() {
+        return nSysNames[nSystem || defOptions.ddigits]; 
+    };
+    
+    // Gets the name of the calendar in use
+    var getCalendarName = function() {
+        return calNames[calendar || defOptions.cal];
+    }
+    
+    var makeLocaleStr = function() {
+        var ret = currLocale;
+        if (nSystem || calendar) {
+            ret += "-u-";
+            if (nSystem) {
+                ret += "-nu-" + nSystem;
+            }
+            if (calendar) {
+                ret += "-ca-" + calendar;
+            }
+        }
+        return ret;
+    };
+    
+    var years = null, yearNames, currYear = 1; // This year
+    
+    // Creates the year calendar view
+    var makeCalendar = function() {
+        var yrObj = years[currYear],
+            localeStr = makeLocaleStr(),
+            fmt = new UsefulJS.Date.Format(localeStr, { year : "numeric", month : "long" }),
+            cal = fmt.getCalendar(),
+            // Today in calendar time
+            today = cal.today();
+        cal.months().forEach(function(n, idx) {
+            // Calendar time to internal time
+            var dLocal = { yy : yrObj[0], mm : idx, dd : 1, en : yrObj[1] },
+                dInternal = UsefulJS.clone(dLocal);
+            cal.fromCalendarDate(dInternal);
+            // Generate a calendar header
+            var d = new Date(dInternal.yy, dInternal.mm, dInternal.dd),
+                headerStr = fmt.format(d),
+                // Month data
+                monthData = fmt.cal(dLocal),
+                mEle = _ele("m" + idx);
+            // Populate the calendar widget        
+            var cTbl = '<table border="0" callpadding="0" cellspacing="0" class="table table-striped cal"><thead>', 
+                i, j, dayNo = 0, dayStr;
+            // Add in the month
+            cTbl += '<tr><th colspan="7" class="chead">' + headerStr + '</th></tr>';
+            // Add in day names
+            cTbl += '<tr>';
+            for (i = 0; i < 7; i++) {
+                cTbl += '<th>' + monthData[0][i] + '</th>';
+            }
+            cTbl += '</tr></thead><tbody>';
+            // Fill in the rest of the month
+            for (i = 1; i < monthData.length; i++) {
+                cTbl += '<tr>';
+                for (j = 0; j < monthData[i].length; j++) {
+                    dayStr = monthData[i][j];
+                    cTbl += '<td';
+                    if (dayStr !== "\xA0") {
+                        ++dayNo;
+                        if (yrObj[0] === today.yy && idx === today.mm && 
+                            dayNo === today.dd && yrObj[1] === today.en) {
+                            // We've found today!
+                            cTbl += ' class="today"';    
+                        }   
+                    }
+                    
+                    cTbl += '><span>' + dayStr + '</span></td>';
+                }
+                cTbl += '</tr>';
+            }
+            // Done
+            cTbl += '</tbody></table>';
+            mEle.innerHTML = cTbl;   
+        });
+    };
+    
+    // Construct the links for the years
+    menu = _ele("yr-choice");
+    menu.innerHTML = "";
+    [0, 1, 2, 3, 4].forEach(function(idx) {
+        var li = document.createElement("li"), 
+            link = document.createElement("a");
+        link.href = "#";
+        li.id = "yr-" + idx;
+        li.appendChild(link);
+        _evt.clear(li);
+        _evt.register(li, "click", function(evt, eType, eSrc, eReg) {
+            var menu = _ele("yr-choice");
+            _cList.get("yr-" + currYear).remove("active");
+            _cList.get("yr-" + idx).add("active");
+            _setText("selected-yr", yearNames[idx]);
+            currYear = idx;
+            _cList.get(menu.parentNode).remove("open");
+            makeCalendar();
+            return false;
+        });
+        menu.appendChild(li);
+    });
+    
+    // Gets the years from one year behind to three years ahead
+    var makeYearList = function() {
+        var localeStr = makeLocaleStr(),
+            fmt = new _dfmt(localeStr, { year : "numeric" }),
+            cal = fmt.getCalendar(),
+            today = cal.today(),
+            thisYear = today.yy,            
+            dObj = today.dateObj;
+            // Japanese calendar needs special handling; last year may not be this year - 1,
+            // but rather a completely different year in a previous era; for the future
+            // years, however, we will assume that the Emperor will survive
+            dObj.setFullYear(dObj.getFullYear() - 1);
+            var oneYearAgo = cal.dateToCalendarDate(dObj, false);
+            
+        years = [[oneYearAgo.yy, oneYearAgo.en],
+            [thisYear, today.en], [thisYear + 1, today.en], 
+            [thisYear + 2, today.en], [thisYear + 3, today.en]];
+        yearNames = [];
+        years.forEach(function(yrObj, idx) {
+            var dLocal = { yy : yrObj[0], mm : 0, dd : 1, en : yrObj[1] },
+                dInternal = clone(dLocal);
+            cal.fromCalendarDate(dInternal);
+            var d = new Date(dInternal.yy, dInternal.mm, dInternal.dd),
+                yrStr = fmt.format(d);
+            yearNames.push(yrStr);
+            var li = _ele("yr-" + idx);
+            _setText(li.firstChild, yrStr);
+            if (idx === currYear) {
+                li.className = "active";
+                _setText("selected-yr", yrStr);
+            }
+        });
+    };
+    
+    makeYearList();
+    
+    _setText("selected-locale", localeName);
+    _setText("selected-nu", getNumSysName());
+    _setText("selected-ca", getCalendarName());
+    
+    makeCalendar();
+    
+    menu = _ele("locale-choice");
+    allLocales.sort();
+    menu.innerHTML = "";
+    allLocales.forEach(function(loc) {
+        var localeName = _loc.options(loc).n, li = document.createElement("li"), 
+            link = document.createElement("a");
+        link.href = "#";
+        link.appendChild(document.createTextNode(localeName));
+        li.id = "loc-" + loc;
+        if (loc === currLocale) {
+            li.className = "active";
+        }
+        li.appendChild(link);
+        _evt.clear(li);
+        _evt.register(li, "click", function(evt, eType, eSrc, eReg) {
+            var menu = _ele("locale-choice");
+            _cList.get("loc-" + currLocale).remove("active");
+            if (_u.featureSupport.storage.local || _fixed._storage.localStorage) {
+                localStorage.setItem("calendar-locale", loc);
+            }
+            _cList.get("loc-" + loc).add("active");
+            _setText("selected-locale", localeName);
+            currLocale = loc;
+            _cList.get(menu.parentNode).remove("open");
+            _loc.current = currLocale;
+            defOptions = _loc.dateOptions(loc);
+            // Update the numbering system and calendar displays
+            _setText("selected-nu", getNumSysName());
+            _setText("selected-ca", getCalendarName());
+            // Regenerate the years
+            makeYearList();
+            // Draw the calendar
+            makeCalendar();
+            return false;
+        });
+        menu.appendChild(li);
+    });
+    
+    allNumSys.sort();
+    allNumSys.unshift("");
+    menu = _ele("nu-choice");
+    menu.innerHTML = "";
+    allNumSys.forEach(function(nSys) {
+        var sysName = nSysNames[nSys], li = document.createElement("li"), 
+            link = document.createElement("a"), idBase = nSys || "def";
+        link.href = "#";
+        link.appendChild(document.createTextNode(sysName));
+        
+        li.id = "nu-" + idBase;
+        if (nSys === nSystem) {
+            li.className = "active";
+        }
+        li.appendChild(link);
+        _evt.clear(li);
+        _evt.register(li, "click", function(evt, eType, eSrc, eReg) {
+            var menu = _ele("nu-choice");
+            var _idBase = nSystem || "def";
+            _cList.get("nu-" + _idBase).remove("active");
+            if (_u.featureSupport.storage.local || _fixed._storage.localStorage) {
+                localStorage.setItem("calendar-nu", nSys);
+            }
+            _cList.get("nu-" + idBase).add("active");
+            nSystem = nSys;
+            _setText("selected-nu", getNumSysName());
+            _cList.get(menu.parentNode).remove("open");
+            // Regenerate the years
+            makeYearList();
+            // Redraw the calendar
+            makeCalendar();
+            return false;
+        });
+        menu.appendChild(li);
+    });
+    
+    allCalendars.unshift("");
+    menu = _ele("ca-choice");
+    menu.innerHTML = "";
+    allCalendars.forEach(function(cal) {        
+        var calName = calNames[cal], li = document.createElement("li"), 
+            link = document.createElement("a"), idBase = cal || "def";
+        link.href = "#";
+        link.appendChild(document.createTextNode(calName));
+        
+        li.id = "ca-" + idBase;
+        if (cal === calendar) {
+            li.className = "active";
+        }
+        li.appendChild(link);
+        _evt.clear(li);
+        _evt.register(li, "click", function(evt, eType, eSrc, eReg) {
+            var menu = _ele("ca-choice");
+            var _idBase = calendar || "def";
+            _cList.get("ca-" + _idBase).remove("active");
+            if (_u.featureSupport.storage.local || _fixed._storage.localStorage) {
+                localStorage.setItem("calendar-ca", cal);
+            }
+            _cList.get("ca-" + idBase).add("active");
+            calendar = cal;
+            _setText("selected-ca", getCalendarName());
+            _cList.get(menu.parentNode).remove("open");
+            // Regenerate the years
+            makeYearList();
+            // Redraw the calendar
+            makeCalendar();
+            return false;
+        });
+        menu.appendChild(li);
+    });
+    
+    // Self-update when the day changes
+    var now = new Date(), 
+        tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, now.getMilliseconds());
+    setTimeout(onload, tomorrow.getTime() - now.getTime());
+};
+
+        </script>
+    </body>
+</html>
