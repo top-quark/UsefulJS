@@ -251,7 +251,7 @@ UsefulJS.Number = (function() {
     // The numeric value of the '0' character
     var _zero = '0'.charCodeAt(0),
     // For suppressing -0
-        _likeZero = /^0(?:\.0*)$/;
+        _likeZero = /^0(?:\.0*)?$/;
     
     // Numerically increments a string
     var _incStr = function(s, pos) {
@@ -1735,7 +1735,7 @@ UsefulJS.Number = (function() {
              *  needed (e.g. when dealing with monetary values; defaults to 0
              */
             _toFixed : function(maxFd, minFd) {
-                var _u = UsefulJS, _N = _u.Number, ret;
+                var _u = UsefulJS, _N = _u.Number;
                 // Handle crappy inputs; sometimes the temptation to just
                 // raise exceptions with obscene error messages is strong
                 if (!isFinite(this)) {
