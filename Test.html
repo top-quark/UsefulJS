@@ -2947,6 +2947,14 @@ if (fixed._number._toFixed) {
     expected = "2.3";
     doTest('(2.25)._toFixed(1) === "' + expected + '"',
         testVal, testVal === expected);
+        
+    testInput = -0.4;
+    p1 = 0;
+    testVal = testInput._toFixed(p1);
+    expected = "0";
+    doTest('(' + testInput + ')._toFixed(' + p1 + ') === "' + expected + '"',
+        testVal, testVal === expected);        
+
 
     testVal = (-1.25e-21)._toFixed(22);
     expected = "-0.0000000000000000000013";
